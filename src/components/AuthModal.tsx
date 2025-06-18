@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, CreditCard, Globe, Shield, Star } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CheckCircle, CreditCard, Globe, Shield, Star, Eye, EyeOff } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 
 interface AuthModalProps {
@@ -28,12 +28,49 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
     country: ''
   });
   const [showPayment, setShowPayment] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const { toast } = useToast();
+
+  const countries = [
+    "Afghanistan", "Afrique du Sud", "Albanie", "Algérie", "Allemagne", "Andorre", "Angola", "Antigua-et-Barbuda", "Arabie saoudite", "Argentine", "Arménie", "Australie", "Autriche", "Azerbaïdjan",
+    "Bahamas", "Bahreïn", "Bangladesh", "Barbade", "Belgique", "Belize", "Bénin", "Bhoutan", "Biélorussie", "Birmanie", "Bolivie", "Bosnie-Herzégovine", "Botswana", "Brésil", "Brunei", "Bulgarie", "Burkina Faso", "Burundi",
+    "Cambodge", "Cameroun", "Canada", "Cap-Vert", "Chili", "Chine", "Chypre", "Colombie", "Comores", "Congo", "République démocratique du Congo", "Corée du Nord", "Corée du Sud", "Costa Rica", "Côte d'Ivoire", "Croatie", "Cuba",
+    "Danemark", "Djibouti", "République dominicaine", "Dominique",
+    "Égypte", "Émirats arabes unis", "Équateur", "Érythrée", "Espagne", "Estonie", "Eswatini", "États-Unis", "Éthiopie",
+    "Fidji", "Finlande", "France",
+    "Gabon", "Gambie", "Géorgie", "Ghana", "Grèce", "Grenade", "Guatemala", "Guinée", "Guinée-Bissau", "Guinée équatoriale", "Guyana",
+    "Haïti", "Honduras", "Hongrie",
+    "Îles Cook", "Îles Marshall", "Inde", "Indonésie", "Irak", "Iran", "Irlande", "Islande", "Israël", "Italie",
+    "Jamaïque", "Japon", "Jordanie",
+    "Kazakhstan", "Kenya", "Kirghizistan", "Kiribati", "Koweït",
+    "Laos", "Lesotho", "Lettonie", "Liban", "Liberia", "Libye", "Liechtenstein", "Lituanie", "Luxembourg",
+    "Macédoine du Nord", "Madagascar", "Malaisie", "Malawi", "Maldives", "Mali", "Malte", "Maroc", "Maurice", "Mauritanie", "Mexique", "Micronésie", "Moldavie", "Monaco", "Mongolie", "Monténégro", "Mozambique",
+    "Namibie", "Nauru", "Népal", "Nicaragua", "Niger", "Nigeria", "Niue", "Norvège", "Nouvelle-Zélande",
+    "Oman", "Ouganda", "Ouzbékistan",
+    "Pakistan", "Palaos", "Palestine", "Panama", "Papouasie-Nouvelle-Guinée", "Paraguay", "Pays-Bas", "Pérou", "Philippines", "Pologne", "Portugal",
+    "Qatar",
+    "Roumanie", "Royaume-Uni", "Russie", "Rwanda",
+    "Saint-Christophe-et-Niévès", "Sainte-Lucie", "Saint-Marin", "Saint-Vincent-et-les-Grenadines", "Salomon", "Salvador", "Samoa", "São Tomé-et-Principe", "Sénégal", "Serbie", "Seychelles", "Sierra Leone", "Singapour", "Slovaquie", "Slovénie", "Somalie", "Soudan", "Soudan du Sud", "Sri Lanka", "Suède", "Suisse", "Suriname", "Syrie",
+    "Tadjikistan", "Tanzanie", "Tchad", "République tchèque", "Thaïlande", "Timor oriental", "Togo", "Tonga", "Trinité-et-Tobago", "Tunisie", "Turkménistan", "Turquie", "Tuvalu",
+    "Ukraine", "Uruguay",
+    "Vanuatu", "Vatican", "Venezuela", "Vietnam",
+    "Yémen",
+    "Zambie", "Zimbabwe"
+  ];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
+    });
+  };
+
+  const handleCountryChange = (value: string) => {
+    setFormData({
+      ...formData,
+      country: value
     });
   };
 
@@ -215,13 +252,12 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="profession" className="text-sm">Profession</Label>
+                <Label htmlFor="profession" className="text-sm">Profession <span className="text-gray-500">(facultatif)</span></Label>
                 <Input
                   id="profession"
                   name="profession"
                   value={formData.profession}
                   onChange={handleInputChange}
-                  required
                   placeholder="Ex: Développeur, Designer..."
                   className="border-gray-300 focus:border-gray-900 h-10 text-sm"
                 />
@@ -229,41 +265,70 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
 
               <div className="space-y-2">
                 <Label htmlFor="country" className="text-sm">Pays</Label>
-                <Input
-                  id="country"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="Votre pays"
-                  className="border-gray-300 focus:border-gray-900 h-10 text-sm"
-                />
+                <Select onValueChange={handleCountryChange} required>
+                  <SelectTrigger className="border-gray-300 focus:border-gray-900 h-10 text-sm">
+                    <SelectValue placeholder="Sélectionnez votre pays" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {countries.map((country) => (
+                      <SelectItem key={country} value={country} className="text-sm">
+                        {country}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm">Mot de passe</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required
-                  className="border-gray-300 focus:border-gray-900 h-10 text-sm"
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                    className="border-gray-300 focus:border-gray-900 h-10 text-sm pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-sm">Confirmer le mot de passe</Label>
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  required
-                  className="border-gray-300 focus:border-gray-900 h-10 text-sm"
-                />
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    required
+                    className="border-gray-300 focus:border-gray-900 h-10 text-sm pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -295,15 +360,28 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
 
               <div className="space-y-2">
                 <Label htmlFor="loginPassword" className="text-sm">Mot de passe</Label>
-                <Input
-                  id="loginPassword"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  required
-                  className="border-gray-300 focus:border-gray-900 h-10 text-sm"
-                />
+                <div className="relative">
+                  <Input
+                    id="loginPassword"
+                    name="password"
+                    type={showLoginPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    required
+                    className="border-gray-300 focus:border-gray-900 h-10 text-sm pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowLoginPassword(!showLoginPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3"
+                  >
+                    {showLoginPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <Button type="submit" className="w-full bg-gray-900 hover:bg-gray-800 text-white h-11 text-sm font-semibold">
