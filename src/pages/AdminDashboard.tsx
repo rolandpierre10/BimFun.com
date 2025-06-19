@@ -15,7 +15,6 @@ import {
   Ban,
   CheckCircle,
   Search,
-  Filter,
   Eye,
   Trash2
 } from 'lucide-react';
@@ -109,20 +108,48 @@ const AdminDashboard = () => {
 
   const loadStats = async () => {
     try {
-      const { data, error } = await supabase.rpc('get_admin_dashboard_stats');
-      if (error) throw error;
-      setStats(data);
+      // Try to get stats from the RPC function first
+      const { data: rpcData, error: rpcError } = await supabase.rpc('get_admin_dashboard_stats');
+      
+      if (rpcError) {
+        console.error('RPC Error:', rpcError);
+        // Fallback to manual stats gathering
+        await loadStatsFallback();
+        return;
+      }
+
+      // Parse the JSON response from the RPC function
+      const parsedStats = typeof rpcData === 'string' ? JSON.parse(rpcData) : rpcData;
+      setStats(parsedStats);
     } catch (error) {
       console.error('Error loading stats:', error);
-      // Fallback to manual stats gathering
-      const usersCount = await supabase.from('profiles').select('id', { count: 'exact' });
-      const pubsCount = await supabase.from('publications').select('id', { count: 'exact' });
-      const subsCount = await supabase.from('subscribers').select('id', { count: 'exact' }).eq('subscribed', true);
-      
+      await loadStatsFallback();
+    }
+  };
+
+  const loadStatsFallback = async () => {
+    try {
+      const [usersCount, pubsCount, subsCount, reportsCount] = await Promise.all([
+        supabase.from('profiles').select('id', { count: 'exact' }),
+        supabase.from('publications').select('id', { count: 'exact' }),
+        supabase.from('subscribers').select('id', { count: 'exact' }).eq('subscribed', true),
+        supabase.from('reports').select('id', { count: 'exact' }).eq('status', 'pending')
+      ]);
+
       setStats({
         total_users: usersCount.count || 0,
         total_publications: pubsCount.count || 0,
         total_subscribers: subsCount.count || 0,
+        active_users_today: 0,
+        total_reports: reportsCount.count || 0,
+        revenue_this_month: 0
+      });
+    } catch (error) {
+      console.error('Error in fallback stats:', error);
+      setStats({
+        total_users: 0,
+        total_publications: 0,
+        total_subscribers: 0,
         active_users_today: 0,
         total_reports: 0,
         revenue_this_month: 0
@@ -140,26 +167,37 @@ const AdminDashboard = () => {
           username,
           created_at,
           posts_count,
-          followers_count,
-          user_roles (role),
-          subscribers (subscribed, subscription_tier)
+          followers_count
         `)
         .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;
       
-      const formattedUsers = data?.map(user => ({
-        id: user.id,
-        full_name: user.full_name || 'N/A',
-        username: user.username || 'N/A',
-        created_at: user.created_at,
-        posts_count: user.posts_count || 0,
-        followers_count: user.followers_count || 0,
-        role: (user.user_roles as any)?.[0]?.role || 'user',
-        subscribed: (user.subscribers as any)?.[0]?.subscribed || false,
-        subscription_tier: (user.subscribers as any)?.[0]?.subscription_tier || 'free'
-      })) || [];
+      // Get user roles and subscriptions separately
+      const userIds = data?.map(u => u.id) || [];
+      
+      const [rolesData, subscriptionsData] = await Promise.all([
+        supabase.from('user_roles').select('user_id, role').in('user_id', userIds),
+        supabase.from('subscribers').select('user_id, subscribed, subscription_tier').in('user_id', userIds)
+      ]);
+
+      const formattedUsers = data?.map(user => {
+        const userRole = rolesData.data?.find(r => r.user_id === user.id);
+        const userSub = subscriptionsData.data?.find(s => s.user_id === user.id);
+        
+        return {
+          id: user.id,
+          full_name: user.full_name || 'N/A',
+          username: user.username || 'N/A',
+          created_at: user.created_at,
+          posts_count: user.posts_count || 0,
+          followers_count: user.followers_count || 0,
+          role: userRole?.role || 'user',
+          subscribed: userSub?.subscribed || false,
+          subscription_tier: userSub?.subscription_tier || 'free'
+        };
+      }) || [];
 
       setUsers(formattedUsers);
     } catch (error) {
@@ -178,13 +216,26 @@ const AdminDashboard = () => {
           is_public,
           likes_count,
           views_count,
-          profiles (full_name, username)
+          user_id
         `)
         .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;
-      setPublications(data || []);
+
+      // Get user profiles for publications
+      const userIds = data?.map(p => p.user_id) || [];
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, full_name, username')
+        .in('id', userIds);
+
+      const formattedPubs = data?.map(pub => ({
+        ...pub,
+        profiles: profilesData?.find(p => p.id === pub.user_id)
+      })) || [];
+
+      setPublications(formattedPubs);
     } catch (error) {
       console.error('Error loading publications:', error);
     }
@@ -200,13 +251,26 @@ const AdminDashboard = () => {
           status,
           description,
           created_at,
-          profiles!reports_reporter_id_fkey (full_name, username)
+          reporter_id
         `)
         .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;
-      setReports(data || []);
+
+      // Get reporter profiles
+      const reporterIds = data?.map(r => r.reporter_id).filter(Boolean) || [];
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, full_name, username')
+        .in('id', reporterIds);
+
+      const formattedReports = data?.map(report => ({
+        ...report,
+        profiles: profilesData?.find(p => p.id === report.reporter_id)
+      })) || [];
+
+      setReports(formattedReports);
     } catch (error) {
       console.error('Error loading reports:', error);
     }
@@ -214,14 +278,19 @@ const AdminDashboard = () => {
 
   const handleUserAction = async (userId: string, action: 'ban' | 'unban' | 'warn') => {
     try {
+      // Map the action to the correct enum values from the database
+      let dbAction = action;
+      if (action === 'ban') dbAction = 'account_ban';
+      if (action === 'warn') dbAction = 'warning';
+      
       const { error } = await supabase
         .from('moderation_actions')
-        .insert([{
+        .insert({
           moderator_id: user?.id,
           target_user_id: userId,
-          action_type: action,
+          action_type: dbAction,
           reason: `Action ${action} effectuée par l'administrateur`
-        }]);
+        });
 
       if (error) throw error;
 

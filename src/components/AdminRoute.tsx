@@ -3,13 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
+import { Navigate } from 'react-router-dom';
 
 interface AdminRouteProps {
   children: React.ReactNode;
 }
 
 const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
@@ -19,6 +20,10 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
   }, [user]);
 
   const checkAdminAccess = async () => {
+    if (authLoading) {
+      return; // Wait for auth to load
+    }
+
     if (!user) {
       setIsAdmin(false);
       setLoading(false);
@@ -26,14 +31,27 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     }
 
     try {
+      console.log('Checking admin access for user:', user.id);
+      
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
         .eq('role', 'admin')
-        .single();
+        .maybeSingle(); // Use maybeSingle instead of single to avoid errors
 
-      if (error || !data) {
+      console.log('Admin check result:', { data, error });
+
+      if (error) {
+        console.error('Error checking admin access:', error);
+        setIsAdmin(false);
+        toast({
+          title: "Erreur",
+          description: "Erreur lors de la vérification des droits d'accès",
+          variant: "destructive",
+        });
+      } else if (!data) {
+        console.log('User is not admin');
         setIsAdmin(false);
         toast({
           title: "Accès refusé",
@@ -41,17 +59,24 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
           variant: "destructive",
         });
       } else {
+        console.log('User is admin');
         setIsAdmin(true);
       }
     } catch (error) {
-      console.error('Error checking admin access:', error);
+      console.error('Exception while checking admin access:', error);
       setIsAdmin(false);
+      toast({
+        title: "Erreur",
+        description: "Erreur lors de la vérification des droits d'accès",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
+  // Show loading spinner while checking auth or admin status
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -62,7 +87,13 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     );
   }
 
-  if (!isAdmin) {
+  // Redirect to home if not authenticated
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Show access denied if not admin
+  if (isAdmin === false) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto">
@@ -86,6 +117,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     );
   }
 
+  // Render admin content if user is admin
   return <>{children}</>;
 };
 
