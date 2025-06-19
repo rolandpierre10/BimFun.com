@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from 'react-router-dom';
 
 interface AuthModalProps {
   mode: 'login' | 'signup';
@@ -18,6 +19,7 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,14 +32,24 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
           title: "Connexion réussie",
           description: "Vous êtes maintenant connecté à BimFun",
         });
+        onClose();
       } else {
         await signUp(email, password);
         toast({
           title: "Inscription réussie",
-          description: "Vérifiez votre email pour confirmer votre compte",
+          description: "Redirection vers le paiement...",
         });
+        onClose();
+        // Rediriger vers la page avec le composant de paiement
+        navigate('/#subscription');
+        // Scroll vers la section abonnement après un court délai
+        setTimeout(() => {
+          const subscriptionElement = document.getElementById('subscription');
+          if (subscriptionElement) {
+            subscriptionElement.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
       }
-      onClose();
     } catch (error: any) {
       toast({
         title: "Erreur",

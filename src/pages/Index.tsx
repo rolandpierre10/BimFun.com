@@ -86,17 +86,20 @@ const Index = () => {
             </div>
           </section>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Sidebar avec abonnement */}
-            <div className="lg:col-span-1 space-y-4">
-              {user && <SubscriptionButton />}
-            </div>
+          {/* Section Abonnement - visible après inscription */}
+          <section id="subscription" className="mb-16">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Sidebar avec abonnement */}
+              <div className="lg:col-span-1 space-y-4">
+                {user && <SubscriptionButton />}
+              </div>
 
-            {/* Zone principale avec le feed public */}
-            <div className="lg:col-span-3">
-              <PublicFeed />
+              {/* Zone principale avec le feed public */}
+              <div className="lg:col-span-3">
+                <PublicFeed />
+              </div>
             </div>
-          </div>
+          </section>
         </div>
       </div>
 

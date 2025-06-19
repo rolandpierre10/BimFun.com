@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Home } from 'lucide-react';
+import { CheckCircle, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSubscription } from '@/hooks/useSubscription';
 
@@ -39,11 +39,11 @@ const Success = () => {
             Vous avez maintenant accès à toutes les fonctionnalités premium.
           </p>
           <Button 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/dashboard')}
             className="w-full mt-6"
           >
-            <Home className="h-4 w-4 mr-2" />
-            Retour à l'accueil
+            <User className="h-4 w-4 mr-2" />
+            Accéder à mon profil
           </Button>
         </CardContent>
       </Card>
