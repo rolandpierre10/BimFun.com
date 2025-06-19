@@ -15,7 +15,12 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <p className="text-gray-300">BimFun</p>
             <p className="text-gray-300">Montréal, QC, Canada</p>
-            <p className="text-gray-300">support@bimfun.com</p>
+            <a 
+              href="mailto:support@bimfun.com" 
+              className="text-gray-300 hover:text-white transition-colors"
+            >
+              support@bimfun.com
+            </a>
           </div>
 
           {/* Liens légaux */}
