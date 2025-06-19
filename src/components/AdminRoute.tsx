@@ -38,7 +38,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
         .select('role')
         .eq('user_id', user.id)
         .eq('role', 'admin')
-        .maybeSingle(); // Use maybeSingle instead of single to avoid errors
+        .maybeSingle();
 
       console.log('Admin check result:', { data, error });
 
@@ -51,16 +51,15 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
           variant: "destructive",
         });
       } else if (!data) {
-        console.log('User is not admin - creating admin role for testing');
+        console.log('User is not admin - attempting to create admin role');
         
-        // For testing purposes, automatically create admin role for the current user
+        // Tenter de créer le rôle admin pour l'utilisateur actuel
         const { error: insertError } = await supabase
           .from('user_roles')
           .insert({
             user_id: user.id,
             role: 'admin',
-            assigned_by: user.id,
-            assigned_at: new Date().toISOString()
+            assigned_by: user.id
           });
 
         if (insertError) {
