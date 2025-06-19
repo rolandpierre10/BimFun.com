@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
-import { TrendingUp, Users, FileText, AlertTriangle, Settings } from 'lucide-react';
+import { TrendingUp, Users, FileText, AlertTriangle, Settings, Plus } from 'lucide-react';
 
 // Import des nouveaux composants
 import AdminStats from '@/components/admin/AdminStats';
@@ -10,6 +10,7 @@ import UsersManagement from '@/components/admin/UsersManagement';
 import PublicationsManagement from '@/components/admin/PublicationsManagement';
 import ReportsManagement from '@/components/admin/ReportsManagement';
 import SystemSettings from '@/components/admin/SystemSettings';
+import AdminPublicationCreator from '@/components/admin/AdminPublicationCreator';
 
 interface AdminStats {
   total_users: number;
@@ -328,6 +329,7 @@ const AdminDashboard = () => {
             { id: 'overview', label: 'Vue d\'ensemble', icon: TrendingUp },
             { id: 'users', label: 'Utilisateurs', icon: Users },
             { id: 'publications', label: 'Publications', icon: FileText },
+            { id: 'create-publication', label: 'Créer Publication', icon: Plus },
             { id: 'reports', label: 'Signalements', icon: AlertTriangle },
             { id: 'settings', label: 'Paramètres', icon: Settings }
           ].map(tab => (
@@ -362,6 +364,15 @@ const AdminDashboard = () => {
             publications={publications} 
             onDeletePublication={handleDeletePublication} 
             onRefresh={loadPublications}
+          />
+        )}
+        
+        {activeTab === 'create-publication' && (
+          <AdminPublicationCreator 
+            onPublicationCreated={() => {
+              loadPublications();
+              loadStats();
+            }}
           />
         )}
         
