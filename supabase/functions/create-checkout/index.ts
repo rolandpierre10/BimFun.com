@@ -58,7 +58,7 @@ serve(async (req) => {
               name: "BimFun Premium - Abonnement Mensuel",
               description: "Accès complet à toutes les fonctionnalités premium"
             },
-            unit_amount: 1000, // 10.00$ en centimes
+            unit_amount: 1000, // 10.00$ USD en centimes
             recurring: { interval: "month" },
           },
           quantity: 1,
