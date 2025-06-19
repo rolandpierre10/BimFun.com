@@ -33,6 +33,7 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
           description: "Vous êtes maintenant connecté à BimFun",
         });
         onClose();
+        // Rester sur la page actuelle après connexion
       } else {
         await signUp(email, password);
         toast({
@@ -40,9 +41,7 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
           description: "Redirection vers le paiement...",
         });
         onClose();
-        // Rediriger vers la page avec le composant de paiement
-        navigate('/#subscription');
-        // Scroll vers la section abonnement après un court délai
+        // Scroll vers la section abonnement après inscription
         setTimeout(() => {
           const subscriptionElement = document.getElementById('subscription');
           if (subscriptionElement) {
@@ -71,7 +70,7 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
           <CardDescription>
             {mode === 'login' 
               ? 'Connectez-vous à votre compte BimFun'
-              : 'Créez votre compte BimFun pour 10$/mois'
+              : 'Créez votre compte BimFun pour 10€/mois'
             }
           </CardDescription>
         </CardHeader>
