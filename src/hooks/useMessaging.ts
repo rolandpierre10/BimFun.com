@@ -49,7 +49,7 @@ export const useMessaging = () => {
 
       if (error) throw error;
 
-      setMessages(prev => [...prev, data]);
+      setMessages(prev => [...prev, data as Message]);
       return data;
     } catch (error) {
       console.error('Error sending message:', error);
@@ -101,7 +101,7 @@ export const useMessaging = () => {
 
       if (error) throw error;
 
-      setMessages(prev => [...prev, data]);
+      setMessages(prev => [...prev, data as Message]);
       toast({
         title: 'Succès',
         description: 'Fichier envoyé avec succès'
@@ -129,7 +129,7 @@ export const useMessaging = () => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages(data);
+      setMessages(data as Message[]);
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
