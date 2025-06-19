@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle, Video, Phone, Send, VideoOff, Image } from 'lucide-react';
 import { useMessaging } from '@/hooks/useMessaging';
+import { useWebRTCCall } from '@/hooks/useWebRTCCall';
 import VoiceRecorder from './VoiceRecorder';
+import VideoCallInterface from './VideoCallInterface';
 import { supabase } from '@/integrations/supabase/client';
 
 interface MessagingInterfaceProps {
@@ -17,8 +19,6 @@ interface MessagingInterfaceProps {
 const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfaceProps) => {
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [isVideoCall, setIsVideoCall] = useState(false);
-  const [isAudioCall, setIsAudioCall] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   
   const { 
@@ -28,6 +28,8 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
     uploadMediaMessage,
     subscribeToMessages 
   } = useMessaging();
+
+  const { callState, startCall } = useWebRTCCall(currentUser?.id || '');
 
   useEffect(() => {
     const getUser = async () => {
@@ -65,13 +67,15 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
   };
 
   const startVideoCall = () => {
-    setIsVideoCall(!isVideoCall);
-    console.log('Appel vidéo:', !isVideoCall ? 'démarré' : 'terminé');
+    if (userId && currentUser) {
+      startCall(userId, userName, 'video');
+    }
   };
 
   const startAudioCall = () => {
-    setIsAudioCall(!isAudioCall);
-    console.log('Appel audio:', !isAudioCall ? 'démarré' : 'terminé');
+    if (userId && currentUser) {
+      startCall(userId, userName, 'audio');
+    }
   };
 
   const renderMessage = (msg: any) => {
@@ -131,6 +135,11 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
     );
   };
 
+  // Afficher l'interface d'appel si un appel est en cours
+  if (callState.isInCall || callState.isInitiating || callState.isRinging) {
+    return <VideoCallInterface currentUserId={currentUser?.id || ''} onCallEnd={onClose} />;
+  }
+
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader className="bg-gray-900 text-white rounded-t-lg">
@@ -142,17 +151,19 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
           <div className="flex gap-2">
             <Button
               size="sm"
-              variant={isAudioCall ? "destructive" : "secondary"}
+              variant="secondary"
               onClick={startAudioCall}
+              title="Appel audio"
             >
               <Phone className="h-4 w-4" />
             </Button>
             <Button
               size="sm"
-              variant={isVideoCall ? "destructive" : "secondary"}
+              variant="secondary"
               onClick={startVideoCall}
+              title="Appel vidéo"
             >
-              {isVideoCall ? <VideoOff className="h-4 w-4" /> : <Video className="h-4 w-4" />}
+              <Video className="h-4 w-4" />
             </Button>
             {onClose && (
               <Button size="sm" variant="outline" onClick={onClose}>
@@ -168,24 +179,6 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
         <div className="h-96 overflow-y-auto p-4 bg-gray-50">
           {messages.map(renderMessage)}
         </div>
-
-        {/* Interface d'appel vidéo/audio */}
-        {(isVideoCall || isAudioCall) && (
-          <div className="p-4 bg-gray-900 text-white text-center">
-            <p className="mb-2">
-              {isVideoCall ? 'Appel vidéo' : 'Appel audio'} en cours avec {userName}...
-            </p>
-            <div className="flex justify-center gap-2">
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={isVideoCall ? startVideoCall : startAudioCall}
-              >
-                Raccrocher
-              </Button>
-            </div>
-          </div>
-        )}
 
         {/* Zone de saisie */}
         <div className="p-4 border-t">
