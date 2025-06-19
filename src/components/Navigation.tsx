@@ -11,6 +11,14 @@ interface NavigationProps {
 const Navigation = ({ onOpenAuth }: NavigationProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -29,13 +37,22 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              <button className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">
+              <button 
+                onClick={() => scrollToSection('features')}
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
+              >
                 Fonctionnalités
               </button>
-              <button className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">
+              <button 
+                onClick={() => scrollToSection('pricing')}
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
+              >
                 Tarifs
               </button>
-              <button className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">
+              <button 
+                onClick={() => scrollToSection('about')}
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
+              >
                 À propos
               </button>
             </div>
@@ -82,13 +99,22 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <button className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium w-full text-left">
+            <button 
+              onClick={() => scrollToSection('features')}
+              className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium w-full text-left"
+            >
               Fonctionnalités
             </button>
-            <button className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium w-full text-left">
+            <button 
+              onClick={() => scrollToSection('pricing')}
+              className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium w-full text-left"
+            >
               Tarifs
             </button>
-            <button className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium w-full text-left">
+            <button 
+              onClick={() => scrollToSection('about')}
+              className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium w-full text-left"
+            >
               À propos
             </button>
             <div className="pt-4 pb-3 border-t border-gray-200">
