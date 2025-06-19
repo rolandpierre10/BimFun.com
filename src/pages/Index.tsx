@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Button } from "@/components/ui/button";
 import PublicFeed from '@/components/PublicFeed';
 import SubscriptionButton from '@/components/SubscriptionButton';
 import Navigation from '@/components/Navigation';
