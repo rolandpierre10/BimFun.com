@@ -71,7 +71,6 @@ const SubscriptionButton = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="text-2xl font-bold text-blue-900">10€/mois</div>
         <ul className="space-y-1 text-sm text-blue-700">
           <li className="flex items-center gap-2">
             <Check className="h-4 w-4" />

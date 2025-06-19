@@ -38,7 +38,7 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
         await signUp(email, password);
         toast({
           title: "Inscription réussie",
-          description: "Redirection vers le paiement...",
+          description: "Redirection vers l'abonnement...",
         });
         onClose();
         // Scroll vers la section abonnement après inscription
@@ -70,7 +70,7 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
           <CardDescription>
             {mode === 'login' 
               ? 'Connectez-vous à votre compte BimFun'
-              : 'Créez votre compte BimFun pour 10€/mois'
+              : 'Créez votre compte BimFun'
             }
           </CardDescription>
         </CardHeader>

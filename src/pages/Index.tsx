@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
@@ -59,10 +58,9 @@ const Index = () => {
 
           {/* Section Tarifs */}
           <section id="pricing" className="mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Tarifs</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Abonnement</h2>
             <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
-              <h3 className="text-2xl font-bold mb-4">Plan Professionnel</h3>
-              <div className="text-4xl font-bold text-gray-900 mb-2">10$<span className="text-lg text-gray-600">/mois</span></div>
+              <h3 className="text-2xl font-bold mb-4">BimFun Premium</h3>
               <p className="text-gray-600 mb-6">Accès complet à toutes les fonctionnalités</p>
               <Button 
                 className="w-full bg-gray-900 hover:bg-gray-800 text-white"
