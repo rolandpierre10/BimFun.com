@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import PublicationCard from './PublicationCard';
 import { Publication } from '@/hooks/usePublications';
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Image, Users, Camera } from 'lucide-react';
 
 const PublicFeed = () => {
   const [refreshing, setRefreshing] = useState(false);
@@ -189,9 +189,62 @@ const PublicFeed = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">Aucune publication disponible</p>
-          <p className="text-gray-400 mt-2">Soyez le premier à publier du contenu !</p>
+        <div className="text-center py-16 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl">
+          {/* Images grid */}
+          <div className="grid grid-cols-3 gap-4 mb-8 max-w-md mx-auto">
+            <div className="aspect-square rounded-lg overflow-hidden shadow-lg transform rotate-3 hover:rotate-6 transition-transform duration-300">
+              <img 
+                src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=300&h=300&fit=crop&crop=faces" 
+                alt="Créatrice au travail"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="aspect-square rounded-lg overflow-hidden shadow-lg transform -rotate-2 hover:rotate-1 transition-transform duration-300">
+              <img 
+                src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=300&h=300&fit=crop&crop=center" 
+                alt="Technologie créative"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="aspect-square rounded-lg overflow-hidden shadow-lg transform rotate-1 hover:-rotate-2 transition-transform duration-300">
+              <img 
+                src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=300&h=300&fit=crop&crop=faces" 
+                alt="Collaboration créative"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          {/* Icon and text content */}
+          <div className="mb-6">
+            <div className="flex justify-center mb-4">
+              <div className="bg-white rounded-full p-4 shadow-lg">
+                <Camera className="h-8 w-8 text-blue-600" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+              Aucune publication disponible
+            </h3>
+            <p className="text-gray-600 text-lg mb-4">
+              Soyez le premier à partager votre créativité !
+            </p>
+          </div>
+
+          {/* Feature highlights */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto mb-8">
+            <div className="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm">
+              <Image className="h-6 w-6 text-blue-600 mb-2" />
+              <span className="text-sm font-medium text-gray-700">Photos & Vidéos</span>
+            </div>
+            <div className="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm">
+              <Users className="h-6 w-6 text-green-600 mb-2" />
+              <span className="text-sm font-medium text-gray-700">Communauté</span>
+            </div>
+            <div className="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm">
+              <Camera className="h-6 w-6 text-purple-600 mb-2" />
+              <span className="text-sm font-medium text-gray-700">Créativité</span>
+            </div>
+          </div>
         </div>
       )}
     </div>
