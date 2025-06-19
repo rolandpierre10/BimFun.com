@@ -122,8 +122,11 @@ export const usePublications = (userId?: string) => {
           .delete()
           .eq('id', existing.id);
 
-        // Decrement likes count
-        await supabase.rpc('decrement_publication_likes', { publication_id: publicationId });
+        // Decrement likes count manually
+        await supabase
+          .from('publications')
+          .update({ likes_count: Math.max(0, (publications?.find(p => p.id === publicationId)?.likes_count || 1) - 1) })
+          .eq('id', publicationId);
       } else {
         // Like
         await supabase
@@ -134,8 +137,11 @@ export const usePublications = (userId?: string) => {
             interaction_type: 'like'
           }]);
 
-        // Increment likes count
-        await supabase.rpc('increment_publication_likes', { publication_id: publicationId });
+        // Increment likes count manually
+        await supabase
+          .from('publications')
+          .update({ likes_count: (publications?.find(p => p.id === publicationId)?.likes_count || 0) + 1 })
+          .eq('id', publicationId);
       }
     },
     onSuccess: () => {
