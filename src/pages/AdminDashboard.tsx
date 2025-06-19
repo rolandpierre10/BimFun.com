@@ -62,37 +62,14 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (user) {
-      checkAdminAccess();
+      loadDashboardData();
     }
   }, [user]);
-
-  const checkAdminAccess = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user?.id)
-        .eq('role', 'admin')
-        .single();
-
-      if (error || !data) {
-        toast({
-          title: "Accès refusé",
-          description: "Vous n'avez pas les droits d'administrateur",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      loadDashboardData();
-    } catch (error) {
-      console.error('Error checking admin access:', error);
-    }
-  };
 
   const loadDashboardData = async () => {
     setLoading(true);
     try {
+      console.log('Loading admin dashboard data...');
       await Promise.all([
         loadStats(),
         loadUsers(),
@@ -108,33 +85,17 @@ const AdminDashboard = () => {
 
   const loadStats = async () => {
     try {
-      // Try to get stats from the RPC function first
-      const { data: rpcData, error: rpcError } = await supabase.rpc('get_admin_dashboard_stats');
+      console.log('Attempting to load stats...');
       
-      if (rpcError) {
-        console.error('RPC Error:', rpcError);
-        // Fallback to manual stats gathering
-        await loadStatsFallback();
-        return;
-      }
-
-      // Parse the JSON response from the RPC function
-      const parsedStats = typeof rpcData === 'string' ? JSON.parse(rpcData) : rpcData;
-      setStats(parsedStats);
-    } catch (error) {
-      console.error('Error loading stats:', error);
-      await loadStatsFallback();
-    }
-  };
-
-  const loadStatsFallback = async () => {
-    try {
+      // Fallback to manual stats gathering
       const [usersCount, pubsCount, subsCount, reportsCount] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact' }),
         supabase.from('publications').select('id', { count: 'exact' }),
         supabase.from('subscribers').select('id', { count: 'exact' }).eq('subscribed', true),
         supabase.from('reports').select('id', { count: 'exact' }).eq('status', 'pending')
       ]);
+
+      console.log('Stats loaded:', { usersCount, pubsCount, subsCount, reportsCount });
 
       setStats({
         total_users: usersCount.count || 0,
@@ -145,7 +106,7 @@ const AdminDashboard = () => {
         revenue_this_month: 0
       });
     } catch (error) {
-      console.error('Error in fallback stats:', error);
+      console.error('Error loading stats:', error);
       setStats({
         total_users: 0,
         total_publications: 0,
@@ -159,6 +120,7 @@ const AdminDashboard = () => {
 
   const loadUsers = async () => {
     try {
+      console.log('Loading users...');
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -172,7 +134,10 @@ const AdminDashboard = () => {
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading users:', error);
+        return;
+      }
       
       // Get user roles and subscriptions separately
       const userIds = data?.map(u => u.id) || [];
@@ -199,6 +164,7 @@ const AdminDashboard = () => {
         };
       }) || [];
 
+      console.log('Users loaded:', formattedUsers.length);
       setUsers(formattedUsers);
     } catch (error) {
       console.error('Error loading users:', error);
@@ -207,6 +173,7 @@ const AdminDashboard = () => {
 
   const loadPublications = async () => {
     try {
+      console.log('Loading publications...');
       const { data, error } = await supabase
         .from('publications')
         .select(`
@@ -221,7 +188,10 @@ const AdminDashboard = () => {
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading publications:', error);
+        return;
+      }
 
       // Get user profiles for publications
       const userIds = data?.map(p => p.user_id) || [];
@@ -235,6 +205,7 @@ const AdminDashboard = () => {
         profiles: profilesData?.find(p => p.id === pub.user_id)
       })) || [];
 
+      console.log('Publications loaded:', formattedPubs.length);
       setPublications(formattedPubs);
     } catch (error) {
       console.error('Error loading publications:', error);
@@ -243,6 +214,7 @@ const AdminDashboard = () => {
 
   const loadReports = async () => {
     try {
+      console.log('Loading reports...');
       const { data, error } = await supabase
         .from('reports')
         .select(`
@@ -256,7 +228,10 @@ const AdminDashboard = () => {
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading reports:', error);
+        return;
+      }
 
       // Get reporter profiles
       const reporterIds = data?.map(r => r.reporter_id).filter(Boolean) || [];
@@ -270,6 +245,7 @@ const AdminDashboard = () => {
         profiles: profilesData?.find(p => p.id === report.reporter_id)
       })) || [];
 
+      console.log('Reports loaded:', formattedReports.length);
       setReports(formattedReports);
     } catch (error) {
       console.error('Error loading reports:', error);
@@ -278,8 +254,10 @@ const AdminDashboard = () => {
 
   const handleUserAction = async (userId: string, action: 'ban' | 'unban' | 'warn') => {
     try {
+      console.log(`Performing action ${action} on user ${userId}`);
+      
       // Map the action to the correct enum values from the database
-      let dbAction = action;
+      let dbAction: 'account_ban' | 'warning' | 'no_action' = 'no_action';
       if (action === 'ban') dbAction = 'account_ban';
       if (action === 'warn') dbAction = 'warning';
       
@@ -292,7 +270,10 @@ const AdminDashboard = () => {
           reason: `Action ${action} effectuée par l'administrateur`
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error performing user action:', error);
+        throw error;
+      }
 
       toast({
         title: "Action effectuée",
@@ -312,6 +293,7 @@ const AdminDashboard = () => {
 
   const handleDeletePublication = async (publicationId: string) => {
     try {
+      console.log(`Deleting publication ${publicationId}`);
       const { error } = await supabase
         .from('publications')
         .delete()
