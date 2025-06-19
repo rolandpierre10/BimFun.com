@@ -1,9 +1,28 @@
 
 
+
 -- Supprimer les politiques RLS existantes sur user_roles si elles existent
 DROP POLICY IF EXISTS "Users can view their own roles" ON public.user_roles;
 DROP POLICY IF EXISTS "Admins can manage all roles" ON public.user_roles;
 DROP POLICY IF EXISTS "Allow self admin assignment" ON public.user_roles;
+
+-- Désactiver temporairement RLS pour permettre la création du premier admin
+ALTER TABLE public.user_roles DISABLE ROW LEVEL SECURITY;
+
+-- Insérer le premier admin si aucun n'existe
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM public.user_roles WHERE role = 'admin') THEN
+    INSERT INTO public.user_roles (user_id, role, assigned_by)
+    SELECT id, 'admin', id 
+    FROM auth.users 
+    ORDER BY created_at ASC 
+    LIMIT 1;
+  END IF;
+END $$;
+
+-- Réactiver RLS
+ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
 
 -- Créer une fonction de sécurité pour éviter la récursion
 CREATE OR REPLACE FUNCTION public.get_user_role_direct(user_uuid uuid)
@@ -39,4 +58,5 @@ WITH CHECK (
     WHERE role = 'admin'
   )
 );
+
 
