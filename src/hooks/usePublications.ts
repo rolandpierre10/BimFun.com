@@ -24,14 +24,14 @@ export const usePublications = (userId?: string) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch publications
+  // Fetch publications - maintenant toujours publiques
   const { data: publications, isLoading } = useQuery({
     queryKey: ['publications', userId],
     queryFn: async () => {
       let query = supabase
         .from('publications')
         .select('*')
-        .eq('is_public', true)
+        .eq('is_public', true) // Toujours publique
         .order('created_at', { ascending: false });
 
       if (userId) {
@@ -44,12 +44,15 @@ export const usePublications = (userId?: string) => {
     },
   });
 
-  // Create publication
+  // Create publication - toujours publique par défaut
   const createPublication = useMutation({
     mutationFn: async (publication: Omit<Publication, 'id' | 'created_at' | 'updated_at' | 'likes_count' | 'views_count' | 'comments_count'>) => {
       const { data, error } = await supabase
         .from('publications')
-        .insert([publication])
+        .insert([{
+          ...publication,
+          is_public: true // Force toujours publique
+        }])
         .select()
         .single();
 
@@ -58,9 +61,10 @@ export const usePublications = (userId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['publications'] });
+      queryClient.invalidateQueries({ queryKey: ['public-publications'] });
       toast({
         title: "Publication créée",
-        description: "Votre contenu a été publié avec succès",
+        description: "Votre contenu a été publié publiquement avec succès",
       });
     },
     onError: (error) => {
@@ -107,7 +111,7 @@ export const usePublications = (userId?: string) => {
       if (!user.user) throw new Error('Not authenticated');
 
       // Check if already liked
-      const { data: existing } = await supabase
+      const { data: existingLike } = await supabase
         .from('publication_interactions')
         .select('id')
         .eq('user_id', user.user.id)
@@ -115,12 +119,12 @@ export const usePublications = (userId?: string) => {
         .eq('interaction_type', 'like')
         .single();
 
-      if (existing) {
+      if (existingLike) {
         // Unlike
         await supabase
           .from('publication_interactions')
           .delete()
-          .eq('id', existing.id);
+          .eq('id', existingLike.id);
 
         // Decrement likes count manually
         await supabase
@@ -128,6 +132,14 @@ export const usePublications = (userId?: string) => {
           .update({ likes_count: Math.max(0, (publications?.find(p => p.id === publicationId)?.likes_count || 1) - 1) })
           .eq('id', publicationId);
       } else {
+        // Remove any existing dislike first
+        await supabase
+          .from('publication_interactions')
+          .delete()
+          .eq('user_id', user.user.id)
+          .eq('publication_id', publicationId)
+          .eq('interaction_type', 'dislike');
+
         // Like
         await supabase
           .from('publication_interactions')
@@ -146,6 +158,67 @@ export const usePublications = (userId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['publications'] });
+      queryClient.invalidateQueries({ queryKey: ['public-publications'] });
+    },
+  });
+
+  // Dislike publication
+  const dislikePublication = useMutation({
+    mutationFn: async (publicationId: string) => {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error('Not authenticated');
+
+      // Check if already disliked
+      const { data: existingDislike } = await supabase
+        .from('publication_interactions')
+        .select('id')
+        .eq('user_id', user.user.id)
+        .eq('publication_id', publicationId)
+        .eq('interaction_type', 'dislike')
+        .single();
+
+      if (existingDislike) {
+        // Remove dislike
+        await supabase
+          .from('publication_interactions')
+          .delete()
+          .eq('id', existingDislike.id);
+      } else {
+        // Remove any existing like first
+        const { data: existingLike } = await supabase
+          .from('publication_interactions')
+          .select('id')
+          .eq('user_id', user.user.id)
+          .eq('publication_id', publicationId)
+          .eq('interaction_type', 'like')
+          .single();
+
+        if (existingLike) {
+          await supabase
+            .from('publication_interactions')
+            .delete()
+            .eq('id', existingLike.id);
+
+          // Decrement likes count
+          await supabase
+            .from('publications')
+            .update({ likes_count: Math.max(0, (publications?.find(p => p.id === publicationId)?.likes_count || 1) - 1) })
+            .eq('id', publicationId);
+        }
+
+        // Dislike
+        await supabase
+          .from('publication_interactions')
+          .insert([{
+            user_id: user.user.id,
+            publication_id: publicationId,
+            interaction_type: 'dislike'
+          }]);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['publications'] });
+      queryClient.invalidateQueries({ queryKey: ['public-publications'] });
     },
   });
 
@@ -155,5 +228,6 @@ export const usePublications = (userId?: string) => {
     createPublication,
     uploadMedia,
     likePublication,
+    dislikePublication,
   };
 };

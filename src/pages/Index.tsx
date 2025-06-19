@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Globe, Users, MessageCircle, Video, Music, Camera, Heart, Share2, CheckCircle, Star } from 'lucide-react';
+import { Globe, Users, MessageCircle, Video, Music, Camera, CheckCircle, Star } from 'lucide-react';
 import AuthModal from '@/components/AuthModal';
 import Navigation from '@/components/Navigation';
 import UserProfile from '@/components/UserProfile';
+import PublicFeed from '@/components/PublicFeed';
 
 const Index = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -141,9 +141,16 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Feed Public des Publications */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <PublicFeed />
+        </div>
+      </section>
+
       {/* Affichage conditionnel du profil utilisateur */}
       {showUserProfile && (
-        <section className="py-20 px-4 bg-white">
+        <section className="py-20 px-4 bg-gray-50">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -161,7 +168,7 @@ const Index = () => {
       )}
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-white">
+      <section id="features" className="py-20 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
