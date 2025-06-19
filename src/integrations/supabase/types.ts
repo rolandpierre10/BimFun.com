@@ -689,6 +689,10 @@ export type Database = {
         Args: { user_id: string }
         Returns: string
       }
+      get_user_role_direct: {
+        Args: { user_uuid: string }
+        Returns: string
+      }
     }
     Enums: {
       moderation_action:

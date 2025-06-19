@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,47 +32,10 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     try {
       console.log('Checking admin access for user:', user.id);
       
-      // D'abord vérifier s'il existe déjà des admins
-      const { data: existingAdmins, error: checkError } = await supabase
-        .from('user_roles')
-        .select('id')
-        .eq('role', 'admin')
-        .limit(1);
-
-      console.log('Existing admins check:', { existingAdmins, checkError });
-
-      // Si aucun admin n'existe, créer un admin pour cet utilisateur
-      if (!checkError && (!existingAdmins || existingAdmins.length === 0)) {
-        console.log('No admin exists, creating admin role for current user');
-        const { error: createError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: user.id,
-            role: 'admin',
-            assigned_by: user.id
-          });
-
-        if (createError) {
-          console.error('Error creating admin role:', createError);
-        } else {
-          console.log('Admin role created successfully');
-          setIsAdmin(true);
-          toast({
-            title: "Accès accordé",
-            description: "Vous êtes maintenant administrateur",
-          });
-          setLoading(false);
-          return;
-        }
-      }
-
-      // Vérifier si l'utilisateur a le rôle admin
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
+      // Utiliser la nouvelle fonction sécurisée pour vérifier les droits admin
+      const { data, error } = await supabase.rpc('get_user_role_direct', {
+        user_uuid: user.id
+      });
 
       console.log('Admin check result:', { data, error });
 
@@ -85,7 +47,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
           description: "Erreur lors de la vérification des droits d'accès",
           variant: "destructive",
         });
-      } else if (data) {
+      } else if (data === 'admin') {
         console.log('User is admin');
         setIsAdmin(true);
       } else {
