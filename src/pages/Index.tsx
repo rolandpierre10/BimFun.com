@@ -7,10 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Globe, Users, MessageCircle, Video, Music, Camera, Heart, Share2, CheckCircle, Star } from 'lucide-react';
 import AuthModal from '@/components/AuthModal';
 import Navigation from '@/components/Navigation';
+import UserProfile from '@/components/UserProfile';
 
 const Index = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
+  const [showUserProfile, setShowUserProfile] = useState(false);
 
   const openAuth = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
@@ -61,6 +63,17 @@ const Index = () => {
     "Gestion d'abonnés"
   ];
 
+  // Exemple d'utilisateur pour la démo
+  const demoUser = {
+    id: '1',
+    name: 'Marie Dubois',
+    profession: 'Designer UX/UI',
+    location: 'Paris, France',
+    joinDate: 'janvier 2024',
+    bio: 'Passionnée par le design d\'expérience utilisateur, j\'aide les entreprises à créer des interfaces intuitives. Spécialisée dans le design mobile et les applications web modernes.',
+    avatar: undefined
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 text-gray-900">
       <Navigation onOpenAuth={openAuth} />
@@ -99,6 +112,14 @@ const Index = () => {
             >
               Se connecter
             </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-4 text-lg transition-all duration-300"
+              onClick={() => setShowUserProfile(true)}
+            >
+              Voir Profil Démo
+            </Button>
           </div>
 
           <div className="flex justify-center items-center gap-8 text-gray-500">
@@ -119,6 +140,25 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Affichage conditionnel du profil utilisateur */}
+      {showUserProfile && (
+        <section className="py-20 px-4 bg-white">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Démonstration - Profil Utilisateur avec Messagerie
+              </h2>
+              <p className="text-gray-600">
+                Découvrez comment les utilisateurs peuvent communiquer via messages texte, vocal et vidéo
+              </p>
+            </div>
+            <div className="flex justify-center">
+              <UserProfile user={demoUser} onClose={() => setShowUserProfile(false)} />
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Features Section */}
       <section id="features" className="py-20 px-4 bg-white">
