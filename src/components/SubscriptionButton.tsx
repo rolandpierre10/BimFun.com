@@ -15,6 +15,19 @@ const SubscriptionButton = () => {
     openCustomerPortal 
   } = useSubscription();
 
+  const handleSubscribe = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout');
+      
+      if (error) throw error;
+      
+      // Rediriger dans la même fenêtre au lieu d'ouvrir un nouvel onglet
+      window.location.href = data.url;
+    } catch (error) {
+      console.error('Error creating checkout:', error);
+    }
+  };
+
   if (subscribed) {
     return (
       <Card className="border-green-200 bg-green-50">
@@ -73,7 +86,7 @@ const SubscriptionButton = () => {
           </li>
         </ul>
         <Button 
-          onClick={createCheckout}
+          onClick={handleSubscribe}
           disabled={loading}
           className="w-full bg-blue-600 hover:bg-blue-700"
         >
