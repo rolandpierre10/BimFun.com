@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,7 +80,7 @@ const Index = () => {
           
           <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
             Le réseau social professionnel multilingue qui connecte le monde entier. 
-            Partagez, échangez et grandissez professionnellement.
+            Partagez, échangez et grandissez professionnellement. Publiez vos annonces.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
