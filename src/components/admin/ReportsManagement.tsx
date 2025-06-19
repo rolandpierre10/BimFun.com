@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,6 +41,15 @@ const ReportsManagement: React.FC<ReportsManagementProps> = ({ reports, onRefres
   const handleReportAction = async (reportId: string, action: 'resolved' | 'dismissed') => {
     setLoading(reportId);
     try {
+      // D'abord, obtenir les détails du rapport pour avoir le target_user_id
+      const { data: reportData, error: fetchError } = await supabase
+        .from('reports')
+        .select('reported_user_id')
+        .eq('id', reportId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
       const { error } = await supabase
         .from('reports')
         .update({ 
@@ -52,15 +60,18 @@ const ReportsManagement: React.FC<ReportsManagementProps> = ({ reports, onRefres
 
       if (error) throw error;
 
-      // Créer une action de modération
-      await supabase
-        .from('moderation_actions')
-        .insert({
-          moderator_id: user?.id,
-          report_id: reportId,
-          action_type: action === 'resolved' ? 'content_removal' : 'no_action',
-          reason: `Rapport ${action === 'resolved' ? 'résolu' : 'rejeté'}`,
-        });
+      // Créer une action de modération avec le target_user_id
+      if (reportData?.reported_user_id) {
+        await supabase
+          .from('moderation_actions')
+          .insert({
+            moderator_id: user?.id,
+            target_user_id: reportData.reported_user_id,
+            report_id: reportId,
+            action_type: action === 'resolved' ? 'content_removal' : 'no_action',
+            reason: `Rapport ${action === 'resolved' ? 'résolu' : 'rejeté'}`,
+          });
+      }
 
       toast({
         title: "Action effectuée",

@@ -19,13 +19,18 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
     setIsMobileMenuOpen(false);
   };
 
+  const navigateToPage = (path: string) => {
+    window.location.href = path;
+    setIsMobileMenuOpen(false);
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
+            <div className="flex-shrink-0 flex items-center cursor-pointer" onClick={() => navigateToPage('/')}>
               <Globe className="h-8 w-8 text-gray-900 mr-2" />
               <span className="text-2xl font-bold text-gray-900">BimFun</span>
               <Badge variant="outline" className="ml-2 text-xs border-gray-400 text-gray-600">
@@ -54,6 +59,12 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                 className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
               >
                 À propos
+              </button>
+              <button 
+                onClick={() => navigateToPage('/contact')}
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                Contact
               </button>
             </div>
           </div>
@@ -117,6 +128,12 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             >
               À propos
             </button>
+            <button 
+              onClick={() => navigateToPage('/contact')}
+              className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium w-full text-left"
+            >
+              Contact
+            </button>
             <div className="pt-4 pb-3 border-t border-gray-200">
               <div className="flex flex-col space-y-3 px-3">
                 <Button 
@@ -143,6 +160,27 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
           </div>
         </div>
       )}
+
+      {/* Footer avec liens légaux */}
+      <div className="hidden md:block absolute bottom-0 left-0 right-0 bg-gray-50 border-t border-gray-200 py-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-center space-x-6 text-sm text-gray-500">
+            <button 
+              onClick={() => navigateToPage('/mentions-legales')}
+              className="hover:text-gray-700 transition-colors"
+            >
+              Mentions légales
+            </button>
+            <button 
+              onClick={() => navigateToPage('/politique-cookies')}
+              className="hover:text-gray-700 transition-colors"
+            >
+              Politique de cookies
+            </button>
+            <span>© 2024 BimFun - Tous droits réservés</span>
+          </div>
+        </div>
+      </div>
     </nav>
   );
 };
