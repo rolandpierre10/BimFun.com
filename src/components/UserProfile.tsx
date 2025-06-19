@@ -23,7 +23,13 @@ const UserProfile = ({ user, onClose }: UserProfileProps) => {
   const [showMessaging, setShowMessaging] = useState(false);
 
   if (showMessaging) {
-    return <MessagingInterface userName={user.name} onClose={() => setShowMessaging(false)} />;
+    return (
+      <MessagingInterface 
+        userName={user.name} 
+        userId={user.id}
+        onClose={() => setShowMessaging(false)} 
+      />
+    );
   }
 
   return (

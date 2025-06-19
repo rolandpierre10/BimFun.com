@@ -1,43 +1,67 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, Mic, Video, Phone, Send, MicOff, VideoOff } from 'lucide-react';
+import { MessageCircle, Video, Phone, Send, VideoOff, Image } from 'lucide-react';
+import { useMessaging } from '@/hooks/useMessaging';
+import VoiceRecorder from './VoiceRecorder';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MessagingInterfaceProps {
   userName: string;
+  userId?: string;
   onClose?: () => void;
 }
 
-const MessagingInterface = ({ userName, onClose }: MessagingInterfaceProps) => {
+const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfaceProps) => {
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isVideoCall, setIsVideoCall] = useState(false);
   const [isAudioCall, setIsAudioCall] = useState(false);
-  const [messages, setMessages] = useState([
-    { id: 1, text: `Bonjour ! Comment allez-vous ?`, sender: userName, time: '10:30' },
-    { id: 2, text: `Salut ${userName} ! Ça va bien, merci. Et vous ?`, sender: 'Vous', time: '10:32' }
-  ]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  
+  const { 
+    messages, 
+    isLoading, 
+    sendTextMessage, 
+    uploadMediaMessage,
+    subscribeToMessages 
+  } = useMessaging();
 
-  const sendMessage = () => {
-    if (message.trim()) {
-      const newMessage = {
-        id: messages.length + 1,
-        text: message,
-        sender: 'Vous',
-        time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-      };
-      setMessages([...messages, newMessage]);
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
+      
+      if (user) {
+        const unsubscribe = subscribeToMessages(user.id);
+        return unsubscribe;
+      }
+    };
+    
+    getUser();
+  }, []);
+
+  const sendMessage = async () => {
+    if (message.trim() && userId) {
+      await sendTextMessage(userId, message);
       setMessage('');
     }
   };
 
-  const startVoiceRecording = () => {
-    setIsRecording(!isRecording);
-    // Logique d'enregistrement vocal à implémenter
-    console.log('Enregistrement vocal:', !isRecording ? 'démarré' : 'arrêté');
+  const handleVoiceMessage = async (audioBlob: Blob, duration: number) => {
+    if (userId) {
+      const audioFile = new File([audioBlob], 'voice-message.wav', { type: 'audio/wav' });
+      await uploadMediaMessage(userId, audioFile, 'voice', duration);
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && userId) {
+      await uploadMediaMessage(userId, file, 'image');
+    }
   };
 
   const startVideoCall = () => {
@@ -48,6 +72,63 @@ const MessagingInterface = ({ userName, onClose }: MessagingInterfaceProps) => {
   const startAudioCall = () => {
     setIsAudioCall(!isAudioCall);
     console.log('Appel audio:', !isAudioCall ? 'démarré' : 'terminé');
+  };
+
+  const renderMessage = (msg: any) => {
+    const isOwn = msg.sender_id === currentUser?.id;
+    
+    return (
+      <div
+        key={msg.id}
+        className={`mb-4 flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+      >
+        <div
+          className={`max-w-xs p-3 rounded-lg ${
+            isOwn
+              ? 'bg-gray-900 text-white'
+              : 'bg-white border border-gray-200'
+          }`}
+        >
+          {msg.message_type === 'text' && (
+            <p className="text-sm">{msg.content}</p>
+          )}
+          
+          {msg.message_type === 'voice' && (
+            <div className="space-y-2">
+              <audio controls className="w-full">
+                <source src={msg.media_url} type="audio/wav" />
+              </audio>
+              {msg.duration_seconds && (
+                <span className="text-xs opacity-70">
+                  {Math.floor(msg.duration_seconds / 60)}:{(msg.duration_seconds % 60).toString().padStart(2, '0')}
+                </span>
+              )}
+            </div>
+          )}
+          
+          {msg.message_type === 'image' && (
+            <img 
+              src={msg.media_url} 
+              alt="Image partagée" 
+              className="max-w-full h-auto rounded"
+            />
+          )}
+          
+          {msg.message_type === 'video' && (
+            <video controls className="max-w-full h-auto rounded">
+              <source src={msg.media_url} type="video/mp4" />
+            </video>
+          )}
+          
+          <span className="text-xs opacity-70 mt-1 block">
+            {new Date(msg.created_at).toLocaleTimeString('fr-FR', { 
+              hour: '2-digit', 
+              minute: '2-digit' 
+            })}
+          </span>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -85,23 +166,7 @@ const MessagingInterface = ({ userName, onClose }: MessagingInterfaceProps) => {
       <CardContent className="p-0">
         {/* Zone des messages */}
         <div className="h-96 overflow-y-auto p-4 bg-gray-50">
-          {messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={`mb-4 flex ${msg.sender === 'Vous' ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-xs p-3 rounded-lg ${
-                  msg.sender === 'Vous'
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white border border-gray-200'
-                }`}
-              >
-                <p className="text-sm">{msg.text}</p>
-                <span className="text-xs opacity-70 mt-1 block">{msg.time}</span>
-              </div>
-            </div>
-          ))}
+          {messages.map(renderMessage)}
         </div>
 
         {/* Interface d'appel vidéo/audio */}
@@ -140,23 +205,35 @@ const MessagingInterface = ({ userName, onClose }: MessagingInterfaceProps) => {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Button
-                size="sm"
-                variant={isRecording ? "destructive" : "outline"}
-                onClick={startVoiceRecording}
+              <VoiceRecorder
+                onSendVoiceMessage={handleVoiceMessage}
+                isRecording={isRecording}
+                onRecordingStateChange={setIsRecording}
+              />
+              
+              <label className="cursor-pointer">
+                <Button size="sm" variant="outline" asChild>
+                  <span>
+                    <Image className="h-4 w-4" />
+                  </span>
+                </Button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </label>
+              
+              <Button 
+                size="sm" 
+                onClick={sendMessage}
+                disabled={isLoading || !message.trim()}
               >
-                {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              </Button>
-              <Button size="sm" onClick={sendMessage}>
                 <Send className="h-4 w-4" />
               </Button>
             </div>
           </div>
-          {isRecording && (
-            <p className="text-sm text-red-600 mt-2 text-center">
-              🔴 Enregistrement en cours...
-            </p>
-          )}
         </div>
       </CardContent>
     </Card>

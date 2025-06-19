@@ -180,6 +180,8 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string | null
+          duration_seconds: number | null
+          file_size: number | null
           id: string
           is_read: boolean | null
           media_url: string | null
@@ -190,6 +192,8 @@ export type Database = {
         Insert: {
           content?: string | null
           created_at?: string | null
+          duration_seconds?: number | null
+          file_size?: number | null
           id?: string
           is_read?: boolean | null
           media_url?: string | null
@@ -200,6 +204,8 @@ export type Database = {
         Update: {
           content?: string | null
           created_at?: string | null
+          duration_seconds?: number | null
+          file_size?: number | null
           id?: string
           is_read?: boolean | null
           media_url?: string | null
