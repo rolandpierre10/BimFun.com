@@ -414,6 +414,134 @@ export type Database = {
         }
         Relationships: []
       }
+      publication_comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          likes_count: number | null
+          parent_comment_id: string | null
+          publication_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          parent_comment_id?: string | null
+          publication_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          parent_comment_id?: string | null
+          publication_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publication_comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "publication_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "publication_comments_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publication_interactions: {
+        Row: {
+          created_at: string | null
+          id: string
+          interaction_type: string
+          publication_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          interaction_type: string
+          publication_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          interaction_type?: string
+          publication_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "publication_interactions_publication_id_fkey"
+            columns: ["publication_id"]
+            isOneToOne: false
+            referencedRelation: "publications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      publications: {
+        Row: {
+          comments_count: number | null
+          content_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_public: boolean | null
+          likes_count: number | null
+          media_urls: Json | null
+          tags: Json | null
+          title: string
+          updated_at: string | null
+          user_id: string
+          views_count: number | null
+        }
+        Insert: {
+          comments_count?: number | null
+          content_type: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          likes_count?: number | null
+          media_urls?: Json | null
+          tags?: Json | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+          views_count?: number | null
+        }
+        Update: {
+          comments_count?: number | null
+          content_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          likes_count?: number | null
+          media_urls?: Json | null
+          tags?: Json | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+          views_count?: number | null
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth_key: string
