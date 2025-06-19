@@ -122,7 +122,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-white">
+      <section id="features" className="py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
@@ -154,7 +154,7 @@ const Index = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+      <section id="pricing" className="py-20 px-4 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -203,6 +203,68 @@ const Index = () => {
               </p>
             </CardContent>
           </Card>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              À Propos de BimFun
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              BimFun révolutionne le networking professionnel en connectant les talents du monde entier, 
+              sans barrières linguistiques ni géographiques.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Notre Mission</h3>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                Créer une plateforme où chaque professionnel, peu importe sa langue ou sa localisation, 
+                peut partager son expertise, développer son réseau et faire progresser sa carrière.
+              </p>
+              <div className="grid grid-cols-2 gap-6 mt-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-gray-900 mb-2">195+</div>
+                  <div className="text-gray-600">Pays supportés</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-gray-900 mb-2">7000+</div>
+                  <div className="text-gray-600">Langues intégrées</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Pourquoi BimFun ?</h3>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Plateforme Mondiale</h4>
+                    <p className="text-gray-600">Accès à un réseau professionnel international</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Sans Barrières</h4>
+                    <p className="text-gray-600">Communication fluide dans toutes les langues</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Contenu Riche</h4>
+                    <p className="text-gray-600">Partagez tous types de contenus professionnels</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
