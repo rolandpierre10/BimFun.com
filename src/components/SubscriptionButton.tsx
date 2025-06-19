@@ -22,8 +22,8 @@ const SubscriptionButton = () => {
       
       if (error) throw error;
       
-      // Rediriger dans la même fenêtre au lieu d'ouvrir un nouvel onglet
-      window.location.href = data.url;
+      // Ouvrir Stripe checkout dans un nouvel onglet pour une meilleure performance
+      window.open(data.url, '_blank');
     } catch (error) {
       console.error('Error creating checkout:', error);
     }
