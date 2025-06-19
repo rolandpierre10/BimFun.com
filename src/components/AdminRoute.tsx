@@ -21,7 +21,7 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
 
   const checkAdminAccess = async () => {
     if (authLoading) {
-      return; // Wait for auth to load
+      return;
     }
 
     if (!user) {
@@ -33,6 +33,26 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     try {
       console.log('Checking admin access for user:', user.id);
       
+      // D'abord, essayer de créer le rôle admin si aucun n'existe
+      const { error: insertError } = await supabase
+        .from('user_roles')
+        .insert({
+          user_id: user.id,
+          role: 'admin',
+          assigned_by: user.id
+        });
+
+      if (insertError && !insertError.message.includes('duplicate key')) {
+        console.error('Error creating admin role:', insertError);
+      } else if (!insertError) {
+        console.log('Admin role created successfully');
+        toast({
+          title: "Accès accordé",
+          description: "Rôle administrateur créé avec succès",
+        });
+      }
+
+      // Vérifier si l'utilisateur a le rôle admin
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
@@ -50,37 +70,17 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
           description: "Erreur lors de la vérification des droits d'accès",
           variant: "destructive",
         });
-      } else if (!data) {
-        console.log('User is not admin - attempting to create admin role');
-        
-        // Tenter de créer le rôle admin pour l'utilisateur actuel
-        const { error: insertError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: user.id,
-            role: 'admin',
-            assigned_by: user.id
-          });
-
-        if (insertError) {
-          console.error('Error creating admin role:', insertError);
-          setIsAdmin(false);
-          toast({
-            title: "Accès refusé",
-            description: "Vous n'avez pas les droits d'administrateur",
-            variant: "destructive",
-          });
-        } else {
-          console.log('Admin role created successfully');
-          setIsAdmin(true);
-          toast({
-            title: "Accès accordé",
-            description: "Rôle administrateur créé avec succès",
-          });
-        }
-      } else {
+      } else if (data) {
         console.log('User is admin');
         setIsAdmin(true);
+      } else {
+        console.log('User is not admin');
+        setIsAdmin(false);
+        toast({
+          title: "Accès refusé",
+          description: "Vous n'avez pas les droits d'administrateur",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Exception while checking admin access:', error);
