@@ -160,27 +160,6 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
           </div>
         </div>
       )}
-
-      {/* Footer avec liens légaux */}
-      <div className="hidden md:block absolute bottom-0 left-0 right-0 bg-gray-50 border-t border-gray-200 py-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center space-x-6 text-sm text-gray-500">
-            <button 
-              onClick={() => navigateToPage('/mentions-legales')}
-              className="hover:text-gray-700 transition-colors"
-            >
-              Mentions légales
-            </button>
-            <button 
-              onClick={() => navigateToPage('/politique-cookies')}
-              className="hover:text-gray-700 transition-colors"
-            >
-              Politique de cookies
-            </button>
-            <span>© 2024 BimFun - Tous droits réservés</span>
-          </div>
-        </div>
-      </div>
     </nav>
   );
 };
