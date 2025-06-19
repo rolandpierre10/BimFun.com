@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -32,6 +33,40 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
     try {
       console.log('Checking admin access for user:', user.id);
       
+      // D'abord vérifier s'il existe déjà des admins
+      const { data: existingAdmins, error: checkError } = await supabase
+        .from('user_roles')
+        .select('id')
+        .eq('role', 'admin')
+        .limit(1);
+
+      console.log('Existing admins check:', { existingAdmins, checkError });
+
+      // Si aucun admin n'existe, créer un admin pour cet utilisateur
+      if (!checkError && (!existingAdmins || existingAdmins.length === 0)) {
+        console.log('No admin exists, creating admin role for current user');
+        const { error: createError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: user.id,
+            role: 'admin',
+            assigned_by: user.id
+          });
+
+        if (createError) {
+          console.error('Error creating admin role:', createError);
+        } else {
+          console.log('Admin role created successfully');
+          setIsAdmin(true);
+          toast({
+            title: "Accès accordé",
+            description: "Vous êtes maintenant administrateur",
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
       // Vérifier si l'utilisateur a le rôle admin
       const { data, error } = await supabase
         .from('user_roles')
@@ -54,12 +89,12 @@ const AdminRoute: React.FC<AdminRouteProps> = ({ children }) => {
         console.log('User is admin');
         setIsAdmin(true);
       } else {
-        console.log('User is not admin - will be granted admin access');
-        // L'utilisateur sera automatiquement admin grâce à la migration
-        setIsAdmin(true);
+        console.log('User is not admin');
+        setIsAdmin(false);
         toast({
-          title: "Accès accordé",
-          description: "Bienvenue dans l'interface administrateur",
+          title: "Accès refusé",
+          description: "Vous n'avez pas les droits d'administrateur",
+          variant: "destructive",
         });
       }
     } catch (error) {
