@@ -29,15 +29,15 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              <a href="#features" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">
+              <button className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">
                 Fonctionnalités
-              </a>
-              <a href="#pricing" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">
+              </button>
+              <button className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">
                 Tarifs
-              </a>
-              <a href="#about" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">
+              </button>
+              <button className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium transition-colors">
                 À propos
-              </a>
+              </button>
             </div>
           </div>
 
@@ -82,15 +82,15 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white border-b border-gray-200">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="#features" className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium">
+            <button className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium w-full text-left">
               Fonctionnalités
-            </a>
-            <a href="#pricing" className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium">
+            </button>
+            <button className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium w-full text-left">
               Tarifs
-            </a>
-            <a href="#about" className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium">
+            </button>
+            <button className="text-gray-600 hover:text-gray-900 block px-3 py-2 text-base font-medium w-full text-left">
               À propos
-            </a>
+            </button>
             <div className="pt-4 pb-3 border-t border-gray-200">
               <div className="flex flex-col space-y-3 px-3">
                 <Button 
