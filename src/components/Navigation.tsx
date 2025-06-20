@@ -10,8 +10,12 @@ interface NavigationProps {
 }
 
 const Navigation = ({ onOpenAuth }: NavigationProps) => {
+  console.log('Navigation component is rendering');
   const { user, logout, userRole } = useAuth();
   const navigate = useNavigate();
+
+  console.log('User state in Navigation:', user);
+  console.log('UserRole in Navigation:', userRole);
 
   const handleLogout = async () => {
     await logout();
@@ -19,7 +23,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50">
+    <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50" style={{ minHeight: '70px' }}>
       <div className="max-w-6xl mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}

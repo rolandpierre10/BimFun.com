@@ -12,6 +12,7 @@ import InstallPrompt from '@/components/InstallPrompt';
 import DemoInteractions from '@/components/DemoInteractions';
 
 const Index = () => {
+  console.log('Index page is rendering');
   const { user } = useAuth();
   const [authModal, setAuthModal] = useState<{ isOpen: boolean; mode: 'login' | 'signup' }>({
     isOpen: false,
@@ -26,12 +27,15 @@ const Index = () => {
     setAuthModal({ isOpen: false, mode: 'login' });
   };
 
+  console.log('About to render Navigation component');
+
   return (
     <div className="min-h-screen bg-gray-50">
       <DemoInteractions />
       <Navigation onOpenAuth={handleOpenAuth} />
       
-      <div className="pt-16">
+      {/* Ajout d'un padding-top plus important pour s'assurer que le contenu ne soit pas caché derrière la navigation fixe */}
+      <div className="pt-20">
         <div className="max-w-6xl mx-auto p-6">
           {/* Header */}
           <div className="text-center mb-8">
