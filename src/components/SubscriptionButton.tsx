@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Crown, Star } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from "@/hooks/use-toast";
 
 const SubscriptionButton = () => {
   const { 
@@ -15,17 +16,46 @@ const SubscriptionButton = () => {
     createCheckout, 
     openCustomerPortal 
   } = useSubscription();
+  const { toast } = useToast();
 
   const handleSubscribe = async () => {
     try {
+      console.log('Subscribe button clicked on mobile/desktop');
+      
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Connexion requise",
+          description: "Veuillez vous connecter pour vous abonner",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log('User authenticated, creating checkout session');
       const { data, error } = await supabase.functions.invoke('create-checkout');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Checkout error:', error);
+        throw error;
+      }
       
-      // Ouvrir Stripe checkout dans un nouvel onglet pour une meilleure performance
-      window.open(data.url, '_blank');
+      console.log('Checkout session created:', data);
+      
+      // Use window.location.href for better mobile compatibility
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
     } catch (error) {
       console.error('Error creating checkout:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer la session de paiement. Veuillez réessayer.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -88,7 +118,8 @@ const SubscriptionButton = () => {
         <Button 
           onClick={handleSubscribe}
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 touch-manipulation"
+          style={{ minHeight: '44px' }} // Ensure minimum touch target size for mobile
         >
           {loading ? "Chargement..." : "S'abonner maintenant"}
         </Button>
