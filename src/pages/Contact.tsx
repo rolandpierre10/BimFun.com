@@ -71,17 +71,6 @@ const Contact = () => {
                     </p>
                   </div>
                 </div>
-
-                <div className="flex items-start space-x-4">
-                  <Clock className="h-6 w-6 text-gray-900 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Heures d'ouverture</h3>
-                    <p className="text-gray-600">
-                      Lundi - Vendredi: 9h00 - 17h00 EST<br />
-                      Support en ligne 24h/24
-                    </p>
-                  </div>
-                </div>
               </CardContent>
             </Card>
 
