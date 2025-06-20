@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import SubscriptionButton from '@/components/SubscriptionButton';
 import Navigation from '@/components/Navigation';
 import AuthModal from '@/components/AuthModal';
 import Footer from '@/components/Footer';
+import InstallPrompt from '@/components/InstallPrompt';
 
 const Index = () => {
   const { user } = useAuth();
@@ -108,6 +108,8 @@ const Index = () => {
       {authModal.isOpen && (
         <AuthModal mode={authModal.mode} onClose={handleCloseAuth} />
       )}
+
+      <InstallPrompt />
     </div>
   );
 };

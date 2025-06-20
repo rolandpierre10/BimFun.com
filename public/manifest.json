@@ -1,0 +1,28 @@
+
+{
+  "name": "BimFun - Plateforme Sociale Créative",
+  "short_name": "BimFun",
+  "description": "La plateforme sociale où les professionnels partagent, découvrent et s'inspirent à travers du contenu créatif du monde entier.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "categories": ["social", "entertainment", "productivity"],
+  "lang": "fr",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/lovable-uploads/d7ef8434-3779-4c4e-8925-e39c07b754f9.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/d7ef8434-3779-4c4e-8925-e39c07b754f9.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
