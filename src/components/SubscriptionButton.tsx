@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Crown, Star } from 'lucide-react';
+import { Check, Crown, Star, Loader2 } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
@@ -17,8 +16,10 @@ const SubscriptionButton = () => {
     openCustomerPortal 
   } = useSubscription();
   const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = React.useState(false);
 
   const handleSubscribe = async () => {
+    setIsProcessing(true);
     try {
       console.log('Subscribe button clicked - starting process');
       
@@ -51,32 +52,9 @@ const SubscriptionButton = () => {
 
       console.log('Redirecting to Stripe checkout:', data.url);
       
-      // Force immediate redirect for better mobile compatibility
-      try {
-        window.location.href = data.url;
-      } catch (redirectError) {
-        console.error('Direct redirect failed, trying window.open:', redirectError);
-        // Fallback to window.open if direct redirect fails
-        const newWindow = window.open(data.url, '_blank');
-        if (!newWindow) {
-          console.error('Window.open blocked, showing manual link');
-          toast({
-            title: "Redirection bloquée",
-            description: "Veuillez cliquer ici pour accéder au paiement",
-            variant: "destructive",
-            action: (
-              <a 
-                href={data.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="bg-blue-600 text-white px-4 py-2 rounded"
-              >
-                Aller au paiement
-              </a>
-            )
-          });
-        }
-      }
+      // Immediate redirect - no fallbacks to keep it simple and fast
+      window.location.href = data.url;
+      
     } catch (error) {
       console.error('Complete error in handleSubscribe:', error);
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
@@ -85,6 +63,8 @@ const SubscriptionButton = () => {
         description: `Impossible de créer la session de paiement: ${errorMessage}`,
         variant: "destructive",
       });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -121,6 +101,9 @@ const SubscriptionButton = () => {
     );
   }
 
+  const buttonDisabled = loading || isProcessing;
+  const buttonText = isProcessing ? "Redirection vers Stripe..." : loading ? "Chargement..." : "S'abonner maintenant";
+
   return (
     <Card className="border-blue-200 bg-blue-50">
       <CardHeader className="pb-3">
@@ -146,11 +129,12 @@ const SubscriptionButton = () => {
         </ul>
         <Button 
           onClick={handleSubscribe}
-          disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition-colors duration-200 touch-manipulation text-base"
-          style={{ minHeight: '48px' }} // Increased touch target for mobile
+          disabled={buttonDisabled}
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-md transition-all duration-200 touch-manipulation text-base flex items-center justify-center gap-2"
+          style={{ minHeight: '48px' }}
         >
-          {loading ? "Redirection..." : "S'abonner maintenant"}
+          {isProcessing && <Loader2 className="h-4 w-4 animate-spin" />}
+          {buttonText}
         </Button>
       </CardContent>
     </Card>
