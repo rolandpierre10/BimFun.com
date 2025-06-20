@@ -34,7 +34,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
               <img 
                 src="/lovable-uploads/d7ef8434-3779-4c4e-8925-e39c07b754f9.png" 
                 alt="BimFun Logo" 
-                className="h-8 w-8 mr-2"
+                className="h-12 w-12 mr-3"
               />
               <span className="text-2xl font-bold text-gray-900">BimFun</span>
               <Badge variant="outline" className="ml-2 text-xs border-gray-400 text-gray-600">
