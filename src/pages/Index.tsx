@@ -35,7 +35,7 @@ const Index = () => {
               Bienvenue sur BimFun
             </h1>
             <p className="text-xl text-gray-600 mb-6">
-              La plateforme sociale pour partager et découvrir du contenu créatif
+              La plateforme sociale où les professionnels partagent, découvrent et s'inspirent à travers du contenu créatif du monde entier.
             </p>
           </div>
 
