@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Menu, X, Globe } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 interface NavigationProps {
   onOpenAuth: (mode: 'login' | 'signup') => void;
@@ -31,7 +31,11 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center cursor-pointer" onClick={() => navigateToPage('/')}>
-              <Globe className="h-8 w-8 text-gray-900 mr-2" />
+              <img 
+                src="/lovable-uploads/d7ef8434-3779-4c4e-8925-e39c07b754f9.png" 
+                alt="BimFun Logo" 
+                className="h-8 w-8 mr-2"
+              />
               <span className="text-2xl font-bold text-gray-900">BimFun</span>
               <Badge variant="outline" className="ml-2 text-xs border-gray-400 text-gray-600">
                 Professionnel
