@@ -22,6 +22,13 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
     navigate('/');
   };
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50" style={{ minHeight: '70px' }}>
       <div className="max-w-6xl mx-auto px-6 py-4">
@@ -35,7 +42,35 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             />
           </Link>
           
-          {/* Menu de navigation */}
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center space-x-6">
+            <button
+              onClick={() => scrollToSection('services')}
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            >
+              Fonctionnalités
+            </button>
+            <button
+              onClick={() => scrollToSection('pricing')}
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            >
+              Tarifs
+            </button>
+            <button
+              onClick={() => scrollToSection('about')}
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            >
+              À propos
+            </button>
+            <Link
+              to="/contact"
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            >
+              Contact
+            </Link>
+          </div>
+          
+          {/* Menu de navigation utilisateur */}
           <div className="flex items-center space-x-4">
             {user ? (
               <>
