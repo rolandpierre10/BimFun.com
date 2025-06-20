@@ -19,18 +19,22 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
-      <div className="max-w-6xl mx-auto px-6 py-3">
+    <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50">
+      <div className="max-w-6xl mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-gray-900">
-            BimFun
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <h1 className="text-3xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
+              BimFun
+            </h1>
           </Link>
           
+          {/* Menu de navigation */}
           <div className="flex items-center space-x-4">
             {user ? (
               <>
                 <Link to="/dashboard">
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                  <Button variant="ghost" size="sm" className="flex items-center space-x-2 hover:bg-blue-50">
                     <MessageCircle className="h-4 w-4" />
                     <span>Dashboard</span>
                   </Button>
@@ -38,7 +42,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
 
                 {userRole === 'admin' && (
                   <Link to="/admin">
-                    <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+                    <Button variant="ghost" size="sm" className="flex items-center space-x-2 hover:bg-blue-50">
                       <Shield className="h-4 w-4" />
                       <span>Admin</span>
                     </Button>
@@ -49,7 +53,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                   variant="ghost"
                   size="sm"
                   onClick={handleLogout}
-                  className="flex items-center space-x-2"
+                  className="flex items-center space-x-2 hover:bg-red-50 hover:text-red-600"
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Déconnexion</span>
@@ -60,12 +64,13 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                 <Button
                   variant="ghost"
                   onClick={() => onOpenAuth('login')}
+                  className="hover:bg-blue-50 hover:text-blue-600"
                 >
                   Connexion
                 </Button>
                 <Button
                   onClick={() => onOpenAuth('signup')}
-                  className="bg-gray-900 hover:bg-gray-800 text-white"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
                 >
                   S'inscrire
                 </Button>
