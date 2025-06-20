@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
@@ -98,6 +97,33 @@ const Index = () => {
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500" />
                       Partage d'images
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Appels vocaux */}
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
+                    <Phone className="h-6 w-6 text-emerald-600" />
+                  </div>
+                  <CardTitle className="text-lg">Appels vocaux</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-center mb-4">Communiquez par la voix avec des appels audio haute qualité.</p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Audio HD cristallin
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Réduction de bruit
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Connexion instantanée
                     </li>
                   </ul>
                 </CardContent>
@@ -206,6 +232,33 @@ const Index = () => {
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500" />
                       Authentification sécurisée
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Messages vocaux */}
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center">
+                    <Mic className="h-6 w-6 text-teal-600" />
+                  </div>
+                  <CardTitle className="text-lg">Messages vocaux</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-center mb-4">Envoyez des messages vocaux expressifs et personnalisés.</p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Enregistrement facile
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Qualité audio optimale
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Lecture instantanée
                     </li>
                   </ul>
                 </CardContent>
