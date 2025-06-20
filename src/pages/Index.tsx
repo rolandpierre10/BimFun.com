@@ -1,6 +1,9 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Check, Crown, Star } from 'lucide-react';
 import PublicFeed from '@/components/PublicFeed';
 import SubscriptionButton from '@/components/SubscriptionButton';
 import Navigation from '@/components/Navigation';
@@ -8,9 +11,11 @@ import AuthModal from '@/components/AuthModal';
 import Footer from '@/components/Footer';
 import InstallPrompt from '@/components/InstallPrompt';
 import DemoInteractions from '@/components/DemoInteractions';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const [authModal, setAuthModal] = useState<{ isOpen: boolean; mode: 'login' | 'signup' }>({
     isOpen: false,
     mode: 'login'
@@ -41,6 +46,43 @@ const Index = () => {
             </p>
           </div>
 
+          {/* Section Mobile Premium - Visible uniquement sur mobile */}
+          {isMobile && (
+            <section className="mb-8 md:hidden">
+              <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50 shadow-lg">
+                <CardHeader className="pb-4 text-center">
+                  <CardTitle className="flex items-center justify-center gap-2 text-blue-800 text-xl">
+                    <Star className="h-6 w-6 text-yellow-500" />
+                    BimFun Premium
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-3 text-sm">
+                    <li className="flex items-center gap-3">
+                      <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
+                      <span className="text-gray-700">Accès illimité aux publications</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
+                      <span className="text-gray-700">Messagerie avancée</span>
+                    </li>
+                    <li className="flex items-center gap-3">
+                      <Check className="h-5 w-5 text-green-600 flex-shrink-0" />
+                      <span className="text-gray-700">Fonctionnalités premium</span>
+                    </li>
+                  </ul>
+                  <Button 
+                    onClick={() => handleOpenAuth('signup')}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
+                    size="lg"
+                  >
+                    S'abonner maintenant
+                  </Button>
+                </CardContent>
+              </Card>
+            </section>
+          )}
+
           {/* Section Fonctionnalités */}
           <section id="features" className="mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Fonctionnalités</h2>
@@ -60,8 +102,8 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Section Tarifs */}
-          <section id="pricing" className="mb-16">
+          {/* Section Tarifs - masquée sur mobile car remplacée par la section mobile premium */}
+          <section id="pricing" className={`mb-16 ${isMobile ? 'hidden' : ''}`}>
             <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Abonnement</h2>
             <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
               <h3 className="text-2xl font-bold mb-4">BimFun Premium</h3>
