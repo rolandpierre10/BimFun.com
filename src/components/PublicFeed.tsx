@@ -29,7 +29,21 @@ const PublicFeed = () => {
         .limit(50);
 
       if (error) throw error;
-      return data as (Publication & { profiles: any })[];
+      
+      // Ajouter des profils de démonstration pour les publications sans utilisateur réel
+      return (data as (Publication & { profiles: any })[]).map((pub, index) => {
+        if (!pub.profiles) {
+          const demoProfiles = [
+            { id: '1', full_name: 'Sophie Martin', username: 'sophie_design', avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face' },
+            { id: '2', full_name: 'Thomas Dubois', username: 'thomas_dev', avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face' },
+            { id: '3', full_name: 'Maria Rodriguez', username: 'maria_photo', avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face' },
+            { id: '4', full_name: 'Alex Chen', username: 'alex_music', avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' },
+            { id: '5', full_name: 'Emma Johnson', username: 'emma_video', avatar_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face' }
+          ];
+          pub.profiles = demoProfiles[index % demoProfiles.length];
+        }
+        return pub;
+      });
     },
   });
 
@@ -215,7 +229,6 @@ const PublicFeed = () => {
             </div>
           </div>
 
-          {/* Icon and text content */}
           <div className="mb-6">
             <div className="flex justify-center mb-4">
               <div className="bg-white rounded-full p-4 shadow-lg">
@@ -230,7 +243,6 @@ const PublicFeed = () => {
             </p>
           </div>
 
-          {/* Feature highlights */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto mb-8">
             <div className="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm">
               <Image className="h-6 w-6 text-blue-600 mb-2" />

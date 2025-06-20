@@ -7,6 +7,7 @@ import Navigation from '@/components/Navigation';
 import AuthModal from '@/components/AuthModal';
 import Footer from '@/components/Footer';
 import InstallPrompt from '@/components/InstallPrompt';
+import DemoInteractions from '@/components/DemoInteractions';
 
 const Index = () => {
   const { user } = useAuth();
@@ -25,6 +26,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <DemoInteractions />
       <Navigation onOpenAuth={handleOpenAuth} />
       
       <div className="pt-16">
