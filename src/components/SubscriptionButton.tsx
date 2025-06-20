@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +18,7 @@ const SubscriptionButton = () => {
   } = useSubscription();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = React.useState(false);
+  const [redirecting, setRedirecting] = React.useState(false);
 
   const handleSubscribe = async () => {
     setIsProcessing(true);
@@ -37,6 +39,12 @@ const SubscriptionButton = () => {
       }
 
       console.log('User authenticated, creating checkout session');
+      
+      // Show preparing message
+      toast({
+        title: "Préparation du paiement...",
+        description: "Redirection vers Stripe en cours",
+      });
       
       // Call the edge function directly
       const { data, error } = await supabase.functions.invoke('create-checkout', {
@@ -59,12 +67,24 @@ const SubscriptionButton = () => {
 
       console.log('Redirecting to Stripe checkout:', data.url);
       
-      // Direct redirection - the most reliable method
-      window.location.href = data.url;
+      // Set redirecting state
+      setRedirecting(true);
+      
+      // Show success message before redirect
+      toast({
+        title: "Redirection en cours...",
+        description: "Ouverture de Stripe",
+      });
+      
+      // Small delay to show the message, then redirect
+      setTimeout(() => {
+        window.location.href = data.url;
+      }, 500);
       
     } catch (error) {
       console.error('Complete error in handleSubscribe:', error);
       setIsProcessing(false);
+      setRedirecting(false);
       
       let errorMessage = 'Erreur inconnue';
       if (error instanceof Error) {
@@ -114,8 +134,13 @@ const SubscriptionButton = () => {
     );
   }
 
-  const buttonDisabled = loading || isProcessing;
-  const buttonText = isProcessing ? "Redirection en cours..." : loading ? "Chargement..." : "S'abonner maintenant";
+  const buttonDisabled = loading || isProcessing || redirecting;
+  const getButtonText = () => {
+    if (redirecting) return "Redirection...";
+    if (isProcessing) return "Préparation...";
+    if (loading) return "Chargement...";
+    return "S'abonner maintenant";
+  };
 
   return (
     <Card className="border-blue-200 bg-blue-50">
@@ -146,9 +171,15 @@ const SubscriptionButton = () => {
           className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-md transition-all duration-200 touch-manipulation text-base flex items-center justify-center gap-2"
           style={{ minHeight: '48px' }}
         >
-          {isProcessing && <Loader2 className="h-4 w-4 animate-spin" />}
-          {buttonText}
+          {(isProcessing || redirecting) && <Loader2 className="h-4 w-4 animate-spin" />}
+          {getButtonText()}
         </Button>
+        
+        {redirecting && (
+          <div className="text-center text-sm text-blue-600 animate-pulse">
+            Ne fermez pas cette page...
+          </div>
+        )}
       </CardContent>
     </Card>
   );
