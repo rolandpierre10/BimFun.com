@@ -17,7 +17,7 @@ const Footer = () => {
             <p className="text-gray-300">Montréal, QC, Canada</p>
             <a 
               href="mailto:support@bimfun.com" 
-              className="text-gray-300 hover:text-white transition-colors"
+              className="text-blue-400 hover:text-blue-300 transition-colors underline"
             >
               support@bimfun.com
             </a>
