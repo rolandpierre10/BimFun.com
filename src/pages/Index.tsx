@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Crown, Star, MessageCircle, Video, Phone, Users, Camera, Image, Mic, Share2, Bell, Settings, Shield } from 'lucide-react';
+import { Check, Crown, Star, MessageCircle, Video, Phone, Users, Camera, Image, Mic, Share2, Bell, Settings, Shield, Loader2 } from 'lucide-react';
 import PublicFeed from '@/components/PublicFeed';
 import SubscriptionButton from '@/components/SubscriptionButton';
 import Navigation from '@/components/Navigation';
@@ -11,15 +12,18 @@ import Footer from '@/components/Footer';
 import InstallPrompt from '@/components/InstallPrompt';
 import DemoInteractions from '@/components/DemoInteractions';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   console.log('Index page is rendering');
   const { user } = useAuth();
   const { createCheckout } = useSubscription();
+  const { toast } = useToast();
   const [authModal, setAuthModal] = useState<{ isOpen: boolean; mode: 'login' | 'signup' }>({
     isOpen: false,
     mode: 'login'
   });
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleOpenAuth = (mode: 'login' | 'signup') => {
     setAuthModal({ isOpen: true, mode });
@@ -40,15 +44,39 @@ const Index = () => {
     return () => window.removeEventListener('openAuthModal', handleOpenAuthModal);
   }, []);
 
-  const handleStartNow = async () => {
-    if (user) {
-      try {
+  const handleStartNow = async (e: React.MouseEvent | React.TouchEvent) => {
+    // Empêcher les événements par défaut et la propagation
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Éviter les doubles clics/touches
+    if (isProcessing) return;
+    
+    setIsProcessing(true);
+    
+    try {
+      if (user) {
+        console.log('User authenticated, creating checkout session');
+        
+        // Show preparing message
+        toast({
+          title: "Préparation du paiement...",
+          description: "Redirection vers Stripe en cours",
+        });
+        
         await createCheckout();
-      } catch (error) {
-        console.error('Error creating checkout:', error);
+      } else {
+        handleOpenAuth('signup');
       }
-    } else {
-      handleOpenAuth('signup');
+    } catch (error) {
+      console.error('Error creating checkout:', error);
+      toast({
+        title: "Erreur de paiement",
+        description: "Impossible de créer la session de paiement",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -333,13 +361,18 @@ const Index = () => {
               </div>
               
               <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md text-base sm:text-lg py-4 px-4 transition-colors duration-200 active:scale-95"
+                className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-md text-base sm:text-lg py-4 px-4 transition-all duration-200 touch-manipulation flex items-center justify-center gap-2"
                 onClick={handleStartNow}
+                onTouchStart={handleStartNow}
+                disabled={isProcessing}
                 style={{ 
-                  minHeight: '56px'
+                  minHeight: '56px',
+                  WebkitTapHighlightColor: 'transparent',
+                  userSelect: 'none'
                 }}
               >
-                Commencer maintenant
+                {isProcessing && <Loader2 className="h-4 w-4 animate-spin" />}
+                {isProcessing ? "Préparation..." : "Commencer maintenant"}
               </Button>
               
               <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4">
