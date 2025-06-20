@@ -18,19 +18,40 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-  );
-
   try {
     logStep("Function started");
 
-    const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
-    const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      logStep("ERROR", { message: "No authorization header provided" });
+      throw new Error("No authorization header provided");
+    }
+    logStep("Authorization header found");
+
+    // Créer le client Supabase avec la clé anon pour l'authentification
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      {
+        global: {
+          headers: {
+            Authorization: authHeader,
+          },
+        },
+      }
+    );
+
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    if (userError) {
+      logStep("ERROR", { message: `Authentication error: ${userError.message}` });
+      throw new Error(`Authentication error: ${userError.message}`);
+    }
+    
+    if (!user?.email) {
+      logStep("ERROR", { message: "User not authenticated or email not available" });
+      throw new Error("User not authenticated or email not available");
+    }
+    
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 
