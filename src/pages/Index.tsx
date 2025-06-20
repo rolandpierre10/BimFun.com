@@ -29,9 +29,17 @@ const Index = () => {
     setAuthModal({ isOpen: false, mode: 'login' });
   };
 
-  const handleStartNow = () => {
+  const handleStartNow = async (e: React.MouseEvent | React.TouchEvent) => {
+    // Empêcher les événements par défaut et la propagation pour mobile
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (user) {
-      createCheckout();
+      try {
+        await createCheckout();
+      } catch (error) {
+        console.error('Error creating checkout:', error);
+      }
     } else {
       handleOpenAuth('signup');
     }
@@ -280,7 +288,7 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Section Tarifs - Mobile optimisé */}
+          {/* Section Tarifs - Mobile optimisé avec bouton corrigé */}
           <section id="pricing" className="mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 text-center px-2">Abonnement</h2>
             <div className="max-w-sm sm:max-w-md mx-auto bg-white p-6 sm:p-8 rounded-lg shadow-md text-center border-2 border-blue-200">
@@ -323,10 +331,16 @@ const Index = () => {
                 </ul>
               </div>
               
+              {/* Bouton optimisé pour mobile */}
               <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 sm:py-4 text-base sm:text-lg font-semibold touch-manipulation"
+                className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-md touch-manipulation text-base sm:text-lg py-4 px-4 transition-all duration-200"
                 onClick={handleStartNow}
-                style={{ minHeight: '48px' }}
+                onTouchStart={handleStartNow}
+                style={{ 
+                  minHeight: '56px',
+                  WebkitTapHighlightColor: 'transparent',
+                  userSelect: 'none'
+                }}
               >
                 Commencer maintenant
               </Button>
