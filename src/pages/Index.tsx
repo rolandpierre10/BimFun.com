@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
@@ -41,11 +40,7 @@ const Index = () => {
     return () => window.removeEventListener('openAuthModal', handleOpenAuthModal);
   }, []);
 
-  const handleStartNow = async (e: React.MouseEvent | React.TouchEvent) => {
-    // Empêcher les événements par défaut et la propagation pour mobile
-    e.preventDefault();
-    e.stopPropagation();
-    
+  const handleStartNow = async () => {
     if (user) {
       try {
         await createCheckout();
@@ -338,13 +333,10 @@ const Index = () => {
               </div>
               
               <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-md touch-manipulation text-base sm:text-lg py-4 px-4 transition-all duration-200"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md text-base sm:text-lg py-4 px-4 transition-colors duration-200 active:scale-95"
                 onClick={handleStartNow}
-                onTouchStart={handleStartNow}
                 style={{ 
-                  minHeight: '56px',
-                  WebkitTapHighlightColor: 'transparent',
-                  userSelect: 'none'
+                  minHeight: '56px'
                 }}
               >
                 Commencer maintenant
