@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,7 +38,7 @@ const SubscriptionButton = () => {
 
       console.log('User authenticated, creating checkout session');
       
-      // Call the edge function directly with proper error handling
+      // Call the edge function directly
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         headers: {
           'Content-Type': 'application/json',
@@ -60,32 +59,8 @@ const SubscriptionButton = () => {
 
       console.log('Redirecting to Stripe checkout:', data.url);
       
-      // Try multiple redirection methods for maximum compatibility
-      try {
-        // Method 1: Direct assignment (most reliable)
-        window.location.href = data.url;
-      } catch (redirectError) {
-        console.warn('Direct redirect failed, trying window.open:', redirectError);
-        // Method 2: Open in new window as fallback
-        const newWindow = window.open(data.url, '_blank');
-        if (!newWindow) {
-          // Method 3: Manual fallback if popup blocked
-          toast({
-            title: "Redirection bloquée",
-            description: "Cliquez sur ce lien pour accéder au paiement",
-            action: (
-              <a 
-                href={data.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="underline text-blue-600"
-              >
-                Ouvrir Stripe
-              </a>
-            ),
-          });
-        }
-      }
+      // Direct redirection - the most reliable method
+      window.location.href = data.url;
       
     } catch (error) {
       console.error('Complete error in handleSubscribe:', error);
