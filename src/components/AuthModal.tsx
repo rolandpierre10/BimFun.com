@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
-import { useSubscription } from '@/hooks/useSubscription';
 
 interface AuthModalProps {
   mode: 'login' | 'signup';
@@ -21,7 +20,6 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { createCheckout } = useSubscription();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,13 +38,11 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
         await signUp(email, password);
         toast({
           title: "Inscription réussie",
-          description: "Redirection vers l'abonnement...",
+          description: "Vérifiez votre email pour confirmer votre compte, puis vous pourrez vous abonner.",
         });
         onClose();
-        // Déclencher automatiquement le processus d'abonnement après inscription
-        setTimeout(() => {
-          createCheckout();
-        }, 1000);
+        // Ne pas déclencher automatiquement l'abonnement après l'inscription
+        // L'utilisateur devra d'abord confirmer son email et se connecter
       }
     } catch (error: any) {
       toast({
@@ -69,7 +65,7 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
           <CardDescription>
             {mode === 'login' 
               ? 'Connectez-vous à votre compte BimFun'
-              : 'Créez votre compte BimFun et accédez à l\'abonnement'
+              : 'Créez votre compte BimFun'
             }
           </CardDescription>
         </CardHeader>
@@ -103,6 +99,11 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
                 Annuler
               </Button>
             </div>
+            {mode === 'signup' && (
+              <p className="text-sm text-gray-500 text-center">
+                Après inscription, vous recevrez un email de confirmation. Une fois votre compte confirmé, vous pourrez vous connecter et souscrire à l'abonnement.
+              </p>
+            )}
           </form>
         </CardContent>
       </Card>
