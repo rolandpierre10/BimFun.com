@@ -20,11 +20,12 @@ const SubscriptionButton = () => {
 
   const handleSubscribe = async () => {
     try {
-      console.log('Subscribe button clicked on mobile/desktop');
+      console.log('Subscribe button clicked - starting process');
       
       // Check if user is authenticated
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
+        console.log('User not authenticated');
         toast({
           title: "Connexion requise",
           description: "Veuillez vous connecter pour vous abonner",
@@ -33,27 +34,55 @@ const SubscriptionButton = () => {
         return;
       }
 
-      console.log('User authenticated, creating checkout session');
+      console.log('User authenticated, invoking create-checkout function');
       const { data, error } = await supabase.functions.invoke('create-checkout');
       
       if (error) {
-        console.error('Checkout error:', error);
+        console.error('Checkout function error:', error);
         throw error;
       }
       
-      console.log('Checkout session created:', data);
+      console.log('Checkout function response:', data);
       
-      // Use window.location.href for better mobile compatibility
-      if (data?.url) {
+      if (!data?.url) {
+        console.error('No checkout URL received');
+        throw new Error('Aucune URL de checkout reçue');
+      }
+
+      console.log('Redirecting to Stripe checkout:', data.url);
+      
+      // Force immediate redirect for better mobile compatibility
+      try {
         window.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL received');
+      } catch (redirectError) {
+        console.error('Direct redirect failed, trying window.open:', redirectError);
+        // Fallback to window.open if direct redirect fails
+        const newWindow = window.open(data.url, '_blank');
+        if (!newWindow) {
+          console.error('Window.open blocked, showing manual link');
+          toast({
+            title: "Redirection bloquée",
+            description: "Veuillez cliquer ici pour accéder au paiement",
+            variant: "destructive",
+            action: (
+              <a 
+                href={data.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="bg-blue-600 text-white px-4 py-2 rounded"
+              >
+                Aller au paiement
+              </a>
+            )
+          });
+        }
       }
     } catch (error) {
-      console.error('Error creating checkout:', error);
+      console.error('Complete error in handleSubscribe:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       toast({
-        title: "Erreur",
-        description: "Impossible de créer la session de paiement. Veuillez réessayer.",
+        title: "Erreur de paiement",
+        description: `Impossible de créer la session de paiement: ${errorMessage}`,
         variant: "destructive",
       });
     }
@@ -118,10 +147,10 @@ const SubscriptionButton = () => {
         <Button 
           onClick={handleSubscribe}
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 touch-manipulation"
-          style={{ minHeight: '44px' }} // Ensure minimum touch target size for mobile
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition-colors duration-200 touch-manipulation text-base"
+          style={{ minHeight: '48px' }} // Increased touch target for mobile
         >
-          {loading ? "Chargement..." : "S'abonner maintenant"}
+          {loading ? "Redirection..." : "S'abonner maintenant"}
         </Button>
       </CardContent>
     </Card>
