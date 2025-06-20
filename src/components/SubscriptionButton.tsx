@@ -20,7 +20,7 @@ const SubscriptionButton = () => {
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [redirecting, setRedirecting] = React.useState(false);
 
-  const handleSubscribe = async (e: React.MouseEvent | React.TouchEvent) => {
+  const handleSubscribe = async (e: React.MouseEvent) => {
     // Empêcher les événements par défaut et la propagation
     e.preventDefault();
     e.stopPropagation();
@@ -31,7 +31,7 @@ const SubscriptionButton = () => {
     setIsProcessing(true);
     
     try {
-      console.log('Subscribe button clicked/touched - starting process');
+      console.log('Subscribe button clicked - starting process');
       
       // Check if user is authenticated
       const { data: { user } } = await supabase.auth.getUser();
@@ -176,13 +176,13 @@ const SubscriptionButton = () => {
         {/* Bouton optimisé pour mobile */}
         <Button 
           onClick={handleSubscribe}
-          onTouchStart={handleSubscribe}
           disabled={buttonDisabled}
           className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium rounded-md transition-all duration-200 touch-manipulation text-sm sm:text-base flex items-center justify-center gap-2 py-4 px-4"
           style={{ 
             minHeight: '56px',
             WebkitTapHighlightColor: 'transparent',
-            userSelect: 'none'
+            userSelect: 'none',
+            cursor: buttonDisabled ? 'not-allowed' : 'pointer'
           }}
         >
           {(isProcessing || redirecting) && <Loader2 className="h-4 w-4 animate-spin" />}
