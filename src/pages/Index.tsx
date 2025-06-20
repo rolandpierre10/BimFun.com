@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, Crown, Star } from 'lucide-react';
+import { Check, Crown, Star, MessageCircle, Video, Phone, Users, Camera, Image, Mic, Share2, Bell, Settings, Shield } from 'lucide-react';
 import PublicFeed from '@/components/PublicFeed';
 import SubscriptionButton from '@/components/SubscriptionButton';
 import Navigation from '@/components/Navigation';
@@ -43,6 +43,176 @@ const Index = () => {
               La plateforme sociale où les professionnels partagent, découvrent et s'inspirent à travers du contenu créatif du monde entier.
             </p>
           </div>
+
+          {/* Section Services */}
+          <section id="services" className="mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Nos Services</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              
+              {/* Publications créatives */}
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Camera className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <CardTitle className="text-lg">Publications créatives</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-center mb-4">Partagez vos créations avec la communauté et découvrez le travail d'autres créateurs.</p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Photos et vidéos haute qualité
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Tags et catégories
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Statistiques de vues
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Messagerie */}
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <MessageCircle className="h-6 w-6 text-green-600" />
+                  </div>
+                  <CardTitle className="text-lg">Messagerie avancée</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-center mb-4">Communiquez instantanément avec d'autres membres de la plateforme.</p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Messages texte en temps réel
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Messages vocaux
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Partage d'images
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Appels vidéo */}
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Video className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <CardTitle className="text-lg">Appels vidéo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-center mb-4">Collaborez en face à face avec des appels vidéo intégrés.</p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Qualité HD
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Partage d'écran
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Enregistrement
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Réseau social */}
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                    <Users className="h-6 w-6 text-orange-600" />
+                  </div>
+                  <CardTitle className="text-lg">Réseau professionnel</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-center mb-4">Connectez-vous avec d'autres professionnels et développez votre réseau.</p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Profils professionnels
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Système de suivi
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Recommandations
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Interactions */}
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <Share2 className="h-6 w-6 text-red-600" />
+                  </div>
+                  <CardTitle className="text-lg">Interactions sociales</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-center mb-4">Engagez-vous avec la communauté à travers diverses interactions.</p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Likes et commentaires
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Partage de contenu
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Notifications temps réel
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              {/* Sécurité */}
+              <Card className="hover:shadow-lg transition-shadow duration-300">
+                <CardHeader className="text-center">
+                  <div className="mx-auto mb-4 w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <Shield className="h-6 w-6 text-indigo-600" />
+                  </div>
+                  <CardTitle className="text-lg">Sécurité & Confidentialité</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600 text-center mb-4">Vos données sont protégées avec les plus hauts standards de sécurité.</p>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Chiffrement end-to-end
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Contrôle de confidentialité
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-500" />
+                      Authentification sécurisée
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+            </div>
+          </section>
 
           {/* Section Fonctionnalités */}
           <section id="features" className="mb-16">
