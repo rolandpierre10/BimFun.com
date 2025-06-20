@@ -37,9 +37,6 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                 className="h-12 w-12 mr-3"
               />
               <span className="text-2xl font-bold text-gray-900">BimFun</span>
-              <Badge variant="outline" className="ml-2 text-xs border-gray-400 text-gray-600">
-                Professionnel
-              </Badge>
             </div>
           </div>
 
@@ -84,10 +81,10 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                 Se connecter
               </Button>
               <Button 
-                className="bg-gray-900 hover:bg-gray-800 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium"
                 onClick={() => onOpenAuth('signup')}
               >
-                S'abonner
+                Commencer gratuitement
               </Button>
             </div>
           </div>
@@ -112,7 +109,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
 
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200">
+        <div className="md:hidden bg-white border-b border-gray-200 shadow-lg">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <button 
               onClick={() => scrollToSection('features')}
@@ -151,13 +148,13 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                   Se connecter
                 </Button>
                 <Button 
-                  className="w-full bg-gray-900 hover:bg-gray-800 text-white"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                   onClick={() => {
                     onOpenAuth('signup');
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  S'abonner - 10$/mois
+                  Commencer gratuitement
                 </Button>
               </div>
             </div>
