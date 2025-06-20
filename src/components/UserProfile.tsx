@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageCircle, Phone, Video, User, MapPin, Briefcase, Calendar, FileText } from 'lucide-react';
 import MessagingInterface from './MessagingInterface';
 import UserPublications from './UserPublications';
+import UserStatusIndicator from './UserStatusIndicator';
 
 interface UserProfileProps {
   user: {
@@ -48,7 +49,10 @@ const UserProfile = ({ user, onClose }: UserProfileProps) => {
               )}
             </div>
             <div>
-              <CardTitle className="text-2xl">{user.name}</CardTitle>
+              <div className="flex items-center gap-2 mb-1">
+                <CardTitle className="text-2xl">{user.name}</CardTitle>
+                <UserStatusIndicator userId={user.id} size="sm" />
+              </div>
               {user.profession && (
                 <Badge variant="outline" className="mt-1">
                   <Briefcase className="h-3 w-3 mr-1" />
@@ -83,7 +87,6 @@ const UserProfile = ({ user, onClose }: UserProfileProps) => {
           </TabsList>
 
           <TabsContent value="about" className="space-y-6">
-            {/* Informations de base */}
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-gray-600">
                 <MapPin className="h-4 w-4" />
@@ -95,13 +98,11 @@ const UserProfile = ({ user, onClose }: UserProfileProps) => {
               </div>
             </div>
 
-            {/* Bio */}
             <div>
               <h3 className="font-semibold mb-2">À propos</h3>
               <p className="text-gray-600 leading-relaxed">{user.bio}</p>
             </div>
 
-            {/* Statistiques */}
             <div className="grid grid-cols-3 gap-4 pt-4 border-t">
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900">24</div>
@@ -123,7 +124,6 @@ const UserProfile = ({ user, onClose }: UserProfileProps) => {
           </TabsContent>
 
           <TabsContent value="contact" className="space-y-4">
-            {/* Options de communication */}
             <div>
               <h3 className="font-semibold mb-3">Communication</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
