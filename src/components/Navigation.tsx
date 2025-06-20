@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import { MessageCircle, User, LogOut, Shield } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import OnlineStatusToggle from './OnlineStatusToggle';
 
 interface NavigationProps {
   onOpenAuth: (mode: 'login' | 'signup') => void;
@@ -30,8 +29,6 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                <OnlineStatusToggle />
-                
                 <Link to="/dashboard">
                   <Button variant="ghost" size="sm" className="flex items-center space-x-2">
                     <MessageCircle className="h-4 w-4" />
