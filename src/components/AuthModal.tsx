@@ -30,19 +30,29 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
         await signIn(email, password);
         toast({
           title: "Connexion réussie",
-          description: "Vous êtes maintenant connecté à BimFun",
+          description: "Redirection vers les paiements...",
         });
         onClose();
-        // Rester sur la page actuelle après connexion
+        // Redirection vers la section abonnement après connexion
+        setTimeout(() => {
+          const element = document.getElementById('pricing');
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 500);
       } else {
         await signUp(email, password);
         toast({
           title: "Inscription réussie",
-          description: "Vérifiez votre email pour confirmer votre compte, puis vous pourrez vous abonner.",
+          description: "Redirection vers la connexion...",
         });
         onClose();
-        // Ne pas déclencher automatiquement l'abonnement après l'inscription
-        // L'utilisateur devra d'abord confirmer son email et se connecter
+        // Redirection automatique vers la connexion après inscription
+        setTimeout(() => {
+          // Réouvrir le modal en mode connexion
+          const event = new CustomEvent('openAuthModal', { detail: { mode: 'login' } });
+          window.dispatchEvent(event);
+        }, 1000);
       }
     } catch (error: any) {
       toast({
@@ -64,8 +74,8 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
           </CardTitle>
           <CardDescription>
             {mode === 'login' 
-              ? 'Connectez-vous à votre compte BimFun'
-              : 'Créez votre compte BimFun'
+              ? 'Connectez-vous pour accéder aux paiements'
+              : 'Créez votre compte pour continuer'
             }
           </CardDescription>
         </CardHeader>
@@ -101,7 +111,12 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
             </div>
             {mode === 'signup' && (
               <p className="text-sm text-gray-500 text-center">
-                Après inscription, vous recevrez un email de confirmation. Une fois votre compte confirmé, vous pourrez vous connecter et souscrire à l'abonnement.
+                Après inscription, vous serez automatiquement redirigé vers la connexion.
+              </p>
+            )}
+            {mode === 'login' && (
+              <p className="text-sm text-gray-500 text-center">
+                Après connexion, vous serez redirigé vers les options de paiement.
               </p>
             )}
           </form>

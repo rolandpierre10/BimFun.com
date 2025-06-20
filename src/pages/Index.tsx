@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +29,17 @@ const Index = () => {
   const handleCloseAuth = () => {
     setAuthModal({ isOpen: false, mode: 'login' });
   };
+
+  // Écouter l'événement personnalisé pour réouvrir le modal de connexion après inscription
+  useEffect(() => {
+    const handleOpenAuthModal = (event: any) => {
+      const { mode } = event.detail;
+      setAuthModal({ isOpen: true, mode });
+    };
+
+    window.addEventListener('openAuthModal', handleOpenAuthModal);
+    return () => window.removeEventListener('openAuthModal', handleOpenAuthModal);
+  }, []);
 
   const handleStartNow = async (e: React.MouseEvent | React.TouchEvent) => {
     // Empêcher les événements par défaut et la propagation pour mobile
@@ -123,7 +135,6 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              {/* Appels vocaux */}
               <Card className="hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="text-center pb-3 sm:pb-4">
                   <div className="mx-auto mb-3 sm:mb-4 w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-full flex items-center justify-center">
@@ -150,7 +161,6 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              {/* Appels vidéo */}
               <Card className="hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="text-center pb-3 sm:pb-4">
                   <div className="mx-auto mb-3 sm:mb-4 w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-full flex items-center justify-center">
@@ -177,7 +187,6 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              {/* Réseau social */}
               <Card className="hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="text-center pb-3 sm:pb-4">
                   <div className="mx-auto mb-3 sm:mb-4 w-10 h-10 sm:w-12 sm:h-12 bg-orange-100 rounded-full flex items-center justify-center">
@@ -204,7 +213,6 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              {/* Interactions */}
               <Card className="hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="text-center pb-3 sm:pb-4">
                   <div className="mx-auto mb-3 sm:mb-4 w-10 h-10 sm:w-12 sm:h-12 bg-red-100 rounded-full flex items-center justify-center">
@@ -231,7 +239,6 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              {/* Sécurité */}
               <Card className="hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="text-center pb-3 sm:pb-4">
                   <div className="mx-auto mb-3 sm:mb-4 w-10 h-10 sm:w-12 sm:h-12 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -258,7 +265,6 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              {/* Messages vocaux */}
               <Card className="hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="text-center pb-3 sm:pb-4">
                   <div className="mx-auto mb-3 sm:mb-4 w-10 h-10 sm:w-12 sm:h-12 bg-teal-100 rounded-full flex items-center justify-center">
@@ -331,7 +337,6 @@ const Index = () => {
                 </ul>
               </div>
               
-              {/* Bouton optimisé pour mobile */}
               <Button 
                 className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-md touch-manipulation text-base sm:text-lg py-4 px-4 transition-all duration-200"
                 onClick={handleStartNow}
@@ -351,7 +356,6 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Section À propos - Mobile friendly */}
           <section id="about" className="mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 text-center px-2">À propos</h2>
             <div className="max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-lg shadow-md">
@@ -364,10 +368,8 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Section Feed - Layout mobile optimisé */}
           <section id="subscription" className="mb-12 sm:mb-16">
             <div className="space-y-6">
-              {/* Sidebar avec abonnement - En haut sur mobile */}
               {user && (
                 <div className="lg:hidden">
                   <SubscriptionButton />
@@ -375,12 +377,10 @@ const Index = () => {
               )}
 
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Sidebar desktop */}
                 <div className="hidden lg:block lg:col-span-1">
                   {user && <SubscriptionButton />}
                 </div>
 
-                {/* Zone principale avec le feed public */}
                 <div className="lg:col-span-3">
                   <PublicFeed />
                 </div>
