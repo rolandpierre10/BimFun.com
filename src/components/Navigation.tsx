@@ -31,7 +31,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             <img 
               src="/lovable-uploads/3ad16cd3-6fcc-475f-bc25-eaad941f1b74.png" 
               alt="BimFun Logo" 
-              className="h-10 w-auto hover:opacity-80 transition-opacity"
+              className="h-16 w-auto hover:opacity-80 transition-opacity"
             />
           </Link>
           
