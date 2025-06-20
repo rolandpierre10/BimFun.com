@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,39 +33,52 @@ const SubscriptionButton = () => {
           description: "Veuillez vous connecter pour vous abonner",
           variant: "destructive",
         });
+        setIsProcessing(false);
         return;
       }
 
-      console.log('User authenticated, invoking create-checkout function');
-      const { data, error } = await supabase.functions.invoke('create-checkout');
+      console.log('User authenticated, creating checkout session');
+      
+      // Call the edge function directly with proper error handling
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
       
       if (error) {
-        console.error('Checkout function error:', error);
-        throw error;
+        console.error('Edge function error:', error);
+        throw new Error(`Erreur du serveur: ${error.message}`);
       }
       
-      console.log('Checkout function response:', data);
+      console.log('Checkout response received:', data);
       
-      if (!data?.url) {
-        console.error('No checkout URL received');
-        throw new Error('Aucune URL de checkout reçue');
+      if (!data || !data.url) {
+        console.error('No checkout URL received:', data);
+        throw new Error('Aucune URL de paiement reçue du serveur');
       }
 
       console.log('Redirecting to Stripe checkout:', data.url);
       
-      // Immediate redirect - no fallbacks to keep it simple and fast
-      window.location.href = data.url;
+      // Use location.replace for more reliable redirection
+      window.location.replace(data.url);
       
     } catch (error) {
       console.error('Complete error in handleSubscribe:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      setIsProcessing(false);
+      
+      let errorMessage = 'Erreur inconnue';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+      
       toast({
         title: "Erreur de paiement",
         description: `Impossible de créer la session de paiement: ${errorMessage}`,
         variant: "destructive",
       });
-    } finally {
-      setIsProcessing(false);
     }
   };
 
@@ -102,7 +116,7 @@ const SubscriptionButton = () => {
   }
 
   const buttonDisabled = loading || isProcessing;
-  const buttonText = isProcessing ? "Redirection vers Stripe..." : loading ? "Chargement..." : "S'abonner maintenant";
+  const buttonText = isProcessing ? "Redirection en cours..." : loading ? "Chargement..." : "S'abonner maintenant";
 
   return (
     <Card className="border-blue-200 bg-blue-50">
@@ -130,7 +144,7 @@ const SubscriptionButton = () => {
         <Button 
           onClick={handleSubscribe}
           disabled={buttonDisabled}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-3 px-4 rounded-md transition-all duration-200 touch-manipulation text-base flex items-center justify-center gap-2"
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-md transition-all duration-200 touch-manipulation text-base flex items-center justify-center gap-2"
           style={{ minHeight: '48px' }}
         >
           {isProcessing && <Loader2 className="h-4 w-4 animate-spin" />}
