@@ -49,9 +49,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user) {
       const fetchUserRole = async () => {
         const { data, error } = await supabase
-          .from('profiles')
+          .from('user_roles')
           .select('role')
-          .eq('id', user.id)
+          .eq('user_id', user.id)
           .single();
 
         if (data && !error) {
