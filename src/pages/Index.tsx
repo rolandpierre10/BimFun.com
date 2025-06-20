@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
@@ -44,7 +43,7 @@ const Index = () => {
     return () => window.removeEventListener('openAuthModal', handleOpenAuthModal);
   }, []);
 
-  const handleStartNow = async (e: React.MouseEvent | React.TouchEvent) => {
+  const handleStartNow = async (e: React.MouseEvent) => {
     // Empêcher les événements par défaut et la propagation
     e.preventDefault();
     e.stopPropagation();
@@ -363,12 +362,12 @@ const Index = () => {
               <Button 
                 className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-md text-base sm:text-lg py-4 px-4 transition-all duration-200 touch-manipulation flex items-center justify-center gap-2"
                 onClick={handleStartNow}
-                onTouchStart={handleStartNow}
                 disabled={isProcessing}
                 style={{ 
                   minHeight: '56px',
                   WebkitTapHighlightColor: 'transparent',
-                  userSelect: 'none'
+                  userSelect: 'none',
+                  cursor: isProcessing ? 'not-allowed' : 'pointer'
                 }}
               >
                 {isProcessing && <Loader2 className="h-4 w-4 animate-spin" />}
@@ -381,6 +380,7 @@ const Index = () => {
             </div>
           </section>
 
+          {/* Section About - Mobile optimisé */}
           <section id="about" className="mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 text-center px-2">À propos</h2>
             <div className="max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-lg shadow-md">
@@ -393,6 +393,7 @@ const Index = () => {
             </div>
           </section>
 
+          {/* Section Subscription - Mobile optimisé */}
           <section id="subscription" className="mb-12 sm:mb-16">
             <div className="space-y-6">
               {user && (
