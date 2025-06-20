@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
+import { useSubscription } from '@/hooks/useSubscription';
 
 interface AuthModalProps {
   mode: 'login' | 'signup';
@@ -20,6 +21,7 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { createCheckout } = useSubscription();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,13 +43,10 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
           description: "Redirection vers l'abonnement...",
         });
         onClose();
-        // Scroll vers la section abonnement après inscription
+        // Déclencher automatiquement le processus d'abonnement après inscription
         setTimeout(() => {
-          const subscriptionElement = document.getElementById('subscription');
-          if (subscriptionElement) {
-            subscriptionElement.scrollIntoView({ behavior: 'smooth' });
-          }
-        }, 100);
+          createCheckout();
+        }, 1000);
       }
     } catch (error: any) {
       toast({
@@ -70,7 +69,7 @@ const AuthModal = ({ mode, onClose }: AuthModalProps) => {
           <CardDescription>
             {mode === 'login' 
               ? 'Connectez-vous à votre compte BimFun'
-              : 'Créez votre compte BimFun'
+              : 'Créez votre compte BimFun et accédez à l\'abonnement'
             }
           </CardDescription>
         </CardHeader>

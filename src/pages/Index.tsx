@@ -11,10 +11,12 @@ import AuthModal from '@/components/AuthModal';
 import Footer from '@/components/Footer';
 import InstallPrompt from '@/components/InstallPrompt';
 import DemoInteractions from '@/components/DemoInteractions';
+import { useSubscription } from '@/hooks/useSubscription';
 
 const Index = () => {
   console.log('Index page is rendering');
   const { user } = useAuth();
+  const { createCheckout } = useSubscription();
   const [authModal, setAuthModal] = useState<{ isOpen: boolean; mode: 'login' | 'signup' }>({
     isOpen: false,
     mode: 'login'
@@ -26,6 +28,16 @@ const Index = () => {
 
   const handleCloseAuth = () => {
     setAuthModal({ isOpen: false, mode: 'login' });
+  };
+
+  const handleStartNow = () => {
+    if (user) {
+      // Si l'utilisateur est connecté, aller directement au checkout
+      createCheckout();
+    } else {
+      // Si l'utilisateur n'est pas connecté, ouvrir la modal d'inscription
+      handleOpenAuth('signup');
+    }
   };
 
   console.log('About to render Navigation component');
@@ -336,7 +348,7 @@ const Index = () => {
               
               <Button 
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold"
-                onClick={() => handleOpenAuth('signup')}
+                onClick={handleStartNow}
               >
                 Commencer maintenant
               </Button>
