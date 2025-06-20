@@ -28,9 +28,11 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <h1 className="text-3xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
-              BimFun
-            </h1>
+            <img 
+              src="/lovable-uploads/3ad16cd3-6fcc-475f-bc25-eaad941f1b74.png" 
+              alt="BimFun Logo" 
+              className="h-10 w-auto hover:opacity-80 transition-opacity"
+            />
           </Link>
           
           {/* Menu de navigation */}
