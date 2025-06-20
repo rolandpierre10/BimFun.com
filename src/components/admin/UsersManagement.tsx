@@ -112,7 +112,6 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                           {userItem.subscription_tier}
                         </Badge>
                       )}
-                      <UserOnlineStatus userId={userItem.id} showAsButton={true} />
                     </div>
                     <p className="text-sm text-gray-600">@{userItem.username}</p>
                     <div className="flex space-x-4 text-sm text-gray-500">
@@ -123,6 +122,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                   </div>
                   
                   <div className="flex space-x-2">
+                    <UserOnlineStatus userId={userItem.id} showAsButton={true} />
                     <Button
                       size="sm"
                       variant="outline"
