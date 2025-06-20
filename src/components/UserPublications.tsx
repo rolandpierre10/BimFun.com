@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Image, Video, Music, Tv, Megaphone } from 'lucide-react';
+import { Plus, Image, Video, Music, Tv, Megaphone, Crown } from 'lucide-react';
 import { usePublications } from '@/hooks/usePublications';
+import { useSubscription } from '@/hooks/useSubscription';
 import CreatePublication from './CreatePublication';
 import PublicationCard from './PublicationCard';
+import SubscriptionButton from './SubscriptionButton';
 
 interface UserPublicationsProps {
   userId?: string;
@@ -17,6 +19,7 @@ const UserPublications = ({ userId, isOwnProfile = false }: UserPublicationsProp
   const [activeTab, setActiveTab] = useState('all');
   
   const { publications, isLoading, likePublication } = usePublications(userId);
+  const { subscribed, loading: subscriptionLoading } = useSubscription();
 
   const handleLike = (publicationId: string) => {
     likePublication.mutate(publicationId);
@@ -32,13 +35,33 @@ const UserPublications = ({ userId, isOwnProfile = false }: UserPublicationsProp
     return filterPublications(contentType).length;
   };
 
-  if (showCreateForm && isOwnProfile) {
+  // Show subscription required message for own profile if not subscribed
+  if (isOwnProfile && !subscriptionLoading && !subscribed) {
+    return (
+      <div className="w-full space-y-6">
+        <div className="text-center py-12">
+          <Crown className="h-16 w-16 text-blue-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Abonnement Premium Requis
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Pour créer et publier du contenu, vous devez avoir un abonnement premium actif.
+          </p>
+          <div className="max-w-md mx-auto">
+            <SubscriptionButton />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (showCreateForm && isOwnProfile && subscribed) {
     return <CreatePublication onClose={() => setShowCreateForm(false)} />;
   }
 
   return (
     <div className="w-full space-y-6">
-      {isOwnProfile && (
+      {isOwnProfile && subscribed && (
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Mes Publications</h2>
           <Button
@@ -101,7 +124,7 @@ const UserPublications = ({ userId, isOwnProfile = false }: UserPublicationsProp
                 <p className="text-gray-500 mb-4">
                   {contentType === 'all' ? 'Aucune publication' : `Aucune ${contentType === 'photo' ? 'photo' : contentType === 'video' ? 'vidéo' : contentType === 'music' ? 'musique' : contentType === 'series' ? 'série' : 'annonce'}`}
                 </p>
-                {isOwnProfile && (
+                {isOwnProfile && subscribed && (
                   <Button
                     onClick={() => setShowCreateForm(true)}
                     variant="outline"
@@ -110,6 +133,14 @@ const UserPublications = ({ userId, isOwnProfile = false }: UserPublicationsProp
                     <Plus className="h-4 w-4" />
                     Créer votre première publication
                   </Button>
+                )}
+                {isOwnProfile && !subscribed && !subscriptionLoading && (
+                  <div className="max-w-md mx-auto">
+                    <p className="text-sm text-gray-500 mb-4">
+                      Abonnez-vous pour commencer à publier
+                    </p>
+                    <SubscriptionButton />
+                  </div>
                 )}
               </div>
             )}

@@ -1,9 +1,13 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useSubscription } from '@/hooks/useSubscription';
 import UserPublications from '@/components/UserPublications';
+import SubscriptionButton from '@/components/SubscriptionButton';
 
 const Dashboard = () => {
+  const { subscribed, subscription_tier, subscription_end, loading } = useSubscription();
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto">
@@ -13,8 +17,11 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar avec statistiques */}
+          {/* Sidebar avec statistiques et abonnement */}
           <div className="lg:col-span-1 space-y-4">
+            {/* Statut d'abonnement */}
+            <SubscriptionButton />
+            
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Mes statistiques</CardTitle>
