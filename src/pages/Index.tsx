@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
@@ -293,15 +294,56 @@ const Index = () => {
           {/* Section Tarifs */}
           <section id="pricing" className="mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Abonnement</h2>
-            <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center">
-              <h3 className="text-2xl font-bold mb-4">BimFun Premium</h3>
-              <p className="text-gray-600 mb-6">Accès complet à toutes les fonctionnalités</p>
+            <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md text-center border-2 border-blue-200">
+              <div className="mb-4">
+                <Crown className="h-12 w-12 text-blue-600 mx-auto mb-2" />
+                <h3 className="text-2xl font-bold mb-2">BimFun Premium</h3>
+                <div className="text-4xl font-bold text-blue-600 mb-2">
+                  10,00 $
+                  <span className="text-lg font-normal text-gray-600">/mois</span>
+                </div>
+                <p className="text-gray-600 mb-6">Accès complet à toutes les fonctionnalités</p>
+              </div>
+              
+              <div className="mb-6">
+                <ul className="space-y-3 text-left">
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Publications créatives illimitées</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Messagerie avancée en temps réel</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Appels vocaux et vidéo HD</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Réseau professionnel étendu</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Sécurité renforcée</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                    <span>Support prioritaire</span>
+                  </li>
+                </ul>
+              </div>
+              
               <Button 
-                className="w-full bg-gray-900 hover:bg-gray-800 text-white"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg font-semibold"
                 onClick={() => handleOpenAuth('signup')}
               >
                 Commencer maintenant
               </Button>
+              
+              <p className="text-sm text-gray-500 mt-4">
+                Annulation possible à tout moment
+              </p>
             </div>
           </section>
 
