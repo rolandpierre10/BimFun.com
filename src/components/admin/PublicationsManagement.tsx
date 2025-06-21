@@ -29,6 +29,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Publication {
   id: string;
@@ -119,6 +130,23 @@ const PublicationsManagement: React.FC<PublicationsManagementProps> = ({
       toast({
         title: "Erreur",
         description: "Impossible de signaler la publication",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeletePublication = async (publicationId: string) => {
+    try {
+      await onDeletePublication(publicationId);
+      toast({
+        title: "Publication supprimée",
+        description: "La publication a été supprimée avec succès",
+      });
+    } catch (error) {
+      console.error('Error deleting publication:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la publication",
         variant: "destructive",
       });
     }
@@ -257,13 +285,33 @@ const PublicationsManagement: React.FC<PublicationsManagementProps> = ({
                       >
                         <Flag className="h-3 w-3" />
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => onDeletePublication(pub.id)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Êtes-vous sûr de vouloir supprimer cette publication ? Cette action est irréversible.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeletePublication(pub.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Supprimer
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </TableCell>
                 </TableRow>
