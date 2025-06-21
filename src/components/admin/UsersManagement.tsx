@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Users, Ban, AlertTriangle, Crown, User } from 'lucide-react';
 import UserOnlineStatus from '@/components/UserOnlineStatus';
+import FollowButton from '@/components/FollowButton';
 
 interface User {
   id: string;
@@ -121,7 +123,8 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                     </div>
                   </div>
                   
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2 items-center">
+                    <FollowButton userId={userItem.id} userName={userItem.full_name} size="sm" variant="outline" />
                     <UserOnlineStatus userId={userItem.id} showAsButton={true} />
                     <Button
                       size="sm"

@@ -8,6 +8,7 @@ import { MessageCircle, Phone, Video, User, MapPin, Briefcase, Calendar, FileTex
 import MessagingInterface from './MessagingInterface';
 import UserPublications from './UserPublications';
 import UserStatusIndicator from './UserStatusIndicator';
+import FollowButton from './FollowButton';
 
 interface UserProfileProps {
   user: {
@@ -59,6 +60,9 @@ const UserProfile = ({ user, onClose }: UserProfileProps) => {
                   {user.profession}
                 </Badge>
               )}
+              <div className="mt-2">
+                <FollowButton userId={user.id} userName={user.name} />
+              </div>
             </div>
           </div>
           {onClose && (

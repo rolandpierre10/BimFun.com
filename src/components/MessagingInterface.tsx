@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,7 +50,7 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
   const sendMessage = async () => {
     if ((message.trim() || selectedGif) && userId) {
       if (selectedGif) {
-        // Send GIF URL as text message with special content
+        // Send GIF URL as text message with special type
         await sendTextMessage(userId, selectedGif, 'gif');
         setSelectedGif(null);
       } else {
