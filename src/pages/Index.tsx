@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import AuthModal from '@/components/AuthModal';
 import Footer from '@/components/Footer';
 import InstallPrompt from '@/components/InstallPrompt';
 import DemoInteractions from '@/components/DemoInteractions';
+import ClickableImage from '@/components/ClickableImage';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from "@/hooks/use-toast";
 
@@ -97,6 +99,52 @@ const Index = () => {
               La plateforme sociale où les professionnels partagent, découvrent et s'inspirent à travers du contenu créatif du monde entier.
             </p>
           </div>
+
+          {/* Galerie d'images d'appels vidéo */}
+          <section className="mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">Connectez-vous en vidéo</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              <ClickableImage
+                src="/lovable-uploads/42e4cfc8-b297-45ae-bdc5-61eb1a2b5be0.png"
+                alt="Appels vidéo multi-participants sur ordinateur et mobile"
+                className="rounded-lg shadow-lg w-full h-48 object-cover"
+                title="Appels vidéo multi-participants"
+                description="Connectez-vous avec plusieurs personnes simultanément"
+              />
+              
+              <ClickableImage
+                src="/lovable-uploads/a730af4c-1fac4-4947-b2a5-6b8dfa72c7a3.png"
+                alt="Appels vidéo mobiles avec filtres"
+                className="rounded-lg shadow-lg w-full h-48 object-cover"
+                title="Appels vidéo avec filtres"
+                description="Personnalisez vos appels avec des filtres amusants"
+              />
+              
+              <ClickableImage
+                src="/lovable-uploads/3d1a7653-54c7-4fde-904a-a4c2860d53e8.png"
+                alt="Réseau professionnel connecté"
+                className="rounded-lg shadow-lg w-full h-48 object-cover"
+                title="Réseau professionnel"
+                description="Développez votre réseau de contacts professionnels"
+              />
+              
+              <ClickableImage
+                src="/lovable-uploads/204a0def-1515-4520-8e02-32f5df1f3b53.png"
+                alt="Appels vidéo sur tablette et mobile"
+                className="rounded-lg shadow-lg w-full h-48 object-cover"
+                title="Multi-appareils"
+                description="Utilisez BimFun sur tous vos appareils"
+              />
+              
+              <ClickableImage
+                src="/lovable-uploads/cc9c6bca-8998-48f7-a0a1-bdfccfac3973.png"
+                alt="Appel vidéo mobile interface utilisateur"
+                className="rounded-lg shadow-lg w-full h-48 object-cover lg:col-span-2 md:col-span-2"
+                title="Interface intuitive"
+                description="Une interface simple et élégante pour vos appels"
+              />
+            </div>
+          </section>
 
           {/* Section Services */}
           <section id="services" className="mb-16">
