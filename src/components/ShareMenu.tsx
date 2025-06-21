@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Share2, Mail, MessageSquare, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import { Share2, Mail, MessageSquare, Facebook, Twitter, Linkedin, Instagram, Phone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ShareMenuProps {
@@ -34,6 +34,16 @@ const ShareMenu = ({ title, description, url }: ShareMenuProps) => {
     toast({
       title: "SMS ouvert",
       description: "Votre application SMS s'est ouverte pour partager la publication",
+    });
+  };
+
+  const shareViaWhatsApp = () => {
+    const message = encodeURIComponent(`Découvrez: ${title}\n${description || ''}\n\n${url}`);
+    window.open(`https://wa.me/?text=${message}`, '_blank');
+    
+    toast({
+      title: "WhatsApp ouvert",
+      description: "WhatsApp s'est ouvert pour partager la publication",
     });
   };
 
@@ -128,6 +138,16 @@ const ShareMenu = ({ title, description, url }: ShareMenuProps) => {
             >
               <MessageSquare className="h-4 w-4" />
               SMS
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={shareViaWhatsApp}
+              className="flex items-center gap-2 justify-start text-green-600 hover:text-green-700"
+            >
+              <Phone className="h-4 w-4" />
+              WhatsApp
             </Button>
             
             <Button
