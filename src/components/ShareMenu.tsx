@@ -9,51 +9,52 @@ interface ShareMenuProps {
   title: string;
   description?: string;
   url: string;
+  imageUrl?: string;
 }
 
-const ShareMenu = ({ title, description, url }: ShareMenuProps) => {
+const ShareMenu = ({ title, description, url, imageUrl }: ShareMenuProps) => {
   const { toast } = useToast();
 
   const shareViaEmail = () => {
-    const subject = encodeURIComponent(`Découvrez: ${title}`);
+    const subject = encodeURIComponent(`Découvrez cette image: ${title}`);
     const body = encodeURIComponent(
-      `Je pensais que cela pourrait vous intéresser:\n\n${title}\n${description || ''}\n\n${url}`
+      `Je pensais que cette image pourrait vous intéresser:\n\n${title}\n${description || ''}\n\nVoir l'image: ${url}${imageUrl ? `\n\nImage directe: ${imageUrl}` : ''}`
     );
     window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
     
     toast({
       title: "Email ouvert",
-      description: "Votre client email s'est ouvert pour partager la publication",
+      description: "Votre client email s'est ouvert pour partager l'image",
     });
   };
 
   const shareViaSMS = () => {
-    const message = encodeURIComponent(`Découvrez: ${title} - ${url}`);
+    const message = encodeURIComponent(`Découvrez cette image: ${title} - ${url}`);
     window.open(`sms:?body=${message}`, '_blank');
     
     toast({
       title: "SMS ouvert",
-      description: "Votre application SMS s'est ouverte pour partager la publication",
+      description: "Votre application SMS s'est ouverte pour partager l'image",
     });
   };
 
   const shareViaWhatsApp = () => {
-    const message = encodeURIComponent(`Découvrez: ${title}\n${description || ''}\n\n${url}`);
+    const message = encodeURIComponent(`Découvrez cette image: ${title}\n${description || ''}\n\n${url}`);
     window.open(`https://wa.me/?text=${message}`, '_blank');
     
     toast({
       title: "WhatsApp ouvert",
-      description: "WhatsApp s'est ouvert pour partager la publication",
+      description: "WhatsApp s'est ouvert pour partager l'image",
     });
   };
 
   const shareOnFacebook = () => {
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}${imageUrl ? `&picture=${encodeURIComponent(imageUrl)}` : ''}`;
     window.open(shareUrl, '_blank', 'width=600,height=400');
     
     toast({
       title: "Partagé sur Facebook",
-      description: "La publication a été partagée sur Facebook",
+      description: "L'image a été partagée sur Facebook",
     });
   };
 
@@ -64,7 +65,7 @@ const ShareMenu = ({ title, description, url }: ShareMenuProps) => {
     
     toast({
       title: "Partagé sur Twitter",
-      description: "La publication a été partagée sur Twitter",
+      description: "L'image a été partagée sur Twitter",
     });
   };
 
@@ -74,7 +75,7 @@ const ShareMenu = ({ title, description, url }: ShareMenuProps) => {
     
     toast({
       title: "Partagé sur LinkedIn",
-      description: "La publication a été partagée sur LinkedIn",
+      description: "L'image a été partagée sur LinkedIn",
     });
   };
 
@@ -92,7 +93,7 @@ const ShareMenu = ({ title, description, url }: ShareMenuProps) => {
     navigator.clipboard.writeText(url).then(() => {
       toast({
         title: "Lien copié",
-        description: "Le lien de la publication a été copié dans le presse-papiers",
+        description: "Le lien de l'image a été copié dans le presse-papiers",
       });
     }).catch(() => {
       toast({
@@ -101,6 +102,23 @@ const ShareMenu = ({ title, description, url }: ShareMenuProps) => {
         variant: "destructive",
       });
     });
+  };
+
+  const copyImage = () => {
+    if (imageUrl) {
+      navigator.clipboard.writeText(imageUrl).then(() => {
+        toast({
+          title: "Lien image copié",
+          description: "Le lien direct de l'image a été copié",
+        });
+      }).catch(() => {
+        toast({
+          title: "Erreur",
+          description: "Impossible de copier le lien de l'image",
+          variant: "destructive",
+        });
+      });
+    }
   };
 
   return (
@@ -117,7 +135,7 @@ const ShareMenu = ({ title, description, url }: ShareMenuProps) => {
       </PopoverTrigger>
       <PopoverContent className="w-64 p-3" align="start">
         <div className="space-y-2">
-          <h4 className="font-medium text-sm text-gray-900 mb-3">Partager cette publication</h4>
+          <h4 className="font-medium text-sm text-gray-900 mb-3">Partager cette image</h4>
           
           <div className="grid grid-cols-2 gap-2">
             <Button
@@ -191,7 +209,7 @@ const ShareMenu = ({ title, description, url }: ShareMenuProps) => {
             </Button>
           </div>
           
-          <div className="pt-2 border-t">
+          <div className="pt-2 border-t space-y-2">
             <Button
               variant="secondary"
               size="sm"
@@ -201,6 +219,18 @@ const ShareMenu = ({ title, description, url }: ShareMenuProps) => {
               <Share2 className="h-4 w-4" />
               Copier le lien
             </Button>
+            
+            {imageUrl && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={copyImage}
+                className="w-full flex items-center gap-2 justify-center"
+              >
+                <Share2 className="h-4 w-4" />
+                Copier l'image
+              </Button>
+            )}
           </div>
         </div>
       </PopoverContent>

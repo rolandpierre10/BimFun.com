@@ -11,6 +11,7 @@ import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import ShareMenu from './ShareMenu';
+import ClickableImage from './ClickableImage';
 
 interface PublicationCardProps {
   publication: Publication;
@@ -293,13 +294,15 @@ const PublicationCard = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {publication.media_urls.slice(0, 4).map((url, index) => (
               <div key={index} className="relative">
-                <img 
-                  src={url} 
+                <ClickableImage
+                  src={url}
                   alt={`Image ${index + 1}`}
                   className="w-full h-48 object-cover rounded-lg"
+                  title={publication.title}
+                  description={publication.description}
                 />
                 {index === 3 && publication.media_urls.length > 4 && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center pointer-events-none">
                     <span className="text-white text-lg font-semibold">
                       +{publication.media_urls.length - 4}
                     </span>
@@ -344,6 +347,13 @@ const PublicationCard = ({
       default:
         return null;
     }
+  };
+
+  const getFirstImageUrl = () => {
+    if (publication.content_type === 'photo' && publication.media_urls && publication.media_urls.length > 0) {
+      return publication.media_urls[0];
+    }
+    return undefined;
   };
 
   return (
@@ -469,6 +479,7 @@ const PublicationCard = ({
               title={publication.title}
               description={publication.description || ''}
               url={`${window.location.origin}/publication/${publication.id}`}
+              imageUrl={getFirstImageUrl()}
             />
 
             {showAllActions && (
