@@ -368,12 +368,7 @@ const AdminDashboard = () => {
         )}
         
         {activeTab === 'create-publication' && (
-          <AdminPublicationCreator 
-            onPublicationCreated={() => {
-              loadPublications();
-              loadStats();
-            }}
-          />
+          <AdminPublicationCreator />
         )}
         
         {activeTab === 'reports' && (

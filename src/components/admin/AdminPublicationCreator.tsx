@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, X, Upload, Loader2 } from 'lucide-react';
+import { Plus, X, Upload, Loader2, Download, Link } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -18,7 +18,9 @@ const AdminPublicationCreator = () => {
   const [currentTag, setCurrentTag] = useState('');
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   const [currentMediaUrl, setCurrentMediaUrl] = useState('');
+  const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
   const handleAddTag = () => {
@@ -34,13 +36,106 @@ const AdminPublicationCreator = () => {
 
   const handleAddMediaUrl = () => {
     if (currentMediaUrl.trim() && !mediaUrls.includes(currentMediaUrl.trim())) {
-      setMediaUrls([...mediaUrls, currentMediaUrl.trim()]);
-      setCurrentMediaUrl('');
+      // Validation simple de l'URL
+      try {
+        new URL(currentMediaUrl.trim());
+        setMediaUrls([...mediaUrls, currentMediaUrl.trim()]);
+        setCurrentMediaUrl('');
+        toast({
+          title: 'URL ajoutée',
+          description: 'L\'URL du média a été ajoutée avec succès',
+        });
+      } catch (error) {
+        toast({
+          title: 'URL invalide',
+          description: 'Veuillez entrer une URL valide',
+          variant: 'destructive',
+        });
+      }
     }
   };
 
   const handleRemoveMediaUrl = (urlToRemove: string) => {
     setMediaUrls(mediaUrls.filter(url => url !== urlToRemove));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const selectedFiles = Array.from(e.target.files);
+      setFiles(selectedFiles);
+      console.log('Files selected:', selectedFiles.length);
+    }
+  };
+
+  const uploadFiles = async (): Promise<string[]> => {
+    if (files.length === 0) return [];
+
+    setIsUploading(true);
+    const uploadedUrls: string[] = [];
+
+    try {
+      for (const file of files) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        // Déterminer le bucket en fonction du type de contenu
+        let bucket = 'user-photos'; // défaut
+        if (contentType === 'video' || contentType === 'series') {
+          bucket = 'user-videos';
+        } else if (contentType === 'music') {
+          bucket = 'user-music';
+        }
+
+        console.log(`Uploading ${file.name} to bucket: ${bucket}`);
+
+        const { error: uploadError } = await supabase.storage
+          .from(bucket)
+          .upload(fileName, file);
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          throw uploadError;
+        }
+
+        const { data } = supabase.storage
+          .from(bucket)
+          .getPublicUrl(fileName);
+
+        uploadedUrls.push(data.publicUrl);
+        console.log(`File uploaded successfully: ${data.publicUrl}`);
+      }
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      throw error;
+    } finally {
+      setIsUploading(false);
+    }
+
+    return uploadedUrls;
+  };
+
+  const handleDownloadFile = (url: string, filename?: string) => {
+    try {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename || `media_${Date.now()}`;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: 'Téléchargement démarré',
+        description: 'Le fichier va être téléchargé',
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: 'Erreur de téléchargement',
+        description: 'Impossible de télécharger le fichier',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleCreatePublication = async () => {
@@ -59,7 +154,8 @@ const AdminPublicationCreator = () => {
       description,
       contentType,
       tags,
-      mediaUrls
+      mediaUrls,
+      filesCount: files.length
     });
 
     try {
@@ -72,12 +168,19 @@ const AdminPublicationCreator = () => {
 
       console.log('Current user:', user);
 
+      // Upload files first if any
+      let allMediaUrls = [...mediaUrls];
+      if (files.length > 0) {
+        const uploadedUrls = await uploadFiles();
+        allMediaUrls = [...allMediaUrls, ...uploadedUrls];
+      }
+
       const publicationData = {
         title: title.trim(),
         description: description.trim() || null,
         content_type: contentType,
         tags: tags,
-        media_urls: mediaUrls,
+        media_urls: allMediaUrls,
         is_public: true, // Always public for admin publications
         user_id: user.id,
         likes_count: 0,
@@ -111,6 +214,7 @@ const AdminPublicationCreator = () => {
       setContentType('');
       setTags([]);
       setMediaUrls([]);
+      setFiles([]);
       setCurrentTag('');
       setCurrentMediaUrl('');
 
@@ -123,6 +227,16 @@ const AdminPublicationCreator = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const getAcceptedFileTypes = () => {
+    switch (contentType) {
+      case 'photo': return 'image/*';
+      case 'video': return 'video/*';
+      case 'music': return 'audio/*';
+      case 'series': return 'video/*';
+      default: return '*/*';
     }
   };
 
@@ -198,13 +312,74 @@ const AdminPublicationCreator = () => {
           </div>
         </div>
 
+        {contentType && contentType !== 'announcement' && (
+          <div>
+            <label className="block text-sm font-medium mb-2">Télécharger des fichiers</label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+              <Upload className="h-12 w-12 mx-auto text-gray-400 mb-2" />
+              <input
+                type="file"
+                multiple
+                accept={getAcceptedFileTypes()}
+                onChange={handleFileChange}
+                className="hidden"
+                id="file-upload"
+              />
+              <label htmlFor="file-upload" className="cursor-pointer">
+                <span className="text-blue-600 hover:text-blue-500">
+                  Cliquez pour sélectionner des fichiers
+                </span>
+                <p className="text-gray-500 text-sm mt-1">
+                  {contentType === 'photo' && 'Images (PNG, JPG, JPEG)'}
+                  {contentType === 'video' && 'Vidéos (MP4, AVI, MOV)'}
+                  {contentType === 'music' && 'Audio (MP3, WAV, FLAC)'}
+                  {contentType === 'series' && 'Vidéos (MP4, AVI, MOV)'}
+                </p>
+              </label>
+            </div>
+            
+            {files.length > 0 && (
+              <div className="mt-2">
+                <p className="text-sm text-gray-600 mb-2">{files.length} fichier(s) sélectionné(s)</p>
+                <div className="space-y-2">
+                  {files.map((file, index) => (
+                    <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                      <span className="text-sm truncate flex-1">{file.name}</span>
+                      <div className="flex gap-2 ml-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const url = URL.createObjectURL(file);
+                            handleDownloadFile(url, file.name);
+                            URL.revokeObjectURL(url);
+                          }}
+                        >
+                          <Download className="h-3 w-3" />
+                        </Button>
+                        <X
+                          className="h-4 w-4 cursor-pointer text-red-500"
+                          onClick={() => {
+                            setFiles(files.filter((_, i) => i !== index));
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div>
           <label className="block text-sm font-medium mb-2">URLs des médias</label>
           <div className="flex space-x-2 mb-2">
             <Input
               value={currentMediaUrl}
               onChange={(e) => setCurrentMediaUrl(e.target.value)}
-              placeholder="URL de l'image/vidéo"
+              placeholder="https://exemple.com/image.jpg"
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
@@ -213,17 +388,27 @@ const AdminPublicationCreator = () => {
               }}
             />
             <Button type="button" onClick={handleAddMediaUrl} size="sm">
-              <Upload className="h-4 w-4" />
+              <Link className="h-4 w-4" />
             </Button>
           </div>
           <div className="space-y-2">
             {mediaUrls.map((url, index) => (
               <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
                 <span className="text-sm truncate flex-1">{url}</span>
-                <X
-                  className="h-4 w-4 cursor-pointer text-red-500 ml-2"
-                  onClick={() => handleRemoveMediaUrl(url)}
-                />
+                <div className="flex gap-2 ml-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleDownloadFile(url)}
+                  >
+                    <Download className="h-3 w-3" />
+                  </Button>
+                  <X
+                    className="h-4 w-4 cursor-pointer text-red-500"
+                    onClick={() => handleRemoveMediaUrl(url)}
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -232,12 +417,12 @@ const AdminPublicationCreator = () => {
         <Button 
           onClick={handleCreatePublication} 
           className="w-full" 
-          disabled={isLoading || !title.trim() || !contentType}
+          disabled={isLoading || isUploading || !title.trim() || !contentType}
         >
-          {isLoading ? (
+          {isLoading || isUploading ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Création en cours...
+              {isUploading ? 'Téléchargement en cours...' : 'Création en cours...'}
             </>
           ) : (
             'Créer et publier'
