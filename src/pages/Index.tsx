@@ -104,7 +104,7 @@ const Index = () => {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
               Communication vidéo professionnelle
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
               <div className="text-center">
                 <img 
                   src="/lovable-uploads/4921e08b-7a9e-4bc8-bc40-96680f5c64ff.png" 
@@ -133,6 +133,16 @@ const Index = () => {
                 />
                 <p className="text-gray-600 mt-2 text-sm">
                   Communication professionnelle
+                </p>
+              </div>
+              <div className="text-center">
+                <img 
+                  src="/lovable-uploads/258ac0d9-5aad-4ece-9365-c2c7d3698a53.png" 
+                  alt="Interface d'appel vidéo moderne"
+                  className="w-full h-auto rounded-lg shadow-lg"
+                />
+                <p className="text-gray-600 mt-2 text-sm">
+                  Interface moderne
                 </p>
               </div>
             </div>
