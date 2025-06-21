@@ -351,9 +351,19 @@ const PublicationCard = ({
 
   const getFirstImageUrl = () => {
     if (publication.content_type === 'photo' && publication.media_urls && publication.media_urls.length > 0) {
-      return publication.media_urls[0];
+      const imageUrl = publication.media_urls[0];
+      // Ensure the URL is properly formatted for sharing
+      if (imageUrl.startsWith('http')) {
+        return imageUrl;
+      }
+      // If it's a relative path, make it absolute
+      return `${window.location.origin}${imageUrl}`;
     }
     return undefined;
+  };
+
+  const getPublicationUrl = () => {
+    return `${window.location.origin}/publication/${publication.id}`;
   };
 
   return (
@@ -478,7 +488,7 @@ const PublicationCard = ({
             <ShareMenu
               title={publication.title}
               description={publication.description || ''}
-              url={`${window.location.origin}/publication/${publication.id}`}
+              url={getPublicationUrl()}
               imageUrl={getFirstImageUrl()}
             />
 

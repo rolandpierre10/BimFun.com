@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Share2, X } from 'lucide-react';
+import { Download, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ShareMenu from './ShareMenu';
 
@@ -18,9 +18,19 @@ const ClickableImage = ({ src, alt, className = "", title, description }: Clicka
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
 
+  // Ensure the image URL is properly formatted
+  const getValidImageUrl = (imgSrc: string) => {
+    if (imgSrc.startsWith('http')) {
+      return imgSrc;
+    }
+    return `${window.location.origin}${imgSrc}`;
+  };
+
+  const validImageUrl = getValidImageUrl(src);
+
   const handleDownload = async () => {
     try {
-      const response = await fetch(src);
+      const response = await fetch(validImageUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -48,7 +58,7 @@ const ClickableImage = ({ src, alt, className = "", title, description }: Clicka
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <img 
-          src={src} 
+          src={validImageUrl} 
           alt={alt}
           className={`cursor-pointer hover:opacity-90 transition-opacity ${className}`}
           onClick={() => setIsOpen(true)}
@@ -66,7 +76,7 @@ const ClickableImage = ({ src, alt, className = "", title, description }: Clicka
           </Button>
           
           <img 
-            src={src} 
+            src={validImageUrl} 
             alt={alt}
             className="w-full h-auto max-h-[80vh] object-contain"
           />
@@ -92,7 +102,7 @@ const ClickableImage = ({ src, alt, className = "", title, description }: Clicka
                   title={title || alt}
                   description={description}
                   url={window.location.href}
-                  imageUrl={src}
+                  imageUrl={validImageUrl}
                 />
               </div>
             </div>

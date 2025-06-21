@@ -15,6 +15,7 @@ import CookiePolicy from "./pages/CookiePolicy";
 import NotFound from "./pages/NotFound";
 import AdminRoute from "./components/AdminRoute";
 import AdminDashboard from "./pages/AdminDashboard";
+import PublicationPage from "./pages/PublicationPage";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/mentions-legales" element={<LegalNotice />} />
             <Route path="/politique-cookies" element={<CookiePolicy />} />
+            <Route path="/publication/:id" element={<PublicationPage />} />
             <Route path="/admin" element={
               <AdminRoute>
                 <AdminDashboard />
