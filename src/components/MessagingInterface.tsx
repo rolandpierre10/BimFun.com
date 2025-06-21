@@ -39,6 +39,7 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
   const [loading, setLoading] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showGifPicker, setShowGifPicker] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -134,6 +135,15 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
   const handleGifSelect = (gifUrl: string) => {
     sendMessage('', 'gif', gifUrl);
     setShowGifPicker(false);
+  };
+
+  const handleVoiceMessage = (audioBlob: Blob, duration: number) => {
+    // In a real implementation, you would upload the audio file
+    console.log('Voice message recorded:', { audioBlob, duration });
+    toast({
+      title: "Message vocal",
+      description: "Fonctionnalité en cours de développement",
+    });
   };
 
   const formatTime = (dateString: string) => {
@@ -232,7 +242,11 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
               )}
             </div>
 
-            <VoiceRecorder />
+            <VoiceRecorder 
+              onSendVoiceMessage={handleVoiceMessage}
+              isRecording={isRecording}
+              onRecordingStateChange={setIsRecording}
+            />
 
             <Input
               placeholder="Tapez votre message..."
