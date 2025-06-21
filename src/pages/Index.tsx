@@ -99,6 +99,18 @@ const Index = () => {
             </p>
           </div>
 
+          {/* Image d'illustration des appels vidéo */}
+          <div className="mb-16 text-center">
+            <img 
+              src="/lovable-uploads/4921e08b-7a9e-4bc8-bc40-96680f5c64ff.png" 
+              alt="Interface d'appels vidéo BimFun - Communication professionnelle"
+              className="max-w-full h-auto mx-auto rounded-lg shadow-lg"
+            />
+            <p className="text-gray-600 mt-4 text-lg">
+              Collaborez en temps réel avec des appels vidéo haute qualité
+            </p>
+          </div>
+
           {/* Section Services */}
           <section id="services" className="mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">Nos Services</h2>
