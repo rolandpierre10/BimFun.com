@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
@@ -47,16 +46,14 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16 lg:h-18">
-          {/* Logo - Masqué sur la page d'accueil */}
-          {!isHomePage && (
-            <Link to="/" className="flex items-center flex-shrink-0">
-              <img 
-                src="/lovable-uploads/3ad16cd3-6fcc-475f-bc25-eaad941f1b74.png" 
-                alt="BimFun Logo" 
-                className="h-8 sm:h-12 lg:h-16 w-auto hover:opacity-80 transition-opacity"
-              />
-            </Link>
-          )}
+          {/* Logo - Visible sur toutes les pages maintenant */}
+          <Link to="/" className="flex items-center flex-shrink-0">
+            <img 
+              src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
+              alt="BimFun Logo" 
+              className="h-8 sm:h-12 lg:h-16 w-auto hover:opacity-80 transition-opacity"
+            />
+          </Link>
           
           {/* Navigation Links - Masqués sur mobile */}
           <div className="hidden lg:flex items-center space-x-6">
