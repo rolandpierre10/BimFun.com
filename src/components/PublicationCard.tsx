@@ -1,16 +1,16 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Heart, MessageCircle, Share2, Play, User, View, ThumbsDown, UserPlus, MessageSquare, UserCheck } from 'lucide-react';
+import { Heart, MessageCircle, Play, User, Eye, ThumbsDown, UserPlus, MessageSquare, UserCheck } from 'lucide-react';
 import { Publication } from '@/hooks/usePublications';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import ShareMenu from './ShareMenu';
 
 interface PublicationCardProps {
   publication: Publication;
@@ -208,6 +208,11 @@ const PublicationCard = ({
           .from('publications')
           .update({ views_count: newViewCount })
           .eq('id', publication.id);
+
+        toast({
+          title: "Vue enregistrée",
+          description: "Votre vue a été enregistrée",
+        });
 
         if (onView) {
           onView(publication.id);
@@ -460,15 +465,11 @@ const PublicationCard = ({
               </DialogContent>
             </Dialog>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleShare}
-              className="flex items-center gap-2 text-gray-600 hover:text-green-600"
-            >
-              <Share2 className="h-4 w-4" />
-              <span>Partager</span>
-            </Button>
+            <ShareMenu
+              title={publication.title}
+              description={publication.description || ''}
+              url={`${window.location.origin}/publication/${publication.id}`}
+            />
 
             {showAllActions && (
               <>
@@ -501,7 +502,7 @@ const PublicationCard = ({
             onClick={handleView}
             className="flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600"
           >
-            <View className="h-4 w-4" />
+            <Eye className="h-4 w-4" />
             <span>{viewCount}</span>
           </Button>
         </div>
