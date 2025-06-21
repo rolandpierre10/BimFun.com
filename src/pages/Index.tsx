@@ -98,68 +98,6 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Galerie d'images d'illustration des appels vidéo */}
-          <div className="mb-16">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-              Communication vidéo professionnelle
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
-              <div className="text-center">
-                <img 
-                  src="/lovable-uploads/4921e08b-7a9e-4bc8-bc40-96680f5c64ff.png" 
-                  alt="Interface d'appels vidéo BimFun sur mobile"
-                  className="w-full h-auto rounded-lg shadow-lg"
-                />
-                <p className="text-gray-600 mt-2 text-sm">
-                  Appels vidéo mobiles
-                </p>
-              </div>
-              <div className="text-center">
-                <img 
-                  src="/lovable-uploads/d7ef8434-3779-4c4e-8925-e39c07b754f9.png" 
-                  alt="Interface d'appels vidéo en groupe sur tablette"
-                  className="w-full h-auto rounded-lg shadow-lg"
-                />
-                <p className="text-gray-600 mt-2 text-sm">
-                  Appels en groupe
-                </p>
-              </div>
-              <div className="text-center">
-                <img 
-                  src="/lovable-uploads/3ad16cd3-6fcc-475f-bc25-eaad941f1b74.png" 
-                  alt="Interface d'appel professionnel sur smartphone"
-                  className="w-full h-auto rounded-lg shadow-lg"
-                />
-                <p className="text-gray-600 mt-2 text-sm">
-                  Communication professionnelle
-                </p>
-              </div>
-              <div className="text-center">
-                <img 
-                  src="/lovable-uploads/258ac0d9-5aad-4ece-9365-c2c7d3698a53.png" 
-                  alt="Interface d'appel vidéo moderne"
-                  className="w-full h-auto rounded-lg shadow-lg"
-                />
-                <p className="text-gray-600 mt-2 text-sm">
-                  Interface moderne
-                </p>
-              </div>
-              <div className="text-center">
-                <img 
-                  src="/lovable-uploads/b024f6c8-ec93-4f8c-8b42-33164d84cbd3.png" 
-                  alt="Interface d'appel vidéo en direct"
-                  className="w-full h-auto rounded-lg shadow-lg"
-                />
-                <p className="text-gray-600 mt-2 text-sm">
-                  Appel vidéo en direct
-                </p>
-              </div>
-            </div>
-            <p className="text-gray-600 text-center text-lg">
-              Collaborez en temps réel avec des appels vidéo haute qualité sur tous vos appareils
-            </p>
-          </div>
-
           {/* Section Services */}
           <section id="services" className="mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">Nos Services</h2>
