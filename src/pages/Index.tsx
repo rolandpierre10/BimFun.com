@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
@@ -104,7 +103,7 @@ const Index = () => {
             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
               Communication vidéo professionnelle
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
               <div className="text-center">
                 <img 
                   src="/lovable-uploads/4921e08b-7a9e-4bc8-bc40-96680f5c64ff.png" 
@@ -143,6 +142,16 @@ const Index = () => {
                 />
                 <p className="text-gray-600 mt-2 text-sm">
                   Interface moderne
+                </p>
+              </div>
+              <div className="text-center">
+                <img 
+                  src="/lovable-uploads/b024f6c8-ec93-4f8c-8b42-33164d84cbd3.png" 
+                  alt="Interface d'appel vidéo en direct"
+                  className="w-full h-auto rounded-lg shadow-lg"
+                />
+                <p className="text-gray-600 mt-2 text-sm">
+                  Appel vidéo en direct
                 </p>
               </div>
             </div>
