@@ -13,6 +13,7 @@ const PublicFeed = () => {
   const { data: publications, isLoading, refetch } = useQuery({
     queryKey: ['public-publications'],
     queryFn: async () => {
+      console.log('Fetching publications...');
       const { data, error } = await supabase
         .from('publications')
         .select(`
@@ -28,7 +29,12 @@ const PublicFeed = () => {
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching publications:', error);
+        throw error;
+      }
+      
+      console.log('Publications fetched:', data);
       
       // Ajouter des profils de démonstration pour les publications sans utilisateur réel
       return (data as (Publication & { profiles: any })[]).map((pub, index) => {
@@ -46,7 +52,7 @@ const PublicFeed = () => {
         return pub;
       });
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 10000, // Refresh every 10 seconds to catch new publications
     refetchOnWindowFocus: true, // Refresh when window regains focus
   });
 
@@ -59,27 +65,13 @@ const PublicFeed = () => {
       .on(
         'postgres_changes',
         {
-          event: 'INSERT',
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
           schema: 'public',
-          table: 'publications',
-          filter: 'is_public=eq.true'
+          table: 'publications'
         },
         (payload) => {
-          console.log('New publication inserted:', payload);
-          refetch(); // Refresh the feed when a new publication is added
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'publications',
-          filter: 'is_public=eq.true'
-        },
-        (payload) => {
-          console.log('Publication updated:', payload);
-          refetch(); // Refresh the feed when a publication is updated
+          console.log('Publication change detected:', payload);
+          refetch(); // Refresh the feed when any publication changes
         }
       )
       .subscribe((status) => {
@@ -93,6 +85,7 @@ const PublicFeed = () => {
   }, [refetch]);
 
   const handleRefresh = async () => {
+    console.log('Manual refresh triggered');
     setRefreshing(true);
     await refetch();
     setRefreshing(false);
@@ -206,6 +199,8 @@ const PublicFeed = () => {
     }
   };
 
+  console.log('PublicFeed render - publications:', publications, 'isLoading:', isLoading);
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -234,6 +229,9 @@ const PublicFeed = () => {
 
       {publications && publications.length > 0 ? (
         <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            {publications.length} publication{publications.length > 1 ? 's' : ''} trouvée{publications.length > 1 ? 's' : ''}
+          </p>
           {publications.map((publication) => (
             <PublicationCard
               key={publication.id}
