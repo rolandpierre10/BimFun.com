@@ -286,7 +286,9 @@ const PublicationCard = ({
       return null;
     }
 
-    const firstMedia = publication.media_urls[0];
+    const isGif = (url: string) => {
+      return url.includes('giphy.com') || url.includes('.gif');
+    };
 
     switch (publication.content_type) {
       case 'photo':
@@ -294,13 +296,21 @@ const PublicationCard = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {publication.media_urls.slice(0, 4).map((url, index) => (
               <div key={index} className="relative">
-                <ClickableImage
-                  src={url}
-                  alt={`Image ${index + 1}`}
-                  className="w-full h-48 object-cover rounded-lg"
-                  title={publication.title}
-                  description={publication.description}
-                />
+                {isGif(url) ? (
+                  <img
+                    src={url}
+                    alt={`GIF ${index + 1}`}
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                ) : (
+                  <ClickableImage
+                    src={url}
+                    alt={`Image ${index + 1}`}
+                    className="w-full h-48 object-cover rounded-lg"
+                    title={publication.title}
+                    description={publication.description}
+                  />
+                )}
                 {index === 3 && publication.media_urls.length > 4 && (
                   <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center pointer-events-none">
                     <span className="text-white text-lg font-semibold">
@@ -318,7 +328,7 @@ const PublicationCard = ({
         return (
           <div className="relative">
             <video 
-              src={firstMedia}
+              src={publication.media_urls[0]}
               className="w-full h-64 object-cover rounded-lg"
               poster=""
               controls={false}

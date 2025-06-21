@@ -1,13 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, Video, Phone, Send, VideoOff, Image } from 'lucide-react';
+import { MessageCircle, Video, Phone, Send, VideoOff, Image, X } from 'lucide-react';
 import { useMessaging } from '@/hooks/useMessaging';
 import { useWebRTCCall } from '@/hooks/useWebRTCCall';
 import VoiceRecorder from './VoiceRecorder';
 import VideoCallInterface from './VideoCallInterface';
+import EmojiPicker from './EmojiPicker';
+import GifPicker from './GifPicker';
 import { supabase } from '@/integrations/supabase/client';
 
 interface MessagingInterfaceProps {
@@ -20,6 +21,7 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
   const [message, setMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [selectedGif, setSelectedGif] = useState<string | null>(null);
   
   const { 
     messages, 
@@ -46,8 +48,14 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
   }, []);
 
   const sendMessage = async () => {
-    if (message.trim() && userId) {
-      await sendTextMessage(userId, message);
+    if ((message.trim() || selectedGif) && userId) {
+      if (selectedGif) {
+        // Send GIF as image message
+        await uploadMediaMessage(userId, selectedGif, 'gif');
+        setSelectedGif(null);
+      } else {
+        await sendTextMessage(userId, message);
+      }
       setMessage('');
     }
   };
@@ -64,6 +72,14 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
     if (file && userId) {
       await uploadMediaMessage(userId, file, 'image');
     }
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    setMessage(prev => prev + emoji);
+  };
+
+  const handleGifSelect = (gifUrl: string) => {
+    setSelectedGif(gifUrl);
   };
 
   const startVideoCall = () => {
@@ -95,6 +111,14 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
         >
           {msg.message_type === 'text' && (
             <p className="text-sm">{msg.content}</p>
+          )}
+          
+          {msg.message_type === 'gif' && (
+            <img 
+              src={msg.media_url || msg.content} 
+              alt="GIF" 
+              className="max-w-full h-auto rounded"
+            />
           )}
           
           {msg.message_type === 'voice' && (
@@ -182,6 +206,25 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
 
         {/* Zone de saisie */}
         <div className="p-4 border-t">
+          {selectedGif && (
+            <div className="mb-2 relative inline-block">
+              <img 
+                src={selectedGif} 
+                alt="GIF sélectionné" 
+                className="h-20 rounded border"
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="destructive"
+                className="absolute -top-2 -right-2 h-6 w-6 p-0"
+                onClick={() => setSelectedGif(null)}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          )}
+          
           <div className="flex gap-2 items-end">
             <div className="flex-1">
               <Textarea
@@ -198,6 +241,9 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
               />
             </div>
             <div className="flex flex-col gap-2">
+              <EmojiPicker onEmojiSelect={handleEmojiSelect} />
+              <GifPicker onGifSelect={handleGifSelect} />
+              
               <VoiceRecorder
                 onSendVoiceMessage={handleVoiceMessage}
                 isRecording={isRecording}
@@ -221,7 +267,7 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
               <Button 
                 size="sm" 
                 onClick={sendMessage}
-                disabled={isLoading || !message.trim()}
+                disabled={isLoading || (!message.trim() && !selectedGif)}
               >
                 <Send className="h-4 w-4" />
               </Button>

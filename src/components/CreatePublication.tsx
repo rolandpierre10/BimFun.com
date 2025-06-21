@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +9,8 @@ import { usePublications } from '@/hooks/usePublications';
 import { supabase } from '@/integrations/supabase/client';
 import { Upload, X, Image, Video, Music, Tv, Megaphone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import EmojiPicker from './EmojiPicker';
+import GifPicker from './GifPicker';
 
 interface CreatePublicationProps {
   onClose?: () => void;
@@ -22,6 +23,7 @@ const CreatePublication = ({ onClose }: CreatePublicationProps) => {
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
   const [files, setFiles] = useState<File[]>([]);
+  const [selectedGif, setSelectedGif] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const { createPublication, uploadMedia } = usePublications();
@@ -33,6 +35,14 @@ const CreatePublication = ({ onClose }: CreatePublicationProps) => {
     music: <Music className="h-4 w-4" />,
     series: <Tv className="h-4 w-4" />,
     announcement: <Megaphone className="h-4 w-4" />
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    setDescription(prev => prev + emoji);
+  };
+
+  const handleGifSelect = (gifUrl: string) => {
+    setSelectedGif(gifUrl);
   };
 
   const handleAddTag = () => {
@@ -81,6 +91,11 @@ const CreatePublication = ({ onClose }: CreatePublicationProps) => {
         }
       }
 
+      // Add GIF to media URLs if selected
+      if (selectedGif) {
+        mediaUrls.push(selectedGif);
+      }
+
       await createPublication.mutateAsync({
         user_id: user.user.id,
         title: title.trim(),
@@ -97,6 +112,7 @@ const CreatePublication = ({ onClose }: CreatePublicationProps) => {
       setContentType('photo');
       setTags([]);
       setFiles([]);
+      setSelectedGif(null);
       
       if (onClose) onClose();
     } catch (error) {
@@ -152,22 +168,54 @@ const CreatePublication = ({ onClose }: CreatePublicationProps) => {
 
           <div>
             <label className="text-sm font-medium mb-2 block">Titre *</label>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Titre de votre publication..."
-              required
-            />
+            <div className="flex gap-2">
+              <Input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Titre de votre publication..."
+                required
+                className="flex-1"
+              />
+              <EmojiPicker onEmojiSelect={(emoji) => setTitle(prev => prev + emoji)} />
+            </div>
           </div>
 
           <div>
             <label className="text-sm font-medium mb-2 block">Description</label>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Décrivez votre contenu..."
-              rows={3}
-            />
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Décrivez votre contenu..."
+                  rows={3}
+                  className="flex-1"
+                />
+                <div className="flex flex-col gap-2">
+                  <EmojiPicker onEmojiSelect={handleEmojiSelect} />
+                  <GifPicker onGifSelect={handleGifSelect} />
+                </div>
+              </div>
+              
+              {selectedGif && (
+                <div className="relative inline-block">
+                  <img 
+                    src={selectedGif} 
+                    alt="GIF sélectionné" 
+                    className="h-24 rounded border"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    className="absolute -top-2 -right-2 h-6 w-6 p-0"
+                    onClick={() => setSelectedGif(null)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
 
           {contentType !== 'announcement' && (
