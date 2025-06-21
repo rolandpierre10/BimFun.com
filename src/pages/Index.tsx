@@ -102,7 +102,7 @@ const Index = () => {
           {/* Galerie d'images d'appels vidéo */}
           <section className="mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">Connectez-vous en vidéo</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               <ClickableImage
                 src="/lovable-uploads/42e4cfc8-b297-45ae-bdc5-61eb1a2b5be0.png"
                 alt="Appels vidéo multi-participants sur ordinateur et mobile"
@@ -130,7 +130,7 @@ const Index = () => {
               <ClickableImage
                 src="/lovable-uploads/cc9c6bca-8998-48f7-a0a1-bdfccfac3973.png"
                 alt="Appel vidéo mobile interface utilisateur"
-                className="rounded-lg shadow-lg w-full h-48 object-cover lg:col-span-2 md:col-span-2"
+                className="rounded-lg shadow-lg w-full h-48 object-cover sm:col-span-2 lg:col-span-3"
                 title="Interface intuitive"
                 description="Une interface simple et élégante pour vos appels"
               />
