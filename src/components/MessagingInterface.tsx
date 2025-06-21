@@ -1,277 +1,255 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, Video, Phone, Send, VideoOff, Image, X } from 'lucide-react';
-import { useMessaging } from '@/hooks/useMessaging';
-import { useWebRTCCall } from '@/hooks/useWebRTCCall';
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Send, ArrowLeft, Phone, Video, Paperclip, Smile } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import VoiceRecorder from './VoiceRecorder';
-import VideoCallInterface from './VideoCallInterface';
 import EmojiPicker from './EmojiPicker';
 import GifPicker from './GifPicker';
-import { supabase } from '@/integrations/supabase/client';
+
+interface Message {
+  id: string;
+  content: string;
+  sender_id: string;
+  receiver_id: string;
+  created_at: string;
+  message_type: 'text' | 'voice' | 'image' | 'video' | 'file' | 'gif';
+  media_url?: string;
+  file_size?: number;
+  duration_seconds?: number;
+  is_read: boolean;
+}
 
 interface MessagingInterfaceProps {
   userName: string;
-  userId?: string;
-  onClose?: () => void;
+  userId: string;
+  onClose: () => void;
 }
 
 const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfaceProps) => {
-  const [message, setMessage] = useState('');
-  const [isRecording, setIsRecording] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [selectedGif, setSelectedGif] = useState<string | null>(null);
-  
-  const { 
-    messages, 
-    isLoading, 
-    sendTextMessage, 
-    uploadMediaMessage,
-    subscribeToMessages 
-  } = useMessaging();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showGifPicker, setShowGifPicker] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { callState, startCall } = useWebRTCCall(currentUser?.id || '');
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setCurrentUser(user);
+    loadMessages();
+    scrollToBottom();
+  }, [userId]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const loadMessages = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .or(`and(sender_id.eq.${user.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${user.id})`)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      setMessages(data || []);
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les messages",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const sendMessage = async (content: string, messageType: 'text' | 'voice' | 'gif' = 'text', mediaUrl?: string) => {
+    if (!user || (!content.trim() && !mediaUrl)) return;
+
+    setLoading(true);
+    try {
+      const messageData = {
+        sender_id: user.id,
+        receiver_id: userId,
+        content: messageType === 'gif' ? mediaUrl : content,
+        message_type: messageType,
+        media_url: messageType !== 'text' ? mediaUrl : null,
+        is_read: false
+      };
+
+      const { error } = await supabase
+        .from('messages')
+        .insert([messageData]);
+
+      if (error) throw error;
+
+      setNewMessage('');
+      loadMessages();
       
-      if (user) {
-        const unsubscribe = subscribeToMessages(user.id);
-        return unsubscribe;
-      }
-    };
-    
-    getUser();
-  }, []);
-
-  const sendMessage = async () => {
-    if ((message.trim() || selectedGif) && userId) {
-      if (selectedGif) {
-        // Send GIF URL as text message with special type
-        await sendTextMessage(userId, selectedGif, 'gif');
-        setSelectedGif(null);
-      } else {
-        await sendTextMessage(userId, message);
-      }
-      setMessage('');
+      toast({
+        title: "Message envoyé",
+        description: "Votre message a été envoyé avec succès",
+      });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer le message",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleVoiceMessage = async (audioBlob: Blob, duration: number) => {
-    if (userId) {
-      const audioFile = new File([audioBlob], 'voice-message.wav', { type: 'audio/wav' });
-      await uploadMediaMessage(userId, audioFile, 'voice', duration);
-    }
-  };
-
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && userId) {
-      await uploadMediaMessage(userId, file, 'image');
-    }
+  const handleSendMessage = () => {
+    sendMessage(newMessage);
   };
 
   const handleEmojiSelect = (emoji: string) => {
-    setMessage(prev => prev + emoji);
+    setNewMessage(prev => prev + emoji);
+    setShowEmojiPicker(false);
   };
 
   const handleGifSelect = (gifUrl: string) => {
-    setSelectedGif(gifUrl);
+    sendMessage('', 'gif', gifUrl);
+    setShowGifPicker(false);
   };
 
-  const startVideoCall = () => {
-    if (userId && currentUser) {
-      startCall(userId, userName, 'video');
-    }
+  const handleVoiceMessage = (audioBlob: Blob, duration: number) => {
+    // In a real implementation, you would upload the audio file
+    console.log('Voice message recorded:', { audioBlob, duration });
+    toast({
+      title: "Message vocal",
+      description: "Fonctionnalité en cours de développement",
+    });
   };
 
-  const startAudioCall = () => {
-    if (userId && currentUser) {
-      startCall(userId, userName, 'audio');
-    }
+  const formatTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
-
-  const renderMessage = (msg: any) => {
-    const isOwn = msg.sender_id === currentUser?.id;
-    
-    return (
-      <div
-        key={msg.id}
-        className={`mb-4 flex ${isOwn ? 'justify-end' : 'justify-start'}`}
-      >
-        <div
-          className={`max-w-xs p-3 rounded-lg ${
-            isOwn
-              ? 'bg-gray-900 text-white'
-              : 'bg-white border border-gray-200'
-          }`}
-        >
-          {msg.message_type === 'text' && (
-            <p className="text-sm">{msg.content}</p>
-          )}
-          
-          {msg.message_type === 'gif' && (
-            <img 
-              src={msg.content || msg.media_url} 
-              alt="GIF" 
-              className="max-w-full h-auto rounded"
-            />
-          )}
-          
-          {msg.message_type === 'voice' && (
-            <div className="space-y-2">
-              <audio controls className="w-full">
-                <source src={msg.media_url} type="audio/wav" />
-              </audio>
-              {msg.duration_seconds && (
-                <span className="text-xs opacity-70">
-                  {Math.floor(msg.duration_seconds / 60)}:{(msg.duration_seconds % 60).toString().padStart(2, '0')}
-                </span>
-              )}
-            </div>
-          )}
-          
-          {msg.message_type === 'image' && (
-            <img 
-              src={msg.media_url} 
-              alt="Image partagée" 
-              className="max-w-full h-auto rounded"
-            />
-          )}
-          
-          {msg.message_type === 'video' && (
-            <video controls className="max-w-full h-auto rounded">
-              <source src={msg.media_url} type="video/mp4" />
-            </video>
-          )}
-          
-          <span className="text-xs opacity-70 mt-1 block">
-            {new Date(msg.created_at).toLocaleTimeString('fr-FR', { 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            })}
-          </span>
-        </div>
-      </div>
-    );
-  };
-
-  // Afficher l'interface d'appel si un appel est en cours
-  if (callState.isInCall || callState.isInitiating || callState.isRinging) {
-    return <VideoCallInterface currentUserId={currentUser?.id || ''} onCallEnd={onClose} />;
-  }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader className="bg-gray-900 text-white rounded-t-lg">
-        <div className="flex justify-between items-center">
-          <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5" />
-            Conversation avec {userName}
-          </CardTitle>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={startAudioCall}
-              title="Appel audio"
-            >
+    <Card className="w-full max-w-4xl mx-auto h-[600px] flex flex-col">
+      <CardHeader className="flex-shrink-0 border-b">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <Button size="sm" variant="ghost" onClick={onClose}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <CardTitle className="text-lg">{userName}</CardTitle>
+          </div>
+          <div className="flex space-x-2">
+            <Button size="sm" variant="outline">
               <Phone className="h-4 w-4" />
             </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={startVideoCall}
-              title="Appel vidéo"
-            >
+            <Button size="sm" variant="outline">
               <Video className="h-4 w-4" />
             </Button>
-            {onClose && (
-              <Button size="sm" variant="outline" onClick={onClose}>
-                ✕
-              </Button>
-            )}
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="p-0">
-        {/* Zone des messages */}
-        <div className="h-96 overflow-y-auto p-4 bg-gray-50">
-          {messages.map(renderMessage)}
-        </div>
+      <CardContent className="flex-1 flex flex-col p-0">
+        <ScrollArea className="flex-1 p-4">
+          <div className="space-y-4">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-xs lg:max-w-md px-3 py-2 rounded-lg ${
+                    message.sender_id === user?.id
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200 text-gray-900'
+                  }`}
+                >
+                  {message.message_type === 'gif' ? (
+                    <img 
+                      src={message.content} 
+                      alt="GIF" 
+                      className="max-w-full h-auto rounded"
+                    />
+                  ) : (
+                    <p className="text-sm">{message.content}</p>
+                  )}
+                  <p className={`text-xs mt-1 ${
+                    message.sender_id === user?.id ? 'text-blue-100' : 'text-gray-500'
+                  }`}>
+                    {formatTime(message.created_at)}
+                  </p>
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        </ScrollArea>
 
-        {/* Zone de saisie */}
-        <div className="p-4 border-t">
-          {selectedGif && (
-            <div className="mb-2 relative inline-block">
-              <img 
-                src={selectedGif} 
-                alt="GIF sélectionné" 
-                className="h-20 rounded border"
-              />
+        <div className="border-t p-4">
+          <div className="flex items-center space-x-2">
+            <div className="relative">
               <Button
-                type="button"
                 size="sm"
-                variant="destructive"
-                className="absolute -top-2 -right-2 h-6 w-6 p-0"
-                onClick={() => setSelectedGif(null)}
+                variant="ghost"
+                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
               >
-                <X className="h-3 w-3" />
+                <Smile className="h-4 w-4" />
               </Button>
+              {showEmojiPicker && (
+                <div className="absolute bottom-12 left-0 z-50">
+                  <EmojiPicker onEmojiSelect={handleEmojiSelect} />
+                </div>
+              )}
             </div>
-          )}
-          
-          <div className="flex gap-2 items-end">
-            <div className="flex-1">
-              <Textarea
-                placeholder="Tapez votre message..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="min-h-[60px] resize-none"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                  }
-                }}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <EmojiPicker onEmojiSelect={handleEmojiSelect} />
-              <GifPicker onGifSelect={handleGifSelect} />
-              
-              <VoiceRecorder
-                onSendVoiceMessage={handleVoiceMessage}
-                isRecording={isRecording}
-                onRecordingStateChange={setIsRecording}
-              />
-              
-              <label className="cursor-pointer">
-                <Button size="sm" variant="outline" asChild>
-                  <span>
-                    <Image className="h-4 w-4" />
-                  </span>
-                </Button>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              </label>
-              
-              <Button 
-                size="sm" 
-                onClick={sendMessage}
-                disabled={isLoading || (!message.trim() && !selectedGif)}
+
+            <div className="relative">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowGifPicker(!showGifPicker)}
               >
-                <Send className="h-4 w-4" />
+                <Paperclip className="h-4 w-4" />
               </Button>
+              {showGifPicker && (
+                <div className="absolute bottom-12 left-0 z-50">
+                  <GifPicker onGifSelect={handleGifSelect} />
+                </div>
+              )}
             </div>
+
+            <VoiceRecorder onRecordingComplete={handleVoiceMessage} />
+
+            <Input
+              placeholder="Tapez votre message..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              className="flex-1"
+            />
+            <Button
+              onClick={handleSendMessage}
+              disabled={loading || !newMessage.trim()}
+              size="sm"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </CardContent>
