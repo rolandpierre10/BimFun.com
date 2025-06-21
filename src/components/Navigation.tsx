@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import { MessageCircle, User, LogOut, Shield, Menu, X } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Drawer,
   DrawerClose,
@@ -21,6 +21,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
   console.log('Navigation component is rendering');
   const { user, logout, userRole } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   console.log('User state in Navigation:', user);
@@ -40,18 +41,22 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
     setMobileMenuOpen(false);
   };
 
+  const isHomePage = location.pathname === '/';
+
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16 lg:h-18">
-          {/* Logo - Plus petit sur mobile */}
-          <Link to="/" className="flex items-center flex-shrink-0">
-            <img 
-              src="/lovable-uploads/3ad16cd3-6fcc-475f-bc25-eaad941f1b74.png" 
-              alt="BimFun Logo" 
-              className="h-8 sm:h-12 lg:h-16 w-auto hover:opacity-80 transition-opacity"
-            />
-          </Link>
+          {/* Logo - Masqué sur la page d'accueil */}
+          {!isHomePage && (
+            <Link to="/" className="flex items-center flex-shrink-0">
+              <img 
+                src="/lovable-uploads/3ad16cd3-6fcc-475f-bc25-eaad941f1b74.png" 
+                alt="BimFun Logo" 
+                className="h-8 sm:h-12 lg:h-16 w-auto hover:opacity-80 transition-opacity"
+              />
+            </Link>
+          )}
           
           {/* Navigation Links - Masqués sur mobile */}
           <div className="hidden lg:flex items-center space-x-6">
