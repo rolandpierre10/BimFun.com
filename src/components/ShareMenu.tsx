@@ -15,10 +15,25 @@ interface ShareMenuProps {
 const ShareMenu = ({ title, description, url, imageUrl }: ShareMenuProps) => {
   const { toast } = useToast();
 
+  // Validate and ensure image URL is accessible
+  const getValidImageUrl = (imgUrl?: string) => {
+    if (!imgUrl) return '';
+    
+    // If it's already a full URL, return as is
+    if (imgUrl.startsWith('http')) {
+      return imgUrl;
+    }
+    
+    // If it's a relative path, make it absolute
+    return `${window.location.origin}${imgUrl}`;
+  };
+
+  const validImageUrl = getValidImageUrl(imageUrl);
+
   const shareViaEmail = () => {
     const subject = encodeURIComponent(`Découvrez cette image: ${title}`);
     const body = encodeURIComponent(
-      `Je pensais que cette image pourrait vous intéresser:\n\n${title}\n${description || ''}\n\nVoir l'image: ${url}${imageUrl ? `\n\nImage directe: ${imageUrl}` : ''}`
+      `Je pensais que cette image pourrait vous intéresser:\n\n${title}\n${description || ''}\n\nVoir l'image: ${url}${validImageUrl ? `\n\nImage directe: ${validImageUrl}` : ''}`
     );
     window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
     
@@ -33,7 +48,7 @@ const ShareMenu = ({ title, description, url, imageUrl }: ShareMenuProps) => {
     window.open(`sms:?body=${message}`, '_blank');
     
     toast({
-      title: "SMS ouvert",
+      title: "SMS ouvert", 
       description: "Votre application SMS s'est ouverte pour partager l'image",
     });
   };
@@ -49,7 +64,20 @@ const ShareMenu = ({ title, description, url, imageUrl }: ShareMenuProps) => {
   };
 
   const shareOnFacebook = () => {
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}${imageUrl ? `&picture=${encodeURIComponent(imageUrl)}` : ''}`;
+    let shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    
+    if (validImageUrl) {
+      shareUrl += `&picture=${encodeURIComponent(validImageUrl)}`;
+    }
+    
+    if (title) {
+      shareUrl += `&title=${encodeURIComponent(title)}`;
+    }
+    
+    if (description) {
+      shareUrl += `&description=${encodeURIComponent(description)}`;
+    }
+    
     window.open(shareUrl, '_blank', 'width=600,height=400');
     
     toast({
@@ -59,8 +87,14 @@ const ShareMenu = ({ title, description, url, imageUrl }: ShareMenuProps) => {
   };
 
   const shareOnTwitter = () => {
-    const text = encodeURIComponent(`${title} - ${description || ''}`);
-    const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(url)}`;
+    const text = encodeURIComponent(`${title}${description ? ` - ${description}` : ''}`);
+    let shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(url)}`;
+    
+    if (validImageUrl) {
+      // Twitter automatically detects images from the shared URL
+      shareUrl += `&via=votre_app`;
+    }
+    
     window.open(shareUrl, '_blank', 'width=600,height=400');
     
     toast({
@@ -70,7 +104,16 @@ const ShareMenu = ({ title, description, url, imageUrl }: ShareMenuProps) => {
   };
 
   const shareOnLinkedIn = () => {
-    const shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+    let shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+    
+    if (title) {
+      shareUrl += `&title=${encodeURIComponent(title)}`;
+    }
+    
+    if (description) {
+      shareUrl += `&summary=${encodeURIComponent(description)}`;
+    }
+    
     window.open(shareUrl, '_blank', 'width=600,height=400');
     
     toast({
@@ -81,10 +124,18 @@ const ShareMenu = ({ title, description, url, imageUrl }: ShareMenuProps) => {
 
   const shareOnInstagram = () => {
     // Instagram ne permet pas le partage direct via URL, on copie le lien
-    navigator.clipboard.writeText(url).then(() => {
+    const textToCopy = `${title}\n${description || ''}\n\n${url}${validImageUrl ? `\n\nImage: ${validImageUrl}` : ''}`;
+    
+    navigator.clipboard.writeText(textToCopy).then(() => {
       toast({
-        title: "Lien copié pour Instagram",
-        description: "Collez le lien dans votre story ou post Instagram",
+        title: "Contenu copié pour Instagram",
+        description: "Collez le contenu dans votre story ou post Instagram",
+      });
+    }).catch(() => {
+      // Fallback pour les navigateurs qui ne supportent pas clipboard API
+      toast({
+        title: "Lien copié",
+        description: "Partagez le lien sur Instagram",
       });
     });
   };
@@ -105,8 +156,8 @@ const ShareMenu = ({ title, description, url, imageUrl }: ShareMenuProps) => {
   };
 
   const copyImage = () => {
-    if (imageUrl) {
-      navigator.clipboard.writeText(imageUrl).then(() => {
+    if (validImageUrl) {
+      navigator.clipboard.writeText(validImageUrl).then(() => {
         toast({
           title: "Lien image copié",
           description: "Le lien direct de l'image a été copié",
@@ -220,7 +271,7 @@ const ShareMenu = ({ title, description, url, imageUrl }: ShareMenuProps) => {
               Copier le lien
             </Button>
             
-            {imageUrl && (
+            {validImageUrl && (
               <Button
                 variant="outline"
                 size="sm"

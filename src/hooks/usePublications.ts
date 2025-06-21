@@ -24,6 +24,35 @@ export const usePublications = (userId?: string) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Ensure storage buckets exist
+  const ensureBucketsExist = async () => {
+    const buckets = ['user-photos', 'user-videos', 'user-music', 'user-series'];
+    
+    for (const bucketId of buckets) {
+      const { data, error } = await supabase.storage.getBucket(bucketId);
+      
+      if (error && error.message.includes('not found')) {
+        console.log(`Creating bucket: ${bucketId}`);
+        const { error: createError } = await supabase.storage.createBucket(bucketId, {
+          public: true,
+          allowedMimeTypes: bucketId === 'user-photos' ? ['image/*'] : 
+                           bucketId === 'user-videos' ? ['video/*'] :
+                           bucketId === 'user-music' ? ['audio/*'] : ['*/*'],
+          fileSizeLimit: 50 * 1024 * 1024 // 50MB
+        });
+        
+        if (createError) {
+          console.error(`Error creating bucket ${bucketId}:`, createError);
+        }
+      }
+    }
+  };
+
+  // Initialize buckets on first load
+  useEffect(() => {
+    ensureBucketsExist();
+  }, []);
+
   // Fetch publications - maintenant toujours publiques
   const { data: publications, isLoading } = useQuery({
     queryKey: ['publications', userId],
@@ -77,7 +106,7 @@ export const usePublications = (userId?: string) => {
     },
   });
 
-  // Upload media file
+  // Upload media file with better error handling and public URL generation
   const uploadMedia = async (file: File, contentType: string): Promise<string> => {
     const bucketMap = {
       photo: 'user-photos',
@@ -87,20 +116,34 @@ export const usePublications = (userId?: string) => {
     };
 
     const bucket = bucketMap[contentType as keyof typeof bucketMap] || 'user-photos';
+    
+    // Ensure bucket exists before upload
+    await ensureBucketsExist();
+    
     const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `${fileName}`;
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `public/${fileName}`;
+
+    console.log(`Uploading file to bucket: ${bucket}, path: ${filePath}`);
 
     const { error: uploadError } = await supabase.storage
       .from(bucket)
-      .upload(filePath, file);
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      throw uploadError;
+    }
 
+    // Get public URL
     const { data } = supabase.storage
       .from(bucket)
       .getPublicUrl(filePath);
 
+    console.log('Generated public URL:', data.publicUrl);
     return data.publicUrl;
   };
 
