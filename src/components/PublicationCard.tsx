@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Heart, MessageCircle, Play, User, Eye, ThumbsDown, UserPlus, MessageSquare, UserCheck } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Heart, MessageCircle, Play, User, Eye, ThumbsDown, UserPlus, MessageSquare, UserCheck, Edit } from 'lucide-react';
 import { Publication } from '@/hooks/usePublications';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -23,7 +24,9 @@ interface PublicationCardProps {
   onShare?: (id: string) => void;
   onFollow?: (userId: string) => void;
   onView?: (id: string) => void;
+  onEdit?: (id: string, updates: Partial<Publication>) => void;
   showAllActions?: boolean;
+  isOwnPublication?: boolean;
 }
 
 const PublicationCard = ({ 
@@ -35,12 +38,18 @@ const PublicationCard = ({
   onShare,
   onFollow,
   onView,
-  showAllActions = false 
+  onEdit,
+  showAllActions = false,
+  isOwnPublication = false
 }: PublicationCardProps) => {
   const [commentText, setCommentText] = useState('');
   const [isCommenting, setIsCommenting] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [viewCount, setViewCount] = useState(publication.views_count || 0);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editTitle, setEditTitle] = useState(publication.title);
+  const [editDescription, setEditDescription] = useState(publication.description || '');
+  const [isEditing, setIsEditing] = useState(false);
   const { toast } = useToast();
 
   const getContentTypeIcon = () => {
@@ -282,6 +291,27 @@ const PublicationCard = ({
     });
   };
 
+  const handleEdit = async () => {
+    if (!onEdit) return;
+    
+    setIsEditing(true);
+    try {
+      await onEdit(publication.id, {
+        title: editTitle,
+        description: editDescription
+      });
+      setShowEditDialog(false);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier la publication",
+        variant: "destructive",
+      });
+    } finally {
+      setIsEditing(false);
+    }
+  };
+
   const renderMedia = () => {
     if (!publication.media_urls || publication.media_urls.length === 0) {
       return null;
@@ -392,7 +422,7 @@ const PublicationCard = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold">{userProfile?.full_name || userProfile?.username || 'Utilisateur'}</h3>
-                {showAllActions && (
+                {showAllActions && !isOwnPublication && (
                   <FollowButton userId={publication.user_id} variant="outline" size="sm" />
                 )}
               </div>
@@ -410,6 +440,46 @@ const PublicationCard = ({
               </div>
             </div>
           </div>
+          {isOwnPublication && (
+            <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="ghost">
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Modifier la publication</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">Titre</label>
+                    <Input
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      placeholder="Titre de la publication"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Description</label>
+                    <Textarea
+                      value={editDescription}
+                      onChange={(e) => setEditDescription(e.target.value)}
+                      placeholder="Description de la publication"
+                      rows={3}
+                    />
+                  </div>
+                  <Button
+                    onClick={handleEdit}
+                    disabled={isEditing || !editTitle.trim()}
+                    className="w-full"
+                  >
+                    {isEditing ? 'Modification...' : 'Modifier'}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </CardHeader>
 
@@ -495,7 +565,7 @@ const PublicationCard = ({
               imageUrl={getFirstImageUrl()}
             />
 
-            {showAllActions && (
+            {showAllActions && !isOwnPublication && (
               <>
                 <Button
                   variant="ghost"

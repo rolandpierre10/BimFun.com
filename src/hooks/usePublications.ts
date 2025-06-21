@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -103,6 +102,37 @@ export const usePublications = (userId?: string) => {
         variant: "destructive",
       });
       console.error('Error creating publication:', error);
+    },
+  });
+
+  // Update publication
+  const updatePublication = useMutation({
+    mutationFn: async ({ id, ...updates }: Partial<Publication> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('publications')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['publications'] });
+      queryClient.invalidateQueries({ queryKey: ['public-publications'] });
+      toast({
+        title: "Publication modifiée",
+        description: "Votre publication a été mise à jour avec succès",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier la publication",
+        variant: "destructive",
+      });
+      console.error('Error updating publication:', error);
     },
   });
 
@@ -269,6 +299,7 @@ export const usePublications = (userId?: string) => {
     publications,
     isLoading,
     createPublication,
+    updatePublication,
     uploadMedia,
     likePublication,
     dislikePublication,

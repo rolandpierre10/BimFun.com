@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Image, Video, Music, Tv, Megaphone, Crown } from 'lucide-react';
 import { usePublications } from '@/hooks/usePublications';
 import { useSubscription } from '@/hooks/useSubscription';
+import { useAuth } from '@/contexts/AuthContext';
 import CreatePublication from './CreatePublication';
 import PublicationCard from './PublicationCard';
 import SubscriptionButton from './SubscriptionButton';
@@ -18,11 +18,16 @@ const UserPublications = ({ userId, isOwnProfile = false }: UserPublicationsProp
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   
-  const { publications, isLoading, likePublication } = usePublications(userId);
+  const { publications, isLoading, likePublication, updatePublication } = usePublications(userId);
   const { subscribed, loading: subscriptionLoading } = useSubscription();
+  const { user } = useAuth();
 
   const handleLike = (publicationId: string) => {
     likePublication.mutate(publicationId);
+  };
+
+  const handleEdit = (publicationId: string, updates: any) => {
+    updatePublication.mutate({ id: publicationId, ...updates });
   };
 
   const filterPublications = (contentType?: string) => {
@@ -129,8 +134,10 @@ const UserPublications = ({ userId, isOwnProfile = false }: UserPublicationsProp
                     key={publication.id}
                     publication={publication}
                     onLike={handleLike}
+                    onEdit={handleEdit}
                     onComment={(id) => console.log('Comment on:', id)}
                     onShare={(id) => console.log('Share:', id)}
+                    isOwnPublication={user?.id === publication.user_id}
                   />
                 ))}
               </div>
