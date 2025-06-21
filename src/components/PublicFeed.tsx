@@ -112,6 +112,38 @@ const PublicFeed = () => {
     setRefreshing(false);
   };
 
+  const handleView = async (publicationId: string) => {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) return;
+
+    try {
+      // Vérifier si l'utilisateur a déjà vu cette publication
+      const { data: existingView } = await supabase
+        .from('publication_interactions')
+        .select('id')
+        .eq('user_id', user.user.id)
+        .eq('publication_id', publicationId)
+        .eq('interaction_type', 'view')
+        .single();
+
+      if (!existingView) {
+        // Ajouter la vue
+        await supabase
+          .from('publication_interactions')
+          .insert([{
+            user_id: user.user.id,
+            publication_id: publicationId,
+            interaction_type: 'view'
+          }]);
+
+        // Rafraîchir les données
+        refetch();
+      }
+    } catch (error) {
+      console.error('Error recording view:', error);
+    }
+  };
+
   const handleLike = async (publicationId: string) => {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) return;
@@ -253,6 +285,7 @@ const PublicFeed = () => {
               onDislike={handleDislike}
               onFollow={handleFollow}
               onShare={handleShare}
+              onView={handleView}
               showAllActions={true}
             />
           ))}

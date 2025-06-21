@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Heart, MessageCircle, Share2, Play, User, Eye, ThumbsDown, UserPlus, MessageSquare, UserCheck } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Play, User, View, ThumbsDown, UserPlus, MessageSquare, UserCheck } from 'lucide-react';
 import { Publication } from '@/hooks/usePublications';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -20,6 +19,7 @@ interface PublicationCardProps {
   onComment?: (id: string) => void;
   onShare?: (id: string) => void;
   onFollow?: (userId: string) => void;
+  onView?: (id: string) => void;
   showAllActions?: boolean;
 }
 
@@ -31,6 +31,7 @@ const PublicationCard = ({
   onComment, 
   onShare,
   onFollow,
+  onView,
   showAllActions = false 
 }: PublicationCardProps) => {
   const [commentText, setCommentText] = useState('');
@@ -98,6 +99,50 @@ const PublicationCard = ({
       });
     } finally {
       setIsCommenting(false);
+    }
+  };
+
+  const handleView = async () => {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) return;
+
+    try {
+      // Vérifier si l'utilisateur a déjà vu cette publication
+      const { data: existingView } = await supabase
+        .from('publication_interactions')
+        .select('id')
+        .eq('user_id', user.user.id)
+        .eq('publication_id', publication.id)
+        .eq('interaction_type', 'view')
+        .single();
+
+      if (!existingView) {
+        // Ajouter la vue
+        await supabase
+          .from('publication_interactions')
+          .insert([{
+            user_id: user.user.id,
+            publication_id: publication.id,
+            interaction_type: 'view'
+          }]);
+
+        // Incrémenter le compteur de vues
+        await supabase
+          .from('publications')
+          .update({ views_count: publication.views_count + 1 })
+          .eq('id', publication.id);
+
+        if (onView) {
+          onView(publication.id);
+        }
+
+        toast({
+          title: "Vue enregistrée",
+          description: "Votre vue a été comptabilisée",
+        });
+      }
+    } catch (error) {
+      console.error('Error recording view:', error);
     }
   };
 
@@ -335,10 +380,15 @@ const PublicationCard = ({
             )}
           </div>
 
-          <div className="flex items-center gap-1 text-sm text-gray-500">
-            <Eye className="h-4 w-4" />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleView}
+            className="flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600"
+          >
+            <View className="h-4 w-4" />
             <span>{publication.views_count}</span>
-          </div>
+          </Button>
         </div>
       </CardContent>
     </Card>
