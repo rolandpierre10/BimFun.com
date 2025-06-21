@@ -51,8 +51,8 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
   const sendMessage = async () => {
     if ((message.trim() || selectedGif) && userId) {
       if (selectedGif) {
-        // Send GIF URL as text message with special type
-        await uploadMediaMessage(userId, selectedGif, 'gif');
+        // Send GIF URL as text message with special content
+        await sendTextMessage(userId, selectedGif, 'gif');
         setSelectedGif(null);
       } else {
         await sendTextMessage(userId, message);
@@ -116,7 +116,7 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
           
           {msg.message_type === 'gif' && (
             <img 
-              src={msg.media_url || msg.content} 
+              src={msg.content || msg.media_url} 
               alt="GIF" 
               className="max-w-full h-auto rounded"
             />
