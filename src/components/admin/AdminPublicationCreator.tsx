@@ -138,7 +138,7 @@ const AdminPublicationCreator: React.FC<AdminPublicationCreatorProps> = ({ onPub
         }
       }
 
-      const { error } = await supabase
+      const { data: newPublication, error } = await supabase
         .from('publications')
         .insert({
           user_id: user.user.id,
@@ -148,13 +148,17 @@ const AdminPublicationCreator: React.FC<AdminPublicationCreatorProps> = ({ onPub
           media_urls: mediaUrls,
           tags,
           is_public: true,
-        });
+        })
+        .select()
+        .single();
 
       if (error) throw error;
 
+      console.log('Publication created successfully:', newPublication);
+
       toast({
-        title: "Publication créée",
-        description: "La publication a été créée avec succès et est maintenant visible par tous les utilisateurs",
+        title: "Publication créée avec succès !",
+        description: "La publication est maintenant visible sur la page d'accueil et dans le feed public",
       });
 
       // Reset form
@@ -166,6 +170,12 @@ const AdminPublicationCreator: React.FC<AdminPublicationCreatorProps> = ({ onPub
       setShowForm(false);
       
       onPublicationCreated();
+
+      // Force refresh of public feed data
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('refreshPublicFeed'));
+      }, 1000);
+
     } catch (error) {
       console.error('Error creating publication:', error);
       toast({

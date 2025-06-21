@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import PublicationCard from './PublicationCard';
@@ -38,14 +38,59 @@ const PublicFeed = () => {
             { id: '2', full_name: 'Thomas Dubois', username: 'thomas_dev', avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face' },
             { id: '3', full_name: 'Maria Rodriguez', username: 'maria_photo', avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face' },
             { id: '4', full_name: 'Alex Chen', username: 'alex_music', avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' },
-            { id: '5', full_name: 'Emma Johnson', username: 'emma_video', avatar_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face' }
+            { id: '5', full_name: 'Emma Johnson', username: 'emma_video', avatar_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face' },
+            { id: 'admin', full_name: 'Administrateur BimFun', username: 'admin_bimfun', avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face' }
           ];
           pub.profiles = demoProfiles[index % demoProfiles.length];
         }
         return pub;
       });
     },
+    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchOnWindowFocus: true, // Refresh when window regains focus
   });
+
+  // Listen for real-time updates to publications
+  useEffect(() => {
+    console.log('Setting up real-time subscription for publications');
+    
+    const channel = supabase
+      .channel('public-publications-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'publications',
+          filter: 'is_public=eq.true'
+        },
+        (payload) => {
+          console.log('New publication inserted:', payload);
+          refetch(); // Refresh the feed when a new publication is added
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'publications',
+          filter: 'is_public=eq.true'
+        },
+        (payload) => {
+          console.log('Publication updated:', payload);
+          refetch(); // Refresh the feed when a publication is updated
+        }
+      )
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
+
+    return () => {
+      console.log('Cleaning up real-time subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -261,6 +306,114 @@ const PublicFeed = () => {
       )}
     </div>
   );
+
+  async function handleLike(publicationId: string) {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) return;
+
+    // Check if already liked
+    const { data: existing } = await supabase
+      .from('publication_interactions')
+      .select('id')
+      .eq('user_id', user.user.id)
+      .eq('publication_id', publicationId)
+      .eq('interaction_type', 'like')
+      .single();
+
+    if (existing) {
+      // Unlike
+      await supabase
+        .from('publication_interactions')
+        .delete()
+        .eq('id', existing.id);
+    } else {
+      // Like
+      await supabase
+        .from('publication_interactions')
+        .insert([{
+          user_id: user.user.id,
+          publication_id: publicationId,
+          interaction_type: 'like'
+        }]);
+    }
+
+    refetch();
+  }
+
+  async function handleDislike(publicationId: string) {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) return;
+
+    // Check if already disliked
+    const { data: existing } = await supabase
+      .from('publication_interactions')
+      .select('id')
+      .eq('user_id', user.user.id)
+      .eq('publication_id', publicationId)
+      .eq('interaction_type', 'dislike')
+      .single();
+
+    if (existing) {
+      // Remove dislike
+      await supabase
+        .from('publication_interactions')
+        .delete()
+        .eq('id', existing.id);
+    } else {
+      // Dislike
+      await supabase
+        .from('publication_interactions')
+        .insert([{
+          user_id: user.user.id,
+          publication_id: publicationId,
+          interaction_type: 'dislike'
+        }]);
+    }
+
+    refetch();
+  }
+
+  async function handleFollow(userId: string) {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user || user.user.id === userId) return;
+
+    // Check if already following
+    const { data: existing } = await supabase
+      .from('followers')
+      .select('id')
+      .eq('follower_id', user.user.id)
+      .eq('following_id', userId)
+      .single();
+
+    if (existing) {
+      // Unfollow
+      await supabase
+        .from('followers')
+        .delete()
+        .eq('id', existing.id);
+    } else {
+      // Follow
+      await supabase
+        .from('followers')
+        .insert([{
+          follower_id: user.user.id,
+          following_id: userId
+        }]);
+    }
+
+    refetch();
+  }
+
+  function handleShare(publicationId: string) {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Publication BimFun',
+        url: `${window.location.origin}/publication/${publicationId}`
+      });
+    } else {
+      navigator.clipboard.writeText(`${window.location.origin}/publication/${publicationId}`);
+    }
+  }
 };
 
 export default PublicFeed;
