@@ -18,7 +18,7 @@ const UserPublications = ({ userId, isOwnProfile = false }: UserPublicationsProp
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   
-  const { publications, isLoading, likePublication, updatePublication } = usePublications(userId);
+  const { publications, isLoading, likePublication, updatePublication, trackView } = usePublications(userId);
   const { subscribed, loading: subscriptionLoading } = useSubscription();
   const { user } = useAuth();
 
@@ -28,6 +28,10 @@ const UserPublications = ({ userId, isOwnProfile = false }: UserPublicationsProp
 
   const handleEdit = (publicationId: string, updates: any) => {
     updatePublication.mutate({ id: publicationId, ...updates });
+  };
+
+  const handleTrackView = (publicationId: string) => {
+    trackView.mutate(publicationId);
   };
 
   const filterPublications = (contentType?: string) => {
@@ -138,6 +142,7 @@ const UserPublications = ({ userId, isOwnProfile = false }: UserPublicationsProp
                     onComment={(id) => console.log('Comment on:', id)}
                     onShare={(id) => console.log('Share:', id)}
                     isOwnPublication={user?.id === publication.user_id}
+                    trackView={handleTrackView}
                   />
                 ))}
               </div>

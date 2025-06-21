@@ -1,9 +1,9 @@
-
 import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Publication } from '@/hooks/usePublications';
+import { usePublications } from '@/hooks/usePublications';
 import PublicationCard from '@/components/PublicationCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { ArrowLeft } from 'lucide-react';
 const PublicationPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { trackView } = usePublications();
 
   const { data: publication, isLoading, error } = useQuery({
     queryKey: ['publication', id],
@@ -47,6 +48,10 @@ const PublicationPage = () => {
     },
     enabled: !!publication?.user_id,
   });
+
+  const handleTrackView = (publicationId: string) => {
+    trackView.mutate(publicationId);
+  };
 
   useEffect(() => {
     if (publication && !document.title.includes(publication.title)) {
@@ -136,6 +141,7 @@ const PublicationPage = () => {
           publication={publication}
           userProfile={userProfile}
           showAllActions={true}
+          trackView={handleTrackView}
         />
       </div>
     </div>

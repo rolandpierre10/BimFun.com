@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,7 @@ interface PublicationCardProps {
   onEdit?: (id: string, updates: Partial<Publication>) => void;
   showAllActions?: boolean;
   isOwnPublication?: boolean;
+  trackView?: (id: string) => void;
 }
 
 const PublicationCard = ({ 
@@ -40,7 +41,8 @@ const PublicationCard = ({
   onView,
   onEdit,
   showAllActions = false,
-  isOwnPublication = false
+  isOwnPublication = false,
+  trackView
 }: PublicationCardProps) => {
   const [commentText, setCommentText] = useState('');
   const [isCommenting, setIsCommenting] = useState(false);
@@ -50,7 +52,17 @@ const PublicationCard = ({
   const [editTitle, setEditTitle] = useState(publication.title);
   const [editDescription, setEditDescription] = useState(publication.description || '');
   const [isEditing, setIsEditing] = useState(false);
+  const [hasTrackedView, setHasTrackedView] = useState(false);
   const { toast } = useToast();
+
+  // Auto-track view when component mounts
+  useEffect(() => {
+    if (!hasTrackedView && trackView && !isOwnPublication) {
+      console.log('Auto-tracking view for publication:', publication.id);
+      trackView(publication.id);
+      setHasTrackedView(true);
+    }
+  }, [publication.id, trackView, hasTrackedView, isOwnPublication]);
 
   const getContentTypeIcon = () => {
     switch (publication.content_type) {
@@ -219,11 +231,6 @@ const PublicationCard = ({
           .from('publications')
           .update({ views_count: newViewCount })
           .eq('id', publication.id);
-
-        toast({
-          title: "Vue enregistrée",
-          description: "Votre vue a été enregistrée",
-        });
 
         if (onView) {
           onView(publication.id);

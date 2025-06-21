@@ -295,6 +295,64 @@ export const usePublications = (userId?: string) => {
     },
   });
 
+  // Track publication view - new function
+  const trackView = useMutation({
+    mutationFn: async (publicationId: string) => {
+      console.log('Tracking view for publication:', publicationId);
+      
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) {
+        console.log('No authenticated user, skipping view tracking');
+        return;
+      }
+
+      // Check if user has already viewed this publication
+      const { data: existingView } = await supabase
+        .from('publication_interactions')
+        .select('id')
+        .eq('user_id', user.user.id)
+        .eq('publication_id', publicationId)
+        .eq('interaction_type', 'view')
+        .single();
+
+      if (!existingView) {
+        // Record the view interaction
+        const { error: interactionError } = await supabase
+          .from('publication_interactions')
+          .insert([{
+            user_id: user.user.id,
+            publication_id: publicationId,
+            interaction_type: 'view'
+          }]);
+
+        if (interactionError) {
+          console.error('Error recording view interaction:', interactionError);
+          return;
+        }
+
+        // Increment the view count on the publication
+        const { error: updateError } = await supabase
+          .from('publications')
+          .update({ 
+            views_count: publications?.find(p => p.id === publicationId)?.views_count + 1 || 1 
+          })
+          .eq('id', publicationId);
+
+        if (updateError) {
+          console.error('Error updating view count:', updateError);
+        } else {
+          console.log('View recorded successfully for publication:', publicationId);
+        }
+      } else {
+        console.log('User has already viewed this publication');
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['publications'] });
+      queryClient.invalidateQueries({ queryKey: ['public-publications'] });
+    },
+  });
+
   return {
     publications,
     isLoading,
@@ -303,5 +361,6 @@ export const usePublications = (userId?: string) => {
     uploadMedia,
     likePublication,
     dislikePublication,
+    trackView,
   };
 };
