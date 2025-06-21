@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import ShareMenu from './ShareMenu';
 import ClickableImage from './ClickableImage';
+import FollowButton from './FollowButton';
 
 interface PublicationCardProps {
   publication: Publication;
@@ -392,15 +393,7 @@ const PublicationCard = ({
               <div className="flex items-center gap-2">
                 <h3 className="font-semibold">{userProfile?.full_name || userProfile?.username || 'Utilisateur'}</h3>
                 {showAllActions && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onFollow?.(publication.user_id)}
-                    className="h-6 px-2 text-xs"
-                  >
-                    <UserPlus className="h-3 w-3 mr-1" />
-                    Suivre
-                  </Button>
+                  <FollowButton userId={publication.user_id} variant="outline" size="sm" />
                 )}
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-500">

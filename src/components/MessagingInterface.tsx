@@ -65,7 +65,14 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+      
+      // Type assertion to ensure compatibility
+      const typedMessages: Message[] = (data || []).map(msg => ({
+        ...msg,
+        message_type: msg.message_type as 'text' | 'voice' | 'image' | 'video' | 'file' | 'gif'
+      }));
+      
+      setMessages(typedMessages);
     } catch (error) {
       console.error('Error loading messages:', error);
       toast({
@@ -127,15 +134,6 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
   const handleGifSelect = (gifUrl: string) => {
     sendMessage('', 'gif', gifUrl);
     setShowGifPicker(false);
-  };
-
-  const handleVoiceMessage = (audioBlob: Blob, duration: number) => {
-    // In a real implementation, you would upload the audio file
-    console.log('Voice message recorded:', { audioBlob, duration });
-    toast({
-      title: "Message vocal",
-      description: "Fonctionnalité en cours de développement",
-    });
   };
 
   const formatTime = (dateString: string) => {
@@ -234,7 +232,7 @@ const MessagingInterface = ({ userName, userId, onClose }: MessagingInterfacePro
               )}
             </div>
 
-            <VoiceRecorder onRecordingComplete={handleVoiceMessage} />
+            <VoiceRecorder />
 
             <Input
               placeholder="Tapez votre message..."
