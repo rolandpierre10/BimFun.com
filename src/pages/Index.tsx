@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
@@ -110,14 +109,6 @@ const Index = () => {
                 className="rounded-lg shadow-lg w-full h-48 object-cover"
                 title="Appels vidéo multi-participants"
                 description="Connectez-vous avec plusieurs personnes simultanément"
-              />
-              
-              <ClickableImage
-                src="/lovable-uploads/a730af4c-1fac4-4947-b2a5-6b8dfa72c7a3.png"
-                alt="Appels vidéo mobiles avec filtres"
-                className="rounded-lg shadow-lg w-full h-48 object-cover"
-                title="Appels vidéo avec filtres"
-                description="Personnalisez vos appels avec des filtres amusants"
               />
               
               <ClickableImage
