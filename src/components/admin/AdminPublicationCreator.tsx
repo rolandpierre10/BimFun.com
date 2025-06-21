@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,7 +35,6 @@ const AdminPublicationCreator = () => {
 
   const handleAddMediaUrl = () => {
     if (currentMediaUrl.trim() && !mediaUrls.includes(currentMediaUrl.trim())) {
-      // Validation simple de l'URL
       try {
         new URL(currentMediaUrl.trim());
         setMediaUrls([...mediaUrls, currentMediaUrl.trim()]);
@@ -78,8 +76,7 @@ const AdminPublicationCreator = () => {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
         
-        // Déterminer le bucket en fonction du type de contenu
-        let bucket = 'user-photos'; // défaut
+        let bucket = 'user-photos';
         if (contentType === 'video' || contentType === 'series') {
           bucket = 'user-videos';
         } else if (contentType === 'music') {
@@ -138,6 +135,39 @@ const AdminPublicationCreator = () => {
     }
   };
 
+  const ensureAdminProfile = async (userId: string) => {
+    console.log('Ensuring admin profile exists for user:', userId);
+    
+    // Vérifier si le profil existe
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (!existingProfile) {
+      console.log('Creating admin profile...');
+      // Créer le profil admin
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([{
+          id: userId,
+          full_name: 'Administrateur BimFun',
+          username: 'admin_bimfun',
+          bio: 'Administrateur officiel de la plateforme BimFun'
+        }]);
+
+      if (profileError) {
+        console.error('Error creating admin profile:', profileError);
+        throw new Error('Impossible de créer le profil administrateur');
+      }
+      
+      console.log('Admin profile created successfully');
+    } else {
+      console.log('Admin profile already exists');
+    }
+  };
+
   const handleCreatePublication = async () => {
     if (!title.trim() || !contentType) {
       toast({
@@ -159,14 +189,16 @@ const AdminPublicationCreator = () => {
     });
 
     try {
-      // Get current user (should be admin)
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       
       if (userError || !user) {
         throw new Error('User not authenticated');
       }
 
-      console.log('Current user:', user);
+      console.log('Current user:', user.id);
+
+      // S'assurer que le profil admin existe
+      await ensureAdminProfile(user.id);
 
       // Upload files first if any
       let allMediaUrls = [...mediaUrls];
@@ -181,7 +213,7 @@ const AdminPublicationCreator = () => {
         content_type: contentType,
         tags: tags,
         media_urls: allMediaUrls,
-        is_public: true, // Always public for admin publications
+        is_public: true, // Force toujours publique
         user_id: user.id,
         likes_count: 0,
         views_count: 0,
@@ -205,7 +237,7 @@ const AdminPublicationCreator = () => {
 
       toast({
         title: 'Publication créée',
-        description: 'La publication a été créée et publiée avec succès',
+        description: 'La publication a été créée et publiée sur la page d\'accueil',
       });
 
       // Reset form
@@ -217,6 +249,11 @@ const AdminPublicationCreator = () => {
       setFiles([]);
       setCurrentTag('');
       setCurrentMediaUrl('');
+
+      // Force refresh of public feed
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('refreshPublicFeed'));
+      }, 1000);
 
     } catch (error) {
       console.error('Error creating publication:', error);
@@ -425,7 +462,7 @@ const AdminPublicationCreator = () => {
               {isUploading ? 'Téléchargement en cours...' : 'Création en cours...'}
             </>
           ) : (
-            'Créer et publier'
+            'Créer et publier sur la page d\'accueil'
           )}
         </Button>
       </CardContent>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,47 +12,69 @@ const PublicFeed = () => {
   const { data: publications, isLoading, refetch } = useQuery({
     queryKey: ['public-publications'],
     queryFn: async () => {
-      console.log('Fetching publications...');
-      const { data, error } = await supabase
+      console.log('Fetching public publications...');
+      
+      // Récupérer les publications publiques
+      const { data: publicationsData, error: pubError } = await supabase
         .from('publications')
-        .select(`
-          *,
-          profiles!publications_user_id_fkey (
-            id,
-            full_name,
-            username,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('is_public', true)
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (error) {
-        console.error('Error fetching publications:', error);
-        throw error;
+      if (pubError) {
+        console.error('Error fetching publications:', pubError);
+        throw pubError;
       }
-      
-      console.log('Publications fetched:', data);
-      
-      // Ajouter des profils de démonstration pour les publications sans utilisateur réel
-      return (data as (Publication & { profiles: any })[]).map((pub, index) => {
-        if (!pub.profiles) {
-          const demoProfiles = [
-            { id: '1', full_name: 'Sophie Martin', username: 'sophie_design', avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face' },
-            { id: '2', full_name: 'Thomas Dubois', username: 'thomas_dev', avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face' },
-            { id: '3', full_name: 'Maria Rodriguez', username: 'maria_photo', avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face' },
-            { id: '4', full_name: 'Alex Chen', username: 'alex_music', avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' },
-            { id: '5', full_name: 'Emma Johnson', username: 'emma_video', avatar_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face' },
-            { id: 'admin', full_name: 'Administrateur BimFun', username: 'admin_bimfun', avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face' }
-          ];
-          pub.profiles = demoProfiles[index % demoProfiles.length];
+
+      console.log('Publications fetched:', publicationsData?.length || 0);
+
+      if (!publicationsData || publicationsData.length === 0) {
+        console.log('No publications found');
+        return [];
+      }
+
+      // Récupérer les profils des utilisateurs
+      const userIds = publicationsData.map(pub => pub.user_id);
+      const { data: profilesData, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url')
+        .in('id', userIds);
+
+      if (profileError) {
+        console.error('Error fetching profiles:', profileError);
+      }
+
+      // Combiner les publications avec leurs profils
+      const publicationsWithProfiles = publicationsData.map(pub => {
+        const profile = profilesData?.find(p => p.id === pub.user_id);
+        
+        // Si pas de profil trouvé, créer un profil par défaut
+        if (!profile) {
+          console.log(`No profile found for user ${pub.user_id}, creating default profile`);
+          return {
+            ...pub,
+            profiles: {
+              id: pub.user_id,
+              full_name: 'Utilisateur',
+              username: 'user',
+              avatar_url: null
+            }
+          };
         }
-        return pub;
+
+        return {
+          ...pub,
+          profiles: profile
+        };
       });
+
+      console.log('Publications with profiles:', publicationsWithProfiles.length);
+      return publicationsWithProfiles as (Publication & { profiles: any })[];
     },
-    refetchInterval: 10000, // Refresh every 10 seconds to catch new publications
-    refetchOnWindowFocus: true, // Refresh when window regains focus
+    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchOnWindowFocus: true,
+    staleTime: 10000, // Consider data stale after 10 seconds
   });
 
   // Listen for real-time updates to publications
@@ -65,13 +86,13 @@ const PublicFeed = () => {
       .on(
         'postgres_changes',
         {
-          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          event: '*',
           schema: 'public',
           table: 'publications'
         },
         (payload) => {
           console.log('Publication change detected:', payload);
-          refetch(); // Refresh the feed when any publication changes
+          refetch();
         }
       )
       .subscribe((status) => {
@@ -95,7 +116,6 @@ const PublicFeed = () => {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) return;
 
-    // Check if already liked
     const { data: existing } = await supabase
       .from('publication_interactions')
       .select('id')
@@ -105,13 +125,11 @@ const PublicFeed = () => {
       .single();
 
     if (existing) {
-      // Unlike
       await supabase
         .from('publication_interactions')
         .delete()
         .eq('id', existing.id);
     } else {
-      // Like
       await supabase
         .from('publication_interactions')
         .insert([{
@@ -128,7 +146,6 @@ const PublicFeed = () => {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user) return;
 
-    // Check if already disliked
     const { data: existing } = await supabase
       .from('publication_interactions')
       .select('id')
@@ -138,13 +155,11 @@ const PublicFeed = () => {
       .single();
 
     if (existing) {
-      // Remove dislike
       await supabase
         .from('publication_interactions')
         .delete()
         .eq('id', existing.id);
     } else {
-      // Dislike
       await supabase
         .from('publication_interactions')
         .insert([{
@@ -161,7 +176,6 @@ const PublicFeed = () => {
     const { data: user } = await supabase.auth.getUser();
     if (!user.user || user.user.id === userId) return;
 
-    // Check if already following
     const { data: existing } = await supabase
       .from('followers')
       .select('id')
@@ -170,13 +184,11 @@ const PublicFeed = () => {
       .single();
 
     if (existing) {
-      // Unfollow
       await supabase
         .from('followers')
         .delete()
         .eq('id', existing.id);
     } else {
-      // Follow
       await supabase
         .from('followers')
         .insert([{
@@ -199,7 +211,7 @@ const PublicFeed = () => {
     }
   };
 
-  console.log('PublicFeed render - publications:', publications, 'isLoading:', isLoading);
+  console.log('PublicFeed render - publications:', publications?.length || 0, 'isLoading:', isLoading);
 
   if (isLoading) {
     return (
