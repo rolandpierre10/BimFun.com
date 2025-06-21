@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ const PublicationCard = ({
   const [commentText, setCommentText] = useState('');
   const [isCommenting, setIsCommenting] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [viewCount, setViewCount] = useState(publication.views_count || 0);
   const { toast } = useToast();
 
   const getContentTypeIcon = () => {
@@ -91,6 +93,10 @@ const PublicationCard = ({
         title: "Commentaire ajouté",
         description: "Votre commentaire a été publié",
       });
+      
+      if (onComment) {
+        onComment(publication.id);
+      }
     } catch (error) {
       toast({
         title: "Erreur",
@@ -99,6 +105,73 @@ const PublicationCard = ({
       });
     } finally {
       setIsCommenting(false);
+    }
+  };
+
+  const handleLike = async () => {
+    const { data: user } = await supabase.auth.getUser();
+    if (!user.user) {
+      toast({
+        title: "Connexion requise",
+        description: "Vous devez être connecté pour aimer une publication",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { data: existing } = await supabase
+        .from('publication_interactions')
+        .select('id')
+        .eq('user_id', user.user.id)
+        .eq('publication_id', publication.id)
+        .eq('interaction_type', 'like')
+        .single();
+
+      if (existing) {
+        // Unlike
+        await supabase
+          .from('publication_interactions')
+          .delete()
+          .eq('id', existing.id);
+        
+        toast({
+          title: "J'aime retiré",
+          description: "Vous n'aimez plus cette publication",
+        });
+      } else {
+        // Remove dislike if exists
+        await supabase
+          .from('publication_interactions')
+          .delete()
+          .eq('user_id', user.user.id)
+          .eq('publication_id', publication.id)
+          .eq('interaction_type', 'dislike');
+
+        // Like
+        await supabase
+          .from('publication_interactions')
+          .insert([{
+            user_id: user.user.id,
+            publication_id: publication.id,
+            interaction_type: 'like'
+          }]);
+
+        toast({
+          title: "Publication aimée",
+          description: "Vous aimez cette publication",
+        });
+      }
+
+      if (onLike) {
+        onLike(publication.id);
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de traiter votre action",
+        variant: "destructive",
+      });
     }
   };
 
@@ -126,24 +199,66 @@ const PublicationCard = ({
             interaction_type: 'view'
           }]);
 
-        // Incrémenter le compteur de vues
+        // Incrémenter le compteur de vues localement
+        const newViewCount = viewCount + 1;
+        setViewCount(newViewCount);
+
+        // Incrémenter le compteur de vues dans la base de données
         await supabase
           .from('publications')
-          .update({ views_count: publication.views_count + 1 })
+          .update({ views_count: newViewCount })
           .eq('id', publication.id);
 
         if (onView) {
           onView(publication.id);
         }
-
-        toast({
-          title: "Vue enregistrée",
-          description: "Votre vue a été comptabilisée",
-        });
       }
     } catch (error) {
       console.error('Error recording view:', error);
     }
+  };
+
+  const handleShare = () => {
+    const publicationUrl = `${window.location.origin}/publication/${publication.id}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: publication.title,
+        text: publication.description || publication.title,
+        url: publicationUrl
+      }).then(() => {
+        toast({
+          title: "Publication partagée",
+          description: "La publication a été partagée avec succès",
+        });
+      }).catch((error) => {
+        console.log('Error sharing:', error);
+        // Fallback to clipboard
+        copyToClipboard(publicationUrl);
+      });
+    } else {
+      // Fallback to clipboard
+      copyToClipboard(publicationUrl);
+    }
+
+    if (onShare) {
+      onShare(publication.id);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        title: "Lien copié",
+        description: "Le lien de la publication a été copié dans le presse-papiers",
+      });
+    }).catch(() => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de copier le lien",
+        variant: "destructive",
+      });
+    });
   };
 
   const handleSendMessage = () => {
@@ -294,7 +409,7 @@ const PublicationCard = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onLike?.(publication.id)}
+              onClick={handleLike}
               className="flex items-center gap-2 text-gray-600 hover:text-red-600"
             >
               <Heart className="h-4 w-4" />
@@ -348,7 +463,7 @@ const PublicationCard = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onShare?.(publication.id)}
+              onClick={handleShare}
               className="flex items-center gap-2 text-gray-600 hover:text-green-600"
             >
               <Share2 className="h-4 w-4" />
@@ -387,7 +502,7 @@ const PublicationCard = ({
             className="flex items-center gap-1 text-sm text-gray-500 hover:text-blue-600"
           >
             <View className="h-4 w-4" />
-            <span>{publication.views_count}</span>
+            <span>{viewCount}</span>
           </Button>
         </div>
       </CardContent>
