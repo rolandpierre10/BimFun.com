@@ -99,15 +99,45 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Image d'illustration des appels vidéo */}
-          <div className="mb-16 text-center">
-            <img 
-              src="/lovable-uploads/4921e08b-7a9e-4bc8-bc40-96680f5c64ff.png" 
-              alt="Interface d'appels vidéo BimFun - Communication professionnelle"
-              className="max-w-full h-auto mx-auto rounded-lg shadow-lg"
-            />
-            <p className="text-gray-600 mt-4 text-lg">
-              Collaborez en temps réel avec des appels vidéo haute qualité
+          {/* Galerie d'images d'illustration des appels vidéo */}
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+              Communication vidéo professionnelle
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div className="text-center">
+                <img 
+                  src="/lovable-uploads/4921e08b-7a9e-4bc8-bc40-96680f5c64ff.png" 
+                  alt="Interface d'appels vidéo BimFun sur mobile"
+                  className="w-full h-auto rounded-lg shadow-lg"
+                />
+                <p className="text-gray-600 mt-2 text-sm">
+                  Appels vidéo mobiles
+                </p>
+              </div>
+              <div className="text-center">
+                <img 
+                  src="/lovable-uploads/d7ef8434-3779-4c4e-8925-e39c07b754f9.png" 
+                  alt="Interface d'appels vidéo en groupe sur tablette"
+                  className="w-full h-auto rounded-lg shadow-lg"
+                />
+                <p className="text-gray-600 mt-2 text-sm">
+                  Appels en groupe
+                </p>
+              </div>
+              <div className="text-center">
+                <img 
+                  src="/lovable-uploads/3ad16cd3-6fcc-475f-bc25-eaad941f1b74.png" 
+                  alt="Interface d'appel professionnel sur smartphone"
+                  className="w-full h-auto rounded-lg shadow-lg"
+                />
+                <p className="text-gray-600 mt-2 text-sm">
+                  Communication professionnelle
+                </p>
+              </div>
+            </div>
+            <p className="text-gray-600 text-center text-lg">
+              Collaborez en temps réel avec des appels vidéo haute qualité sur tous vos appareils
             </p>
           </div>
 
