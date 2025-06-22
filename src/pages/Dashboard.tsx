@@ -33,12 +33,9 @@ const Dashboard = () => {
             <p className="text-gray-600 text-sm sm:text-base">Gérez vos publications et votre contenu</p>
           </div>
 
-          {/* Layout mobile-first */}
           <div className="space-y-4 sm:space-y-6 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-6">
-            {/* Sidebar - En haut sur mobile, à côté sur desktop */}
             <div className="lg:col-span-1 lg:order-1">
               <div className="space-y-4">
-                {/* Statut d'abonnement */}
                 <div className="w-full">
                   <SubscriptionButton />
                 </div>
@@ -71,7 +68,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Zone principale avec publications */}
             <div className="lg:col-span-3 lg:order-2">
               <UserPublications isOwnProfile={true} />
             </div>

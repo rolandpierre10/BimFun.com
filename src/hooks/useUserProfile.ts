@@ -23,7 +23,7 @@ export const useUserProfile = (userId?: string) => {
       return data;
     },
     enabled: !!targetUserId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     refetchInterval: false,
     refetchOnWindowFocus: false,
     refetchOnMount: false,

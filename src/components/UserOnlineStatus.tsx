@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { supabase } from '@/integrations/supabase/client';
 import { Wifi, WifiOff } from 'lucide-react';
@@ -11,77 +11,60 @@ interface UserOnlineStatusProps {
 
 const UserOnlineStatus = ({ userId, showAsButton = true }: UserOnlineStatusProps) => {
   const [isOnline, setIsOnline] = useState(false);
-  const channelRef = useRef<any>(null);
-  const mountedRef = useRef(true);
-  const userIdRef = useRef(userId);
+  const subscriptionRef = useRef<any>(null);
 
-  // Update ref when userId changes
   useEffect(() => {
-    userIdRef.current = userId;
-  }, [userId]);
+    if (!userId) return;
 
-  const cleanup = useCallback(() => {
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current);
-      channelRef.current = null;
-    }
-  }, []);
+    let isMounted = true;
 
-  const setupSubscription = useCallback(async () => {
-    const currentUserId = userIdRef.current;
-    if (!currentUserId || !mountedRef.current) return;
+    const fetchStatus = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('is_online')
+          .eq('id', userId)
+          .single();
 
-    // Cleanup existing subscription
-    cleanup();
-
-    try {
-      // Fetch initial status
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('is_online')
-        .eq('id', currentUserId)
-        .single();
-
-      if (error || !mountedRef.current) return;
-
-      if (data) {
-        setIsOnline(data.is_online || false);
+        if (error || !isMounted) return;
+        if (data) {
+          setIsOnline(data.is_online || false);
+        }
+      } catch (error) {
+        console.error('Error fetching user status:', error);
       }
+    };
 
-      // Setup realtime subscription
-      const channelName = `user-status-${currentUserId}-${Date.now()}`;
-      
-      channelRef.current = supabase
-        .channel(channelName)
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'profiles',
-            filter: `id=eq.${currentUserId}`,
-          },
-          (payload) => {
-            if (payload.new && mountedRef.current) {
-              setIsOnline(payload.new.is_online || false);
-            }
+    fetchStatus();
+
+    // Setup realtime subscription
+    const channel = supabase
+      .channel(`user-status-${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${userId}`,
+        },
+        (payload) => {
+          if (payload.new && isMounted) {
+            setIsOnline(payload.new.is_online || false);
           }
-        )
-        .subscribe();
-    } catch (error) {
-      console.error('Error in setupSubscription:', error);
-    }
-  }, [cleanup]);
+        }
+      )
+      .subscribe();
 
-  useEffect(() => {
-    mountedRef.current = true;
-    setupSubscription();
+    subscriptionRef.current = channel;
 
     return () => {
-      mountedRef.current = false;
-      cleanup();
+      isMounted = false;
+      if (subscriptionRef.current) {
+        supabase.removeChannel(subscriptionRef.current);
+      }
     };
-  }, [setupSubscription]);
+  }, [userId]);
 
   if (showAsButton) {
     return (
