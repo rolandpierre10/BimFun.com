@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
@@ -138,119 +137,125 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             )}
           </div>
 
-          {/* Mobile Menu - Enlarged */}
-          <div className="flex lg:hidden items-center gap-3 flex-shrink-0 max-w-[30%]">
-            {/* Language Selector - Larger mobile size */}
-            <div className="scale-110 origin-right">
-              <LanguageSelector />
+          {/* Mobile Menu - Centered */}
+          <div className="flex lg:hidden items-center justify-center gap-3 flex-shrink-0 max-w-[30%]">
+            {/* Language Selector - Centered */}
+            <div className="flex justify-center">
+              <div className="scale-110">
+                <LanguageSelector />
+              </div>
             </div>
             
             {user && (
-              <Link to="/dashboard">
-                <Button variant="ghost" size="sm" className="p-2.5 min-w-[40px] h-11">
-                  <MessageCircle className="h-5 w-5" />
-                </Button>
-              </Link>
+              <div className="flex justify-center">
+                <Link to="/dashboard">
+                  <Button variant="ghost" size="sm" className="p-2.5 min-w-[40px] h-11">
+                    <MessageCircle className="h-5 w-5" />
+                  </Button>
+                </Link>
+              </div>
             )}
             
-            <Drawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <DrawerTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-2.5 min-w-[40px] h-11">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </DrawerTrigger>
-              <DrawerContent className="max-h-[80vh]">
-                <DrawerHeader className="border-b">
-                  <div className="flex items-center justify-between">
-                    <DrawerTitle>Menu</DrawerTitle>
-                    <DrawerClose asChild>
-                      <Button variant="ghost" size="sm" className="p-2">
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </DrawerClose>
-                  </div>
-                </DrawerHeader>
-                
-                <div className="px-4 py-6 space-y-2 overflow-y-auto">
-                  {/* Navigation Links */}
-                  <div className="space-y-1">
-                    <button
-                      onClick={() => scrollToSection('services')}
-                      className="w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      Fonctionnalités
-                    </button>
-                    <button
-                      onClick={() => scrollToSection('pricing')}
-                      className="w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      Tarifs
-                    </button>
-                    <button
-                      onClick={() => scrollToSection('about')}
-                      className="w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      À propos
-                    </button>
-                    <Link
-                      to="/contact"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      Contact
-                    </Link>
-                  </div>
+            <div className="flex justify-center">
+              <Drawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <DrawerTrigger asChild>
+                  <Button variant="ghost" size="sm" className="p-2.5 min-w-[40px] h-11">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent className="max-h-[80vh]">
+                  <DrawerHeader className="border-b">
+                    <div className="flex items-center justify-between">
+                      <DrawerTitle>Menu</DrawerTitle>
+                      <DrawerClose asChild>
+                        <Button variant="ghost" size="sm" className="p-2">
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </DrawerClose>
+                    </div>
+                  </DrawerHeader>
+                  
+                  <div className="px-4 py-6 space-y-2 overflow-y-auto">
+                    {/* Navigation Links */}
+                    <div className="space-y-1">
+                      <button
+                        onClick={() => scrollToSection('services')}
+                        className="w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        Fonctionnalités
+                      </button>
+                      <button
+                        onClick={() => scrollToSection('pricing')}
+                        className="w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        Tarifs
+                      </button>
+                      <button
+                        onClick={() => scrollToSection('about')}
+                        className="w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        À propos
+                      </button>
+                      <Link
+                        to="/contact"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        Contact
+                      </Link>
+                    </div>
 
-                  {/* User Actions */}
-                  <div className="border-t pt-4 mt-6 space-y-1">
-                    {user ? (
-                      <>
-                        {userRole === 'admin' && (
-                          <Link
-                            to="/admin"
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center space-x-3 py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                    {/* User Actions */}
+                    <div className="border-t pt-4 mt-6 space-y-1">
+                      {user ? (
+                        <>
+                          {userRole === 'admin' && (
+                            <Link
+                              to="/admin"
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="flex items-center space-x-3 py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                            >
+                              <Shield className="h-5 w-5" />
+                              <span>Administration</span>
+                            </Link>
+                          )}
+                          
+                          <button
+                            onClick={handleLogout}
+                            className="flex items-center space-x-3 w-full text-left py-4 px-4 text-lg font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           >
-                            <Shield className="h-5 w-5" />
-                            <span>Administration</span>
-                          </Link>
-                        )}
-                        
-                        <button
-                          onClick={handleLogout}
-                          className="flex items-center space-x-3 w-full text-left py-4 px-4 text-lg font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                          <LogOut className="h-5 w-5" />
-                          <span>Déconnexion</span>
-                        </button>
-                      </>
-                    ) : (
-                      <div className="space-y-3">
-                        <Button
-                          variant="ghost"
-                          onClick={() => {
-                            onOpenAuth('login');
-                            setMobileMenuOpen(false);
-                          }}
-                          className="w-full justify-start text-lg py-6 hover:bg-blue-50 hover:text-blue-600"
-                        >
-                          Connexion
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            onOpenAuth('signup');
-                            setMobileMenuOpen(false);
-                          }}
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-6"
-                        >
-                          S'inscrire
-                        </Button>
-                      </div>
-                    )}
+                            <LogOut className="h-5 w-5" />
+                            <span>Déconnexion</span>
+                          </button>
+                        </>
+                      ) : (
+                        <div className="space-y-3">
+                          <Button
+                            variant="ghost"
+                            onClick={() => {
+                              onOpenAuth('login');
+                              setMobileMenuOpen(false);
+                            }}
+                            className="w-full justify-start text-lg py-6 hover:bg-blue-50 hover:text-blue-600"
+                          >
+                            Connexion
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              onOpenAuth('signup');
+                              setMobileMenuOpen(false);
+                            }}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-6"
+                          >
+                            S'inscrire
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </DrawerContent>
-            </Drawer>
+                </DrawerContent>
+              </Drawer>
+            </div>
           </div>
         </div>
       </div>
