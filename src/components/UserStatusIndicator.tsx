@@ -15,29 +15,38 @@ const UserStatusIndicator = ({ userId, showText = true, size = 'md' }: UserStatu
   const [lastSeen, setLastSeen] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!userId) return;
+
     const fetchUserStatus = async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('is_online, last_seen')
-        .eq('id', userId)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('is_online, last_seen')
+          .eq('id', userId)
+          .single();
 
-      if (error) {
-        console.error('Error fetching user status:', error);
-        return;
-      }
+        if (error) {
+          console.error('Error fetching user status:', error);
+          return;
+        }
 
-      if (data) {
-        setIsOnline(data.is_online || false);
-        setLastSeen(data.last_seen);
+        if (data) {
+          setIsOnline(data.is_online || false);
+          setLastSeen(data.last_seen);
+        }
+      } catch (error) {
+        console.error('Error in fetchUserStatus:', error);
       }
     };
 
     fetchUserStatus();
 
+    // Create a unique channel name to avoid conflicts
+    const channelName = `user-status-indicator-${userId}-${Date.now()}`;
+
     // Écouter les mises à jour en temps réel
     const channel = supabase
-      .channel('user-status-changes')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -56,6 +65,7 @@ const UserStatusIndicator = ({ userId, showText = true, size = 'md' }: UserStatu
       .subscribe();
 
     return () => {
+      // Proper cleanup
       supabase.removeChannel(channel);
     };
   }, [userId]);
