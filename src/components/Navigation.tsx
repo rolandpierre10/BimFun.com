@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
@@ -45,16 +46,18 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50">
-      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-24 sm:h-20 lg:h-24">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20 sm:h-20 lg:h-24">
           {/* Logo */}
-          <Link to="/" className="flex items-center flex-shrink-0 min-w-0 max-w-[65%]">
-            <img 
-              src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
-              alt="BimFun Logo" 
-              className="h-20 sm:h-10 lg:h-14 xl:h-16 w-auto max-w-full hover:opacity-80 transition-opacity"
-            />
-          </Link>
+          <div className="flex-shrink-0 w-auto max-w-[50%] overflow-hidden">
+            <Link to="/" className="block">
+              <img 
+                src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
+                alt="BimFun Logo" 
+                className="h-12 sm:h-10 lg:h-14 xl:h-16 w-auto max-w-full hover:opacity-80 transition-opacity object-contain"
+              />
+            </Link>
+          </div>
           
           {/* Navigation Links - Desktop only */}
           <div className="hidden lg:flex items-center space-x-6">
@@ -137,30 +140,30 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             )}
           </div>
 
-          {/* Mobile Menu - Centered */}
-          <div className="flex lg:hidden items-center justify-center gap-3 flex-shrink-0 max-w-[30%]">
-            {/* Language Selector - Centered */}
-            <div className="flex justify-center">
-              <div className="scale-110">
-                <LanguageSelector />
-              </div>
+          {/* Mobile Menu */}
+          <div className="flex lg:hidden items-center justify-center gap-2 flex-shrink-0">
+            {/* Language Selector */}
+            <div className="flex items-center justify-center">
+              <LanguageSelector />
             </div>
             
+            {/* Dashboard Button for logged in users */}
             {user && (
-              <div className="flex justify-center">
+              <div className="flex items-center justify-center">
                 <Link to="/dashboard">
-                  <Button variant="ghost" size="sm" className="p-2.5 min-w-[40px] h-11">
-                    <MessageCircle className="h-5 w-5" />
+                  <Button variant="ghost" size="sm" className="p-2 min-w-[36px] h-10">
+                    <MessageCircle className="h-4 w-4" />
                   </Button>
                 </Link>
               </div>
             )}
             
-            <div className="flex justify-center">
+            {/* Menu Button */}
+            <div className="flex items-center justify-center">
               <Drawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <DrawerTrigger asChild>
-                  <Button variant="ghost" size="sm" className="p-2.5 min-w-[40px] h-11">
-                    <Menu className="h-5 w-5" />
+                  <Button variant="ghost" size="sm" className="p-2 min-w-[36px] h-10">
+                    <Menu className="h-4 w-4" />
                   </Button>
                 </DrawerTrigger>
                 <DrawerContent className="max-h-[80vh]">
