@@ -18,22 +18,18 @@ const SubscriptionButton = () => {
   } = useSubscription();
   const { toast } = useToast();
   const [isProcessing, setIsProcessing] = React.useState(false);
-  const [redirecting, setRedirecting] = React.useState(false);
 
   const handleSubscribe = async (e: React.MouseEvent) => {
-    // Empêcher les événements par défaut et la propagation
     e.preventDefault();
     e.stopPropagation();
     
-    // Éviter les doubles clics/touches
-    if (isProcessing || redirecting) return;
+    if (isProcessing) return;
     
     setIsProcessing(true);
     
     try {
       console.log('Subscribe button clicked - starting process');
       
-      // Check if user is authenticated
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         console.log('User not authenticated');
@@ -48,49 +44,16 @@ const SubscriptionButton = () => {
 
       console.log('User authenticated, creating checkout session');
       
-      // Show preparing message
       toast({
         title: "Préparation du paiement...",
         description: "Redirection vers Stripe en cours",
       });
       
-      // Call the edge function directly
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-      
-      if (error) {
-        console.error('Edge function error:', error);
-        throw new Error(`Erreur du serveur: ${error.message}`);
-      }
-      
-      console.log('Checkout response received:', data);
-      
-      if (!data || !data.url) {
-        console.error('No checkout URL received:', data);
-        throw new Error('Aucune URL de paiement reçue du serveur');
-      }
-
-      console.log('Redirecting to Stripe checkout:', data.url);
-      
-      // Set redirecting state
-      setRedirecting(true);
-      
-      // Show success message before redirect
-      toast({
-        title: "Redirection en cours...",
-        description: "Ouverture de Stripe",
-      });
-      
-      // Redirection immédiate pour mobile
-      window.location.href = data.url;
+      await createCheckout();
       
     } catch (error) {
       console.error('Complete error in handleSubscribe:', error);
       setIsProcessing(false);
-      setRedirecting(false);
       
       let errorMessage = 'Erreur inconnue';
       if (error instanceof Error) {
@@ -141,10 +104,9 @@ const SubscriptionButton = () => {
     );
   }
 
-  const buttonDisabled = loading || isProcessing || redirecting;
+  const buttonDisabled = loading || isProcessing;
   const getButtonText = () => {
-    if (redirecting) return "Redirection...";
-    if (isProcessing) return "Préparation...";
+    if (isProcessing) return "Redirection...";
     if (loading) return "Chargement...";
     return "S'abonner maintenant";
   };
@@ -173,7 +135,6 @@ const SubscriptionButton = () => {
           </li>
         </ul>
         
-        {/* Bouton optimisé pour mobile */}
         <Button 
           onClick={handleSubscribe}
           disabled={buttonDisabled}
@@ -185,15 +146,9 @@ const SubscriptionButton = () => {
             cursor: buttonDisabled ? 'not-allowed' : 'pointer'
           }}
         >
-          {(isProcessing || redirecting) && <Loader2 className="h-4 w-4 animate-spin" />}
+          {isProcessing && <Loader2 className="h-4 w-4 animate-spin" />}
           {getButtonText()}
         </Button>
-        
-        {redirecting && (
-          <div className="text-center text-xs sm:text-sm text-blue-600 animate-pulse">
-            Ne fermez pas cette page...
-          </div>
-        )}
       </CardContent>
     </Card>
   );

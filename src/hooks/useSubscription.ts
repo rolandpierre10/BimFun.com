@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -47,16 +48,8 @@ export const useSubscription = () => {
       
       if (error) throw error;
       
-      // Détecter si on est sur mobile
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-      
-      if (isMobile) {
-        // Sur mobile, rediriger directement dans le même onglet
-        window.location.href = data.url;
-      } else {
-        // Sur desktop, ouvrir dans un nouvel onglet
-        window.open(data.url, '_blank');
-      }
+      // Sur mobile, rediriger directement dans le même onglet
+      window.location.href = data.url;
     } catch (error) {
       console.error('Error creating checkout:', error);
       toast({
@@ -76,16 +69,8 @@ export const useSubscription = () => {
       
       if (error) throw error;
       
-      // Détecter si on est sur mobile
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-      
-      if (isMobile) {
-        // Sur mobile, rediriger directement dans le même onglet
-        window.location.href = data.url;
-      } else {
-        // Sur desktop, ouvrir dans un nouvel onglet
-        window.open(data.url, '_blank');
-      }
+      // Sur mobile, rediriger directement dans le même onglet
+      window.location.href = data.url;
     } catch (error) {
       console.error('Error opening customer portal:', error);
       toast({
