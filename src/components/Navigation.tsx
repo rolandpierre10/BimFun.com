@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
@@ -47,15 +45,15 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50">
-      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 sm:h-20 lg:h-24">
+      <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-14 sm:h-20 lg:h-24">
           {/* Logo */}
-          <div className="flex-shrink-0 w-auto max-w-[40%] overflow-hidden">
+          <div className="flex-shrink-0 w-auto max-w-[30%] overflow-hidden">
             <Link to="/" className="block">
               <img 
                 src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
                 alt="BimFun Logo" 
-                className="h-10 sm:h-10 lg:h-14 xl:h-16 w-auto max-w-full hover:opacity-80 transition-opacity object-contain"
+                className="h-8 sm:h-10 lg:h-14 xl:h-16 w-auto max-w-full hover:opacity-80 transition-opacity object-contain"
               />
             </Link>
           </div>
@@ -141,32 +139,32 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             )}
           </div>
 
-          {/* Mobile Menu */}
-          <div className="flex lg:hidden items-center justify-end gap-1 flex-shrink-0">
-            {/* Language Selector */}
+          {/* Mobile Menu - Simplified and Compact */}
+          <div className="flex lg:hidden items-center justify-end gap-0.5 flex-shrink-0 min-w-0">
+            {/* Language Selector - Smaller */}
             <div className="flex items-center justify-center">
-              <div className="scale-90">
+              <div className="scale-75">
                 <LanguageSelector />
               </div>
             </div>
             
-            {/* Dashboard Button for logged in users */}
+            {/* Dashboard Button for logged in users - Smaller */}
             {user && (
               <div className="flex items-center justify-center">
                 <Link to="/dashboard">
-                  <Button variant="ghost" size="sm" className="p-1.5 min-w-[32px] h-8">
-                    <MessageCircle className="h-3.5 w-3.5" />
+                  <Button variant="ghost" size="sm" className="p-1 min-w-[28px] h-7">
+                    <MessageCircle className="h-3 w-3" />
                   </Button>
                 </Link>
               </div>
             )}
             
-            {/* Menu Button */}
+            {/* Menu Button - Smaller */}
             <div className="flex items-center justify-center">
               <Drawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <DrawerTrigger asChild>
-                  <Button variant="ghost" size="sm" className="p-1.5 min-w-[32px] h-8">
-                    <Menu className="h-3.5 w-3.5" />
+                  <Button variant="ghost" size="sm" className="p-1 min-w-[28px] h-7">
+                    <Menu className="h-3 w-3" />
                   </Button>
                 </DrawerTrigger>
                 <DrawerContent className="max-h-[80vh]">
@@ -270,4 +268,3 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
 };
 
 export default Navigation;
-
