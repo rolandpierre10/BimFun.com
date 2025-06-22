@@ -1,10 +1,10 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import { MessageCircle, User, LogOut, Shield, Menu, X } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import LanguageSelector from './LanguageSelector';
-import { handleMobileLogout } from '@/utils/mobileRedirect';
 import {
   Drawer,
   DrawerClose,
@@ -35,11 +35,12 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
     try {
       console.log('Logout button clicked - starting logout process');
       setMobileMenuOpen(false);
+      
       await logout();
       console.log('Logout successful, navigating to home');
       
-      // Utiliser la nouvelle fonction de redirection mobile pour la déconnexion
-      handleMobileLogout();
+      // Redirection vers la page d'accueil après déconnexion
+      navigate('/', { replace: true });
       
     } catch (error) {
       console.error('Logout error:', error);

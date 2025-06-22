@@ -33,6 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session:', session?.user?.email);
       setUser(session?.user ?? null);
       setLoading(false);
     });
@@ -40,7 +41,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.email);
-      setUser(session?.user ?? null);
+      
+      if (event === 'SIGNED_OUT') {
+        console.log('User signed out - clearing state');
+        setUser(null);
+        setUserRole(null);
+      } else {
+        setUser(session?.user ?? null);
+      }
+      
       setLoading(false);
       
       // Si l'utilisateur vient de se connecter et qu'il n'a pas d'abonnement, proposer l'abonnement
@@ -60,15 +69,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (user) {
       const fetchUserRole = async () => {
-        const { data, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .single();
+        try {
+          const { data, error } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id)
+            .single();
 
-        if (data && !error) {
-          setUserRole(data.role || 'user');
-        } else {
+          if (data && !error) {
+            setUserRole(data.role || 'user');
+          } else {
+            setUserRole('user');
+          }
+        } catch (error) {
+          console.error('Error fetching user role:', error);
           setUserRole('user');
         }
       };
@@ -99,8 +113,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    console.log('Starting signOut process');
+    
+    try {
+      // Clear local state immediately
+      setUser(null);
+      setUserRole(null);
+      
+      // Then sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Supabase signOut error:', error);
+        throw error;
+      }
+      
+      console.log('SignOut successful');
+    } catch (error) {
+      console.error('SignOut error:', error);
+      throw error;
+    }
   };
 
   const logout = signOut; // Alias for signOut
