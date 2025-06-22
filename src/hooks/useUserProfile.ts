@@ -23,8 +23,10 @@ export const useUserProfile = (userId?: string) => {
       return data;
     },
     enabled: !!targetUserId,
-    staleTime: 30000, // 30 secondes avant de considérer les données comme obsolètes
-    refetchInterval: false, // Désactiver le refetch automatique
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   const updateProfileMutation = useMutation({

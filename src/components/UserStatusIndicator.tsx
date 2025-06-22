@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { supabase } from '@/integrations/supabase/client';
 import { Wifi, WifiOff } from 'lucide-react';
@@ -15,42 +15,44 @@ const UserStatusIndicator = ({ userId, showText = true, size = 'md' }: UserStatu
   const [lastSeen, setLastSeen] = useState<string | null>(null);
   const channelRef = useRef<any>(null);
   const mountedRef = useRef(true);
+  const userIdRef = useRef(userId);
 
+  // Update ref when userId changes
   useEffect(() => {
-    mountedRef.current = true;
-    
-    const fetchUserStatus = async () => {
-      if (!userId || !mountedRef.current) return;
-      
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('is_online, last_seen')
-          .eq('id', userId)
-          .single();
+    userIdRef.current = userId;
+  }, [userId]);
 
-        if (error || !mountedRef.current) return;
-
-        if (data) {
-          setIsOnline(data.is_online || false);
-          setLastSeen(data.last_seen);
-        }
-      } catch (error) {
-        console.error('Error in fetchUserStatus:', error);
-      }
-    };
-
-    fetchUserStatus();
-
-    // Nettoyer le canal précédent
+  const cleanup = useCallback(() => {
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
     }
+  }, []);
 
-    // Créer un nouveau canal seulement si nécessaire
-    if (userId && mountedRef.current) {
-      const channelName = `user-indicator-${userId}`;
+  const setupSubscription = useCallback(async () => {
+    const currentUserId = userIdRef.current;
+    if (!currentUserId || !mountedRef.current) return;
+
+    // Cleanup existing subscription
+    cleanup();
+
+    try {
+      // Fetch initial status
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('is_online, last_seen')
+        .eq('id', currentUserId)
+        .single();
+
+      if (error || !mountedRef.current) return;
+
+      if (data) {
+        setIsOnline(data.is_online || false);
+        setLastSeen(data.last_seen);
+      }
+
+      // Setup realtime subscription
+      const channelName = `user-indicator-${currentUserId}-${Date.now()}`;
 
       channelRef.current = supabase
         .channel(channelName)
@@ -60,7 +62,7 @@ const UserStatusIndicator = ({ userId, showText = true, size = 'md' }: UserStatu
             event: 'UPDATE',
             schema: 'public',
             table: 'profiles',
-            filter: `id=eq.${userId}`,
+            filter: `id=eq.${currentUserId}`,
           },
           (payload) => {
             if (payload.new && mountedRef.current) {
@@ -70,16 +72,20 @@ const UserStatusIndicator = ({ userId, showText = true, size = 'md' }: UserStatu
           }
         )
         .subscribe();
+    } catch (error) {
+      console.error('Error in setupSubscription:', error);
     }
+  }, [cleanup]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    setupSubscription();
 
     return () => {
       mountedRef.current = false;
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
-      }
+      cleanup();
     };
-  }, [userId]);
+  }, [setupSubscription]);
 
   const getIconSize = () => {
     switch (size) {

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,68 +13,71 @@ const OnlineStatusToggle = () => {
   const [isOnline, setIsOnline] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Récupérer le statut actuel de l'utilisateur
+  const setUserOnlineStatus = useCallback(async (status: boolean) => {
+    if (!user?.id) return;
+    
+    try {
+      await supabase
+        .from('profiles')
+        .update({ is_online: status })
+        .eq('id', user.id);
+      setIsOnline(status);
+    } catch (error) {
+      console.error('Error updating online status:', error);
+    }
+  }, [user?.id]);
+
+  // Fetch initial status
   useEffect(() => {
-    if (!user) return;
+    if (!user?.id) return;
 
     const fetchUserStatus = async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('is_online')
-        .eq('id', user.id)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('is_online')
+          .eq('id', user.id)
+          .single();
 
-      if (error) {
-        console.error('Error fetching user status:', error);
-        return;
-      }
+        if (error) {
+          console.error('Error fetching user status:', error);
+          return;
+        }
 
-      if (data) {
-        setIsOnline(data.is_online || false);
+        if (data) {
+          setIsOnline(data.is_online || false);
+        }
+      } catch (error) {
+        console.error('Error in fetchUserStatus:', error);
       }
     };
 
     fetchUserStatus();
-  }, [user]);
+  }, [user?.id]);
 
-  // Mettre automatiquement l'utilisateur en ligne lors de la connexion
+  // Set user online when component mounts
   useEffect(() => {
-    if (!user) return;
+    if (!user?.id) return;
 
-    const setUserOnline = async () => {
-      await supabase
-        .from('profiles')
-        .update({ is_online: true })
-        .eq('id', user.id);
-      setIsOnline(true);
-    };
+    setUserOnlineStatus(true);
 
-    setUserOnline();
-
-    // Mettre l'utilisateur hors ligne quand il quitte la page
-    const handleBeforeUnload = async () => {
-      await supabase
-        .from('profiles')
-        .update({ is_online: false })
-        .eq('id', user.id);
+    // Set offline when page unloads
+    const handleBeforeUnload = () => {
+      if (user?.id) {
+        navigator.sendBeacon('/api/set-offline', JSON.stringify({ userId: user.id }));
+      }
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      // Mettre hors ligne lors du démontage du composant
-      if (user) {
-        supabase
-          .from('profiles')
-          .update({ is_online: false })
-          .eq('id', user.id);
-      }
+      setUserOnlineStatus(false);
     };
-  }, [user]);
+  }, [user?.id, setUserOnlineStatus]);
 
   const toggleOnlineStatus = async () => {
-    if (!user) return;
+    if (!user?.id) return;
 
     setLoading(true);
     try {
