@@ -21,7 +21,7 @@ interface Subscriber {
   profiles?: {
     full_name: string;
     username: string;
-  };
+  } | null;
 }
 
 const SubscriptionsManagement: React.FC = () => {
@@ -55,7 +55,14 @@ const SubscriptionsManagement: React.FC = () => {
       }
 
       console.log('Subscribers loaded:', data?.length || 0);
-      setSubscribers(data || []);
+      
+      // Transformer les données pour correspondre au type attendu
+      const formattedData = data?.map(item => ({
+        ...item,
+        profiles: Array.isArray(item.profiles) ? item.profiles[0] : item.profiles
+      })) || [];
+      
+      setSubscribers(formattedData);
     } catch (error) {
       console.error('Error loading subscribers:', error);
       toast({
@@ -162,99 +169,60 @@ const SubscriptionsManagement: React.FC = () => {
               {searchTerm ? 'Aucun abonnement trouvé pour cette recherche' : 'Aucun abonnement trouvé'}
             </p>
           ) : (
-            <>
-              {/* Vue mobile */}
-              <div className="block md:hidden space-y-4">
-                {filteredSubscribers.map((subscriber) => (
-                  <Card key={subscriber.id} className="p-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <div className="flex items-center space-x-2">
-                            <User className="h-4 w-4 text-gray-500" />
-                            <span className="font-medium text-sm">
-                              {subscriber.profiles?.full_name || 'Nom non disponible'}
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Mail className="h-3 w-3 text-gray-400" />
-                            <span className="text-xs text-gray-600">{subscriber.email}</span>
-                          </div>
-                        </div>
-                        {getSubscriptionBadge(subscriber.subscribed, subscriber.subscription_tier)}
-                      </div>
-                      
-                      {subscriber.subscribed && subscriber.subscription_end && (
-                        <div className="flex items-center space-x-2 text-xs text-gray-500">
-                          <Calendar className="h-3 w-3" />
-                          <span>Expire le: {new Date(subscriber.subscription_end).toLocaleDateString('fr-FR')}</span>
-                        </div>
-                      )}
-                      
-                      <div className="text-xs text-gray-500">
-                        Inscrit: {new Date(subscriber.created_at).toLocaleDateString('fr-FR')}
-                      </div>
-                      
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => refreshSubscription(subscriber.id)}
-                        disabled={refreshing}
-                        className="w-full"
-                      >
-                        <RefreshCw className={`h-3 w-3 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                        Actualiser
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-
-              {/* Vue desktop */}
-              <div className="hidden md:block space-y-4">
-                {filteredSubscribers.map((subscriber) => (
-                  <div key={subscriber.id} className="border rounded-lg p-4 space-y-3">
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-2">
+            <div className="space-y-4">
+              {filteredSubscribers.map((subscriber) => (
+                <Card key={subscriber.id} className="p-4">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
                         <div className="flex items-center space-x-2">
-                          <h3 className="font-semibold">
+                          <User className="h-4 w-4 text-gray-500" />
+                          <span className="font-medium text-sm">
                             {subscriber.profiles?.full_name || 'Nom non disponible'}
-                          </h3>
-                          {getSubscriptionBadge(subscriber.subscribed, subscriber.subscription_tier)}
+                          </span>
                         </div>
-                        <p className="text-sm text-gray-600">
-                          @{subscriber.profiles?.username || 'username'} • {subscriber.email}
-                        </p>
-                        <div className="flex space-x-4 text-sm text-gray-500">
-                          <span>Inscrit: {new Date(subscriber.created_at).toLocaleDateString('fr-FR')}</span>
-                          {subscriber.subscribed && subscriber.subscription_end && (
-                            <span>Expire: {new Date(subscriber.subscription_end).toLocaleDateString('fr-FR')}</span>
-                          )}
+                        <div className="flex items-center space-x-2">
+                          <Mail className="h-3 w-3 text-gray-400" />
+                          <span className="text-xs text-gray-600">{subscriber.email}</span>
                         </div>
-                        {subscriber.stripe_customer_id && (
-                          <p className="text-xs text-gray-400">
-                            ID Stripe: {subscriber.stripe_customer_id}
-                          </p>
+                        {subscriber.profiles?.username && (
+                          <p className="text-xs text-gray-500">@{subscriber.profiles.username}</p>
                         )}
                       </div>
-                      
-                      <div className="flex space-x-2 items-center">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => refreshSubscription(subscriber.id)}
-                          disabled={refreshing}
-                          className="flex items-center space-x-1"
-                        >
-                          <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-                          <span>Actualiser</span>
-                        </Button>
-                      </div>
+                      {getSubscriptionBadge(subscriber.subscribed, subscriber.subscription_tier)}
                     </div>
+                    
+                    {subscriber.subscribed && subscriber.subscription_end && (
+                      <div className="flex items-center space-x-2 text-xs text-gray-500">
+                        <Calendar className="h-3 w-3" />
+                        <span>Expire le: {new Date(subscriber.subscription_end).toLocaleDateString('fr-FR')}</span>
+                      </div>
+                    )}
+                    
+                    <div className="text-xs text-gray-500">
+                      Inscrit: {new Date(subscriber.created_at).toLocaleDateString('fr-FR')}
+                    </div>
+
+                    {subscriber.stripe_customer_id && (
+                      <p className="text-xs text-gray-400">
+                        ID Stripe: {subscriber.stripe_customer_id}
+                      </p>
+                    )}
+                    
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => refreshSubscription(subscriber.id)}
+                      disabled={refreshing}
+                      className="w-full"
+                    >
+                      <RefreshCw className={`h-3 w-3 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                      Actualiser
+                    </Button>
                   </div>
-                ))}
-              </div>
-            </>
+                </Card>
+              ))}
+            </div>
           )}
         </div>
       </CardContent>
