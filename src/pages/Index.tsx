@@ -15,6 +15,7 @@ import DemoInteractions from '@/components/DemoInteractions';
 import ClickableImage from '@/components/ClickableImage';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const { t } = useTranslation();
@@ -48,34 +49,69 @@ const Index = () => {
   }, []);
 
   const handleStartNow = async (e: React.MouseEvent) => {
-    // Empêcher les événements par défaut et la propagation
     e.preventDefault();
     e.stopPropagation();
     
-    // Éviter les doubles clics/touches
     if (isProcessing) return;
     
     setIsProcessing(true);
     
     try {
+      console.log('Start Now button clicked');
+      
       if (user) {
-        console.log('User authenticated, creating checkout session');
+        console.log('User authenticated, checking auth status...');
         
-        // Show preparing message
+        // Vérifier que l'utilisateur est toujours connecté
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        if (!currentUser) {
+          console.log('User not authenticated anymore');
+          toast({
+            title: "Connexion requise",
+            description: "Veuillez vous connecter pour vous abonner",
+            variant: "destructive",
+          });
+          handleOpenAuth('login');
+          return;
+        }
+
+        console.log('User confirmed, creating checkout session');
+        
         toast({
           title: "Préparation du paiement...",
           description: "Redirection vers Stripe en cours",
         });
         
-        await createCheckout();
+        // Redirection directe pour mobile
+        const { data, error } = await supabase.functions.invoke('create-checkout');
+        
+        if (error) {
+          console.error('Checkout error:', error);
+          throw error;
+        }
+        
+        console.log('Checkout session created, redirecting to:', data.url);
+        
+        // Redirection directe dans le même onglet pour mobile
+        window.location.href = data.url;
+        
       } else {
+        console.log('User not authenticated, opening signup modal');
         handleOpenAuth('signup');
       }
     } catch (error) {
-      console.error('Error creating checkout:', error);
+      console.error('Complete error in handleStartNow:', error);
+      
+      let errorMessage = 'Erreur inconnue';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+      
       toast({
         title: "Erreur de paiement",
-        description: "Impossible de créer la session de paiement",
+        description: `Impossible de créer la session de paiement: ${errorMessage}`,
         variant: "destructive",
       });
     } finally {
@@ -408,7 +444,7 @@ const Index = () => {
                 onClick={handleStartNow}
                 disabled={isProcessing}
                 style={{ 
-                  minHeight: '48px',
+                  minHeight: '56px',
                   WebkitTapHighlightColor: 'transparent',
                   userSelect: 'none',
                   cursor: isProcessing ? 'not-allowed' : 'pointer'

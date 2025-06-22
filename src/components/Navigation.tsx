@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
@@ -27,10 +28,19 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
   console.log('User state in Navigation:', user);
   console.log('UserRole in Navigation:', userRole);
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
-    setMobileMenuOpen(false);
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    try {
+      console.log('Logout button clicked');
+      await logout();
+      console.log('Logout successful, navigating to home');
+      navigate('/');
+      setMobileMenuOpen(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const scrollToSection = (sectionId: string) => {
@@ -135,7 +145,11 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                         
                         <button
                           onClick={handleLogout}
-                          className="flex items-center space-x-3 w-full text-left py-4 px-4 text-lg font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="flex items-center space-x-3 w-full text-left py-4 px-4 text-lg font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors touch-manipulation"
+                          style={{ 
+                            minHeight: '48px',
+                            WebkitTapHighlightColor: 'transparent'
+                          }}
                         >
                           <LogOut className="h-5 w-5" />
                           <span>Déconnexion</span>
