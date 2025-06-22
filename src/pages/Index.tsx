@@ -54,7 +54,7 @@ const Index = () => {
     if (isProcessing) return;
     
     setIsProcessing(true);
-    console.log('Start Now button clicked - Mobile/Desktop payment');
+    console.log('Start Now button clicked');
     
     try {
       if (user) {
@@ -90,8 +90,6 @@ const Index = () => {
         }
         
         console.log('Checkout session created, redirecting to:', data.url);
-        
-        // Redirection simple et directe - la meilleure méthode pour mobile
         window.location.href = data.url;
         
       } else {

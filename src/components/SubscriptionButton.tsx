@@ -61,8 +61,6 @@ const SubscriptionButton = () => {
       }
       
       console.log('Checkout session created, redirecting to:', data.url);
-      
-      // Redirection simple et directe - fonctionne mieux sur mobile
       window.location.href = data.url;
       
     } catch (error) {
