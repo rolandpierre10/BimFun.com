@@ -37,7 +37,8 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 
+    // Utiliser la clé Stripe LIVE pour la production
+    const stripe = new Stripe(Deno.env.get("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") || "", { 
       apiVersion: "2023-10-16" 
     });
 
