@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Users, Ban, AlertTriangle, Crown, User } from 'lucide-react';
+import { Users, Ban, AlertTriangle, Crown, User, Shield } from 'lucide-react';
 import UserOnlineStatus from '@/components/UserOnlineStatus';
 import FollowButton from '@/components/FollowButton';
 
@@ -43,36 +43,74 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
   };
 
   const handleUserAction = async (userId: string, action: 'ban' | 'unban' | 'warn' | 'promote' | 'demote') => {
+    if (!user?.id) {
+      toast({
+        title: "Erreur",
+        description: "Vous devez être connecté pour effectuer cette action",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(userId);
     try {
       console.log(`Performing action ${action} on user ${userId}`);
       
-      let actionType: 'no_action' | 'warning' | 'content_removal' | 'account_suspension' | 'account_ban' = 'no_action';
-      if (action === 'ban') actionType = 'account_ban';
-      if (action === 'warn') actionType = 'warning';
-      
-      const expirationDate = new Date();
-      expirationDate.setDate(expirationDate.getDate() + 30); // 30 jours d'expiration
+      if (action === 'promote') {
+        // Promouvoir l'utilisateur au rôle de modérateur
+        const { error } = await supabase
+          .from('user_roles')
+          .upsert({
+            user_id: userId,
+            role: 'moderator',
+            assigned_by: user.id
+          });
 
-      const { error } = await supabase
-        .from('moderation_actions')
-        .insert({
-          moderator_id: user?.id,
-          target_user_id: userId,
-          action_type: actionType,
-          reason: `Action ${action} effectuée par l'administrateur`,
-          expires_at: actionType === 'account_ban' ? expirationDate.toISOString() : null
+        if (error) throw error;
+        
+        toast({
+          title: "Utilisateur promu",
+          description: "L'utilisateur a été promu modérateur",
         });
+      } else if (action === 'demote') {
+        // Rétrograder l'utilisateur au rôle d'utilisateur normal
+        const { error } = await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', userId);
 
-      if (error) {
-        console.error('Error performing user action:', error);
-        throw error;
+        if (error) throw error;
+        
+        toast({
+          title: "Utilisateur rétrogradé",
+          description: "L'utilisateur a été rétrogradé au rôle d'utilisateur normal",
+        });
+      } else {
+        // Actions de modération (ban, warn)
+        let actionType: 'no_action' | 'warning' | 'content_removal' | 'account_suspension' | 'account_ban' = 'no_action';
+        if (action === 'ban') actionType = 'account_ban';
+        if (action === 'warn') actionType = 'warning';
+        
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 30); // 30 jours d'expiration
+
+        const { error } = await supabase
+          .from('moderation_actions')
+          .insert({
+            moderator_id: user.id,
+            target_user_id: userId,
+            action_type: actionType,
+            reason: `Action ${action} effectuée par l'administrateur`,
+            expires_at: actionType === 'account_ban' ? expirationDate.toISOString() : null
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Action effectuée",
+          description: `L'utilisateur a été ${action === 'ban' ? 'banni' : 'averti'}`,
+        });
       }
-
-      toast({
-        title: "Action effectuée",
-        description: `L'utilisateur a été ${action === 'ban' ? 'banni' : action === 'unban' ? 'débanni' : 'averti'}`,
-      });
 
       onRefresh();
     } catch (error) {
@@ -100,68 +138,160 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
           {users.length === 0 ? (
             <p className="text-center text-gray-500 py-8">Aucun utilisateur trouvé</p>
           ) : (
-            users.map((userItem) => (
-              <div key={userItem.id} className="border rounded-lg p-4 space-y-3">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <h3 className="font-semibold">{userItem.full_name}</h3>
-                      <Badge variant={getRoleBadgeVariant(userItem.role)}>
-                        {userItem.role}
-                      </Badge>
-                      {userItem.subscribed && (
-                        <Badge variant="default">
-                          {userItem.subscription_tier}
-                        </Badge>
-                      )}
+            <>
+              {/* Vue mobile */}
+              <div className="block md:hidden space-y-4">
+                {users.map((userItem) => (
+                  <Card key={userItem.id} className="p-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <div className="flex items-center space-x-2">
+                            <h3 className="font-semibold text-sm">{userItem.full_name}</h3>
+                            <Badge variant={getRoleBadgeVariant(userItem.role)} className="text-xs">
+                              {userItem.role}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-gray-600">@{userItem.username}</p>
+                        </div>
+                        <UserOnlineStatus userId={userItem.id} showAsButton={true} />
+                      </div>
+                      
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>{userItem.posts_count} posts</span>
+                        <span>{userItem.followers_count} abonnés</span>
+                      </div>
+                      
+                      <div className="flex flex-wrap gap-2">
+                        <FollowButton userId={userItem.id} userName={userItem.full_name} size="sm" variant="outline" />
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleUserAction(userItem.id, 'warn')}
+                          disabled={loading === userItem.id}
+                          className="flex items-center space-x-1"
+                        >
+                          <AlertTriangle className="h-3 w-3" />
+                          <span className="text-xs">Avertir</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleUserAction(userItem.id, 'ban')}
+                          disabled={loading === userItem.id}
+                          className="flex items-center space-x-1"
+                        >
+                          <Ban className="h-3 w-3" />
+                          <span className="text-xs">Bannir</span>
+                        </Button>
+                        {userItem.role === 'user' && (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleUserAction(userItem.id, 'promote')}
+                            disabled={loading === userItem.id}
+                            className="flex items-center space-x-1"
+                          >
+                            <Crown className="h-3 w-3" />
+                            <span className="text-xs">Promouvoir</span>
+                          </Button>
+                        )}
+                        {userItem.role === 'moderator' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleUserAction(userItem.id, 'demote')}
+                            disabled={loading === userItem.id}
+                            className="flex items-center space-x-1"
+                          >
+                            <Shield className="h-3 w-3" />
+                            <span className="text-xs">Rétrograder</span>
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600">@{userItem.username}</p>
-                    <div className="flex space-x-4 text-sm text-gray-500">
-                      <span>{userItem.posts_count} publications</span>
-                      <span>{userItem.followers_count} abonnés</span>
-                      <span>Inscrit: {new Date(userItem.created_at).toLocaleDateString('fr-FR')}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex space-x-2 items-center">
-                    <FollowButton userId={userItem.id} userName={userItem.full_name} size="sm" variant="outline" />
-                    <UserOnlineStatus userId={userItem.id} showAsButton={true} />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleUserAction(userItem.id, 'warn')}
-                      disabled={loading === userItem.id}
-                      className="flex items-center space-x-1"
-                    >
-                      <AlertTriangle className="h-4 w-4" />
-                      <span>Avertir</span>
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleUserAction(userItem.id, 'ban')}
-                      disabled={loading === userItem.id}
-                      className="flex items-center space-x-1"
-                    >
-                      <Ban className="h-4 w-4" />
-                      <span>Bannir</span>
-                    </Button>
-                    {userItem.role === 'user' && (
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => handleUserAction(userItem.id, 'promote')}
-                        disabled={loading === userItem.id}
-                        className="flex items-center space-x-1"
-                      >
-                        <Crown className="h-4 w-4" />
-                        <span>Promouvoir</span>
-                      </Button>
-                    )}
-                  </div>
-                </div>
+                  </Card>
+                ))}
               </div>
-            ))
+
+              {/* Vue desktop */}
+              <div className="hidden md:block space-y-4">
+                {users.map((userItem) => (
+                  <div key={userItem.id} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <h3 className="font-semibold">{userItem.full_name}</h3>
+                          <Badge variant={getRoleBadgeVariant(userItem.role)}>
+                            {userItem.role}
+                          </Badge>
+                          {userItem.subscribed && (
+                            <Badge variant="default">
+                              {userItem.subscription_tier}
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600">@{userItem.username}</p>
+                        <div className="flex space-x-4 text-sm text-gray-500">
+                          <span>{userItem.posts_count} publications</span>
+                          <span>{userItem.followers_count} abonnés</span>
+                          <span>Inscrit: {new Date(userItem.created_at).toLocaleDateString('fr-FR')}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex space-x-2 items-center">
+                        <FollowButton userId={userItem.id} userName={userItem.full_name} size="sm" variant="outline" />
+                        <UserOnlineStatus userId={userItem.id} showAsButton={true} />
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleUserAction(userItem.id, 'warn')}
+                          disabled={loading === userItem.id}
+                          className="flex items-center space-x-1"
+                        >
+                          <AlertTriangle className="h-4 w-4" />
+                          <span>Avertir</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleUserAction(userItem.id, 'ban')}
+                          disabled={loading === userItem.id}
+                          className="flex items-center space-x-1"
+                        >
+                          <Ban className="h-4 w-4" />
+                          <span>Bannir</span>
+                        </Button>
+                        {userItem.role === 'user' && (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleUserAction(userItem.id, 'promote')}
+                            disabled={loading === userItem.id}
+                            className="flex items-center space-x-1"
+                          >
+                            <Crown className="h-4 w-4" />
+                            <span>Promouvoir</span>
+                          </Button>
+                        )}
+                        {userItem.role === 'moderator' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleUserAction(userItem.id, 'demote')}
+                            disabled={loading === userItem.id}
+                            className="flex items-center space-x-1"
+                          >
+                            <Shield className="h-4 w-4" />
+                            <span>Rétrograder</span>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </CardContent>

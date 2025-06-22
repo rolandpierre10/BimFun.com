@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
-import { TrendingUp, Users, FileText, AlertTriangle, Settings, Plus } from 'lucide-react';
+import { TrendingUp, Users, FileText, AlertTriangle, Settings, Plus, CreditCard } from 'lucide-react';
 
-// Import des nouveaux composants
+// Import des composants admin
 import AdminStats from '@/components/admin/AdminStats';
 import UsersManagement from '@/components/admin/UsersManagement';
 import PublicationsManagement from '@/components/admin/PublicationsManagement';
 import ReportsManagement from '@/components/admin/ReportsManagement';
 import SystemSettings from '@/components/admin/SystemSettings';
 import AdminPublicationCreator from '@/components/admin/AdminPublicationCreator';
+import SubscriptionsManagement from '@/components/admin/SubscriptionsManagement';
 
 interface AdminStats {
   total_users: number;
@@ -238,41 +239,7 @@ const AdminDashboard = () => {
   };
 
   const handleUserAction = async (userId: string, action: 'ban' | 'unban' | 'warn' | 'promote' | 'demote') => {
-    try {
-      console.log(`Performing action ${action} on user ${userId}`);
-      
-      let dbAction: 'account_ban' | 'warning' | 'no_action' = 'no_action';
-      if (action === 'ban') dbAction = 'account_ban';
-      if (action === 'warn') dbAction = 'warning';
-      
-      const { error } = await supabase
-        .from('moderation_actions')
-        .insert({
-          moderator_id: user?.id,
-          target_user_id: userId,
-          action_type: dbAction,
-          reason: `Action ${action} effectuée par l'administrateur`
-        });
-
-      if (error) {
-        console.error('Error performing user action:', error);
-        throw error;
-      }
-
-      toast({
-        title: "Action effectuée",
-        description: `L'utilisateur a été ${action === 'ban' ? 'banni' : action === 'unban' ? 'débanni' : 'averti'}`,
-      });
-
-      loadUsers();
-    } catch (error) {
-      console.error('Error performing user action:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'effectuer cette action",
-        variant: "destructive",
-      });
-    }
+    await loadUsers(); // Refresh users after action
   };
 
   const handleDeletePublication = async (publicationId: string) => {
@@ -324,26 +291,27 @@ const AdminDashboard = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-6">
+        <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-lg mb-6 overflow-x-auto">
           {[
             { id: 'overview', label: 'Vue d\'ensemble', icon: TrendingUp },
             { id: 'users', label: 'Utilisateurs', icon: Users },
             { id: 'publications', label: 'Publications', icon: FileText },
             { id: 'create-publication', label: 'Créer Publication', icon: Plus },
+            { id: 'subscriptions', label: 'Abonnements', icon: CreditCard },
             { id: 'reports', label: 'Signalements', icon: AlertTriangle },
             { id: 'settings', label: 'Paramètres', icon: Settings }
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-md font-medium transition-colors ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md font-medium transition-colors whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'bg-white text-blue-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               <tab.icon className="h-4 w-4" />
-              <span>{tab.label}</span>
+              <span className="text-sm">{tab.label}</span>
             </button>
           ))}
         </div>
@@ -369,6 +337,10 @@ const AdminDashboard = () => {
         
         {activeTab === 'create-publication' && (
           <AdminPublicationCreator />
+        )}
+        
+        {activeTab === 'subscriptions' && (
+          <SubscriptionsManagement />
         )}
         
         {activeTab === 'reports' && (
