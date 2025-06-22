@@ -1,57 +1,45 @@
 
-// Utilitaire pour gérer les redirections mobiles de manière fiable
+// Utilitaire simplifié pour gérer les redirections mobiles
 export const handleMobileRedirect = (url: string, fallbackText?: string) => {
-  console.log('=== MOBILE REDIRECT DEBUG ===');
-  console.log('URL to redirect to:', url);
+  console.log('=== MOBILE REDIRECT ===');
+  console.log('URL:', url);
   console.log('User agent:', navigator.userAgent);
-  console.log('Platform:', navigator.platform);
   
   // Vérifier si l'URL est valide
   if (!url || typeof url !== 'string') {
-    console.error('Invalid URL provided:', url);
+    console.error('URL invalide:', url);
     return false;
   }
   
   try {
-    // Détecter si on est sur mobile
+    // Sur mobile, toujours utiliser window.location.href
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    console.log('Is mobile device:', isMobile);
     
     if (isMobile) {
-      // Sur mobile, utiliser directement window.location.href
-      console.log('Mobile redirect: Using window.location.href');
+      console.log('Mobile détecté - Redirection directe');
       window.location.href = url;
-      return true;
     } else {
-      // Sur desktop, essayer d'ouvrir dans un nouvel onglet
-      console.log('Desktop redirect: Opening in new tab');
+      console.log('Desktop détecté - Tentative nouvel onglet');
       const newWindow = window.open(url, '_blank');
-      if (newWindow) {
-        newWindow.focus();
-        return true;
-      } else {
-        // Fallback sur desktop si popup bloqué
-        console.log('Popup blocked, using direct redirect');
+      if (!newWindow) {
+        console.log('Popup bloqué - Redirection directe');
         window.location.href = url;
-        return true;
       }
     }
     
-  } catch (error) {
-    console.error('Redirect failed:', error);
+    return true;
     
-    // Dernier recours: redirection directe
+  } catch (error) {
+    console.error('Erreur de redirection:', error);
+    
+    // Dernier recours
     try {
       window.location.href = url;
       return true;
     } catch (finalError) {
-      console.error('Final redirect attempt failed:', finalError);
-      
-      // Afficher un message à l'utilisateur avec le lien
+      console.error('Échec final de redirection:', finalError);
       if (fallbackText) {
-        alert(`${fallbackText}\n\nRedirection automatique échouée. Veuillez visiter: ${url}`);
-      } else {
-        alert(`Redirection automatique échouée. Veuillez visiter: ${url}`);
+        alert(`${fallbackText}\n\nVeuillez visiter: ${url}`);
       }
       return false;
     }
@@ -59,8 +47,6 @@ export const handleMobileRedirect = (url: string, fallbackText?: string) => {
 };
 
 export const handleMobileLogout = () => {
-  console.log('Handling mobile logout redirect');
-  
-  // Pour la déconnexion, redirection simple vers la page d'accueil
+  console.log('Déconnexion - redirection vers accueil');
   window.location.href = '/';
 };

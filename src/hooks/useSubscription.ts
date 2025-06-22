@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { handleMobileRedirect } from '@/utils/mobileRedirect';
 
 interface SubscriptionData {
   subscribed: boolean;
@@ -44,12 +45,21 @@ export const useSubscription = () => {
   const createCheckout = async () => {
     try {
       setLoading(true);
+      console.log('Creating checkout session via useSubscription hook...');
+      
       const { data, error } = await supabase.functions.invoke('create-checkout');
       
       if (error) throw error;
       
-      // Sur mobile, rediriger directement dans le même onglet
-      window.location.href = data.url;
+      if (!data?.url) {
+        throw new Error('URL de paiement non reçue');
+      }
+      
+      console.log('Checkout URL received, redirecting:', data.url);
+      
+      // Utiliser la fonction handleMobileRedirect pour une redirection cohérente
+      handleMobileRedirect(data.url, 'Redirection vers le paiement...');
+      
     } catch (error) {
       console.error('Error creating checkout:', error);
       toast({
@@ -65,12 +75,21 @@ export const useSubscription = () => {
   const openCustomerPortal = async () => {
     try {
       setLoading(true);
+      console.log('Opening customer portal via useSubscription hook...');
+      
       const { data, error } = await supabase.functions.invoke('customer-portal');
       
       if (error) throw error;
       
-      // Sur mobile, rediriger directement dans le même onglet
-      window.location.href = data.url;
+      if (!data?.url) {
+        throw new Error('URL du portail client non reçue');
+      }
+      
+      console.log('Customer portal URL received, redirecting:', data.url);
+      
+      // Utiliser la fonction handleMobileRedirect pour une redirection cohérente
+      handleMobileRedirect(data.url, 'Redirection vers le portail client...');
+      
     } catch (error) {
       console.error('Error opening customer portal:', error);
       toast({
