@@ -46,14 +46,14 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 sm:h-20 lg:h-24">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-14 sm:h-20 lg:h-24">
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
             <img 
               src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
               alt="BimFun Logo" 
-              className="h-8 sm:h-10 lg:h-14 xl:h-16 w-auto hover:opacity-80 transition-opacity"
+              className="h-7 sm:h-10 lg:h-14 xl:h-16 w-auto hover:opacity-80 transition-opacity"
             />
           </Link>
           
@@ -138,16 +138,16 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             )}
           </div>
 
-          {/* Mobile Menu - Compact layout */}
-          <div className="flex lg:hidden items-center space-x-2">
-            {/* Language Selector - Compact mobile version */}
-            <div className="scale-90 origin-right">
+          {/* Mobile Menu - Ultra compact layout */}
+          <div className="flex lg:hidden items-center space-x-1">
+            {/* Language Selector - Extra small mobile version */}
+            <div className="scale-75 origin-right">
               <LanguageSelector />
             </div>
             
             {user && (
               <Link to="/dashboard">
-                <Button variant="ghost" size="sm" className="p-2">
+                <Button variant="ghost" size="sm" className="p-1.5">
                   <MessageCircle className="h-4 w-4" />
                 </Button>
               </Link>
@@ -155,8 +155,8 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             
             <Drawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <DrawerTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-2">
-                  <Menu className="h-5 w-5" />
+                <Button variant="ghost" size="sm" className="p-1.5">
+                  <Menu className="h-4 w-4" />
                 </Button>
               </DrawerTrigger>
               <DrawerContent className="max-h-[80vh]">
