@@ -47,9 +47,9 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50">
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20 sm:h-20 lg:h-24">
+        <div className="flex justify-between items-center h-24 sm:h-20 lg:h-24">
           {/* Logo */}
-          <Link to="/" className="flex items-center flex-shrink-0 min-w-0 max-w-[60%]">
+          <Link to="/" className="flex items-center flex-shrink-0 min-w-0 max-w-[65%]">
             <img 
               src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
               alt="BimFun Logo" 
@@ -139,15 +139,15 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
           </div>
 
           {/* Mobile Menu - Enlarged */}
-          <div className="flex lg:hidden items-center gap-2 flex-shrink-0 max-w-[35%]">
+          <div className="flex lg:hidden items-center gap-3 flex-shrink-0 max-w-[30%]">
             {/* Language Selector - Larger mobile size */}
-            <div className="scale-90 origin-right">
+            <div className="scale-110 origin-right">
               <LanguageSelector />
             </div>
             
             {user && (
               <Link to="/dashboard">
-                <Button variant="ghost" size="sm" className="p-2 min-w-[36px] h-10">
+                <Button variant="ghost" size="sm" className="p-2.5 min-w-[40px] h-11">
                   <MessageCircle className="h-5 w-5" />
                 </Button>
               </Link>
@@ -155,7 +155,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             
             <Drawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <DrawerTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-2 min-w-[36px] h-10">
+                <Button variant="ghost" size="sm" className="p-2.5 min-w-[40px] h-11">
                   <Menu className="h-5 w-5" />
                 </Button>
               </DrawerTrigger>
