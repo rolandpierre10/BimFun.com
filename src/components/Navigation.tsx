@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
@@ -47,7 +48,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50">
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-        <div className="flex items-center h-16 sm:h-20 lg:h-24">
+        <div className="flex items-center justify-between h-16 sm:h-20 lg:h-24">
           {/* Logo */}
           <div className="flex-shrink-0 w-auto max-w-[50%] overflow-hidden">
             <Link to="/" className="block">
@@ -59,8 +60,8 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             </Link>
           </div>
           
-          {/* Mobile Menu - Right next to logo */}
-          <div className="flex lg:hidden items-center ml-2 gap-1 flex-shrink-0">
+          {/* Mobile Menu - More space from logo */}
+          <div className="flex lg:hidden items-center gap-3 flex-shrink-0">
             <LanguageSelector />
             
             {user && (
@@ -258,3 +259,4 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
 };
 
 export default Navigation;
+
