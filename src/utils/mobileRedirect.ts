@@ -4,7 +4,7 @@ export const handleMobileRedirect = (url: string, fallbackText?: string) => {
   console.log('=== MOBILE REDIRECT DEBUG ===');
   console.log('URL to redirect to:', url);
   console.log('User agent:', navigator.userAgent);
-  console.log('Attempting redirection...');
+  console.log('Platform:', navigator.platform);
   
   // Vérifier si l'URL est valide
   if (!url || typeof url !== 'string') {
@@ -13,66 +13,54 @@ export const handleMobileRedirect = (url: string, fallbackText?: string) => {
   }
   
   try {
-    // Méthode principale: redirection directe
-    console.log('Method 1: Direct window.location.href');
-    window.location.href = url;
+    // Détecter si on est sur mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    console.log('Is mobile device:', isMobile);
     
-    // Si on arrive ici, c'est que la redirection a échoué
-    console.log('Direct redirect may have failed, trying alternative methods...');
-    
-    // Attendre un peu puis essayer window.open
-    setTimeout(() => {
-      console.log('Method 2: window.open in same tab');
-      try {
-        const newWindow = window.open(url, '_self');
-        if (!newWindow) {
-          console.warn('window.open returned null, trying fallback');
-          // Fallback: créer un lien et le cliquer
-          const link = document.createElement('a');
-          link.href = url;
-          link.target = '_self';
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          console.log('Method 3: Creating temporary link');
-          link.click();
-          document.body.removeChild(link);
-        }
-      } catch (error) {
-        console.error('Alternative redirect methods failed:', error);
-        // Dernier recours: afficher l'URL à l'utilisateur
-        alert(`Redirection automatique échouée. Veuillez visiter: ${url}`);
+    if (isMobile) {
+      // Sur mobile, utiliser directement window.location.href
+      console.log('Mobile redirect: Using window.location.href');
+      window.location.href = url;
+      return true;
+    } else {
+      // Sur desktop, essayer d'ouvrir dans un nouvel onglet
+      console.log('Desktop redirect: Opening in new tab');
+      const newWindow = window.open(url, '_blank');
+      if (newWindow) {
+        newWindow.focus();
+        return true;
+      } else {
+        // Fallback sur desktop si popup bloqué
+        console.log('Popup blocked, using direct redirect');
+        window.location.href = url;
+        return true;
       }
-    }, 100);
-    
-    return true;
+    }
     
   } catch (error) {
-    console.error('All redirect methods failed:', error);
+    console.error('Redirect failed:', error);
     
-    // Afficher un message à l'utilisateur avec le lien
-    if (fallbackText) {
-      alert(`${fallbackText}\n\nRedirection automatique échouée. Veuillez visiter: ${url}`);
-    } else {
-      alert(`Redirection automatique échouée. Veuillez visiter: ${url}`);
+    // Dernier recours: redirection directe
+    try {
+      window.location.href = url;
+      return true;
+    } catch (finalError) {
+      console.error('Final redirect attempt failed:', finalError);
+      
+      // Afficher un message à l'utilisateur avec le lien
+      if (fallbackText) {
+        alert(`${fallbackText}\n\nRedirection automatique échouée. Veuillez visiter: ${url}`);
+      } else {
+        alert(`Redirection automatique échouée. Veuillez visiter: ${url}`);
+      }
+      return false;
     }
-    return false;
   }
 };
 
 export const handleMobileLogout = () => {
   console.log('Handling mobile logout redirect');
   
-  // Pour la déconnexion, on utilise plusieurs tentatives
-  try {
-    // Première tentative: replace
-    window.location.replace('/');
-  } catch (error) {
-    console.warn('Replace failed, trying assign:', error);
-    try {
-      window.location.assign('/');
-    } catch (error2) {
-      console.warn('Assign failed, trying href:', error2);
-      window.location.href = '/';
-    }
-  }
+  // Pour la déconnexion, redirection simple vers la page d'accueil
+  window.location.href = '/';
 };

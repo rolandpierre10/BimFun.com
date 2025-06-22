@@ -71,20 +71,26 @@ const SubscriptionButton = () => {
       console.log('Step 4: Checkout session created successfully');
       console.log('Redirect URL:', data.url);
       
-      // Tenter la redirection
-      console.log('Step 5: Attempting redirection...');
-      const redirectSuccess = handleMobileRedirect(data.url, 'Redirection vers le paiement en cours...');
+      // Améliorer la redirection mobile
+      console.log('Step 5: Attempting mobile-optimized redirection...');
       
-      if (redirectSuccess) {
-        console.log('Step 5: Redirection initiated successfully');
-        // Garder le loading pendant un moment car la page va changer
-        setTimeout(() => {
+      // Toast de confirmation avant redirection
+      toast({
+        title: "Redirection en cours...",
+        description: "Vous allez être redirigé vers Stripe",
+      });
+      
+      // Petit délai pour que l'utilisateur voie le message
+      setTimeout(() => {
+        const redirectSuccess = handleMobileRedirect(data.url, 'Redirection vers le paiement en cours...');
+        
+        if (redirectSuccess) {
+          console.log('Step 5: Redirection initiated successfully');
+        } else {
+          console.log('Step 5: Redirection failed');
           setIsProcessing(false);
-        }, 5000);
-      } else {
-        console.log('Step 5: Redirection failed');
-        setIsProcessing(false);
-      }
+        }
+      }, 500);
       
     } catch (error) {
       console.error('=== SUBSCRIPTION ERROR ===');
