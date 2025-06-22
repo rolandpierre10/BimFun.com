@@ -53,7 +53,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             <img 
               src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
               alt="BimFun Logo" 
-              className="h-12 sm:h-16 lg:h-20 w-auto hover:opacity-80 transition-opacity"
+              className="h-10 sm:h-12 lg:h-16 xl:h-20 w-auto hover:opacity-80 transition-opacity"
             />
           </Link>
           
@@ -139,9 +139,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
           </div>
 
           {/* Mobile Menu - Visible sur tablette et mobile */}
-          <div className="flex lg:hidden items-center space-x-2">
-            <LanguageSelector />
-            
+          <div className="flex lg:hidden items-center space-x-1">
             {user && (
               <Link to="/dashboard">
                 <Button variant="ghost" size="sm" className="p-2">
@@ -169,6 +167,12 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                 </DrawerHeader>
                 
                 <div className="px-4 py-6 space-y-2 overflow-y-auto">
+                  {/* Language Selector - First item in mobile menu */}
+                  <div className="pb-4 border-b border-gray-100">
+                    <div className="text-sm font-medium text-gray-700 mb-3">Langue</div>
+                    <LanguageSelector />
+                  </div>
+
                   {/* Navigation Links */}
                   <div className="space-y-1">
                     <button
