@@ -1,0 +1,18 @@
+
+{
+  "nav": {
+    "home": "홈",
+    "dashboard": "대시보드",
+    "login": "로그인",
+    "signup": "회원가입"
+  },
+  "home": {
+    "title": "BimFun에 오신 것을 환영합니다",
+    "startNow": "지금 시작하기"
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류",
+    "success": "성공"
+  }
+}

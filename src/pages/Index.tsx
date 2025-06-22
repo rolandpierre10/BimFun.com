@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +16,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
+  const { t } = useTranslation();
   console.log('Index page is rendering');
   const { user } = useAuth();
   const { createCheckout } = useSubscription();
@@ -92,16 +94,16 @@ const Index = () => {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              Bienvenue sur BimFun
+              {t('home.title')}
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed max-w-4xl mx-auto">
-              La plateforme sociale où les professionnels partagent, découvrent et s'inspirent à travers du contenu créatif du monde entier.
+              {t('home.subtitle')}
             </p>
           </div>
 
           {/* Galerie d'images d'appels vidéo */}
           <section className="mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">Connectez-vous en vidéo</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">{t('home.videoCallsTitle')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               <ClickableImage
                 src="/lovable-uploads/42e4cfc8-b297-45ae-bdc5-61eb1a2b5be0.png"
@@ -139,7 +141,7 @@ const Index = () => {
 
           {/* Section Services */}
           <section id="services" className="mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">Nos Services</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">{t('home.servicesTitle')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               
               {/* Publications créatives */}
@@ -148,22 +150,22 @@ const Index = () => {
                   <div className="mx-auto mb-4 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                     <Camera className="h-6 w-6 text-blue-600" />
                   </div>
-                  <CardTitle className="text-lg">Publications créatives</CardTitle>
+                  <CardTitle className="text-lg">{t('services.creativePublications.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">Partagez vos créations avec la communauté et découvrez le travail d'autres créateurs.</p>
+                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.creativePublications.description')}</p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Photos et vidéos haute qualité</span>
+                      <span>{t('services.creativePublications.features.highQuality')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Tags et catégories</span>
+                      <span>{t('services.creativePublications.features.tagsCategories')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Statistiques de vues</span>
+                      <span>{t('services.creativePublications.features.viewStats')}</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -175,22 +177,22 @@ const Index = () => {
                   <div className="mx-auto mb-4 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                     <MessageCircle className="h-6 w-6 text-green-600" />
                   </div>
-                  <CardTitle className="text-lg">Messagerie avancée</CardTitle>
+                  <CardTitle className="text-lg">{t('services.messaging.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">Communiquez instantanément avec d'autres membres de la plateforme.</p>
+                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.messaging.description')}</p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Messages texte en temps réel</span>
+                      <span>{t('services.messaging.features.realTime')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Messages vocaux</span>
+                      <span>{t('services.messaging.features.voice')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Partage d'images</span>
+                      <span>{t('services.messaging.features.imageShare')}</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -201,22 +203,22 @@ const Index = () => {
                   <div className="mx-auto mb-4 w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
                     <Phone className="h-6 w-6 text-emerald-600" />
                   </div>
-                  <CardTitle className="text-lg">Appels vocaux</CardTitle>
+                  <CardTitle className="text-lg">{t('services.voiceCalls.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">Communiquez par la voix avec des appels audio haute qualité.</p>
+                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.voiceCalls.description')}</p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Audio HD cristallin</span>
+                      <span>{t('services.voiceCalls.features.hdAudio')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Réduction de bruit</span>
+                      <span>{t('services.voiceCalls.features.noiseReduction')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Connexion instantanée</span>
+                      <span>{t('services.voiceCalls.features.instantConnection')}</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -227,22 +229,22 @@ const Index = () => {
                   <div className="mx-auto mb-4 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
                     <Video className="h-6 w-6 text-purple-600" />
                   </div>
-                  <CardTitle className="text-lg">Appels vidéo</CardTitle>
+                  <CardTitle className="text-lg">{t('services.videoCalls.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">Collaborez en face à face avec des appels vidéo intégrés.</p>
+                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.videoCalls.description')}</p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Qualité HD</span>
+                      <span>{t('services.videoCalls.features.hdQuality')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Partage d'écran</span>
+                      <span>{t('services.videoCalls.features.screenShare')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Enregistrement</span>
+                      <span>{t('services.videoCalls.features.recording')}</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -253,22 +255,22 @@ const Index = () => {
                   <div className="mx-auto mb-4 w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
                     <Users className="h-6 w-6 text-orange-600" />
                   </div>
-                  <CardTitle className="text-lg">Réseau professionnel</CardTitle>
+                  <CardTitle className="text-lg">{t('services.professionalNetwork.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">Connectez-vous avec d'autres professionnels et développez votre réseau.</p>
+                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.professionalNetwork.description')}</p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Profils professionnels</span>
+                      <span>{t('services.professionalNetwork.features.professionalProfiles')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Système de suivi</span>
+                      <span>{t('services.professionalNetwork.features.followingSystem')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Recommandations</span>
+                      <span>{t('services.professionalNetwork.features.recommendations')}</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -279,22 +281,22 @@ const Index = () => {
                   <div className="mx-auto mb-4 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                     <Share2 className="h-6 w-6 text-red-600" />
                   </div>
-                  <CardTitle className="text-lg">Interactions sociales</CardTitle>
+                  <CardTitle className="text-lg">{t('services.socialInteractions.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">Engagez-vous avec la communauté à travers diverses interactions.</p>
+                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.socialInteractions.description')}</p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Likes et commentaires</span>
+                      <span>{t('services.socialInteractions.features.likesAndComments')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Partage de contenu</span>
+                      <span>{t('services.socialInteractions.features.contentShare')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Notifications temps réel</span>
+                      <span>{t('services.socialInteractions.features.realTimeNotifications')}</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -305,22 +307,22 @@ const Index = () => {
                   <div className="mx-auto mb-4 w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
                     <Shield className="h-6 w-6 text-indigo-600" />
                   </div>
-                  <CardTitle className="text-lg">Sécurité & Confidentialité</CardTitle>
+                  <CardTitle className="text-lg">{t('services.security.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">Vos données sont protégées avec les plus hauts standards de sécurité.</p>
+                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.security.description')}</p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Chiffrement end-to-end</span>
+                      <span>{t('services.security.features.endToEndEncryption')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Contrôle de confidentialité</span>
+                      <span>{t('services.security.features.confidentialityControl')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Authentification sécurisée</span>
+                      <span>{t('services.security.features.secureAuthentication')}</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -331,22 +333,22 @@ const Index = () => {
                   <div className="mx-auto mb-4 w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center">
                     <Mic className="h-6 w-6 text-teal-600" />
                   </div>
-                  <CardTitle className="text-lg">Messages vocaux</CardTitle>
+                  <CardTitle className="text-lg">{t('services.voiceMessages.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">Envoyez des messages vocaux expressifs et personnalisés.</p>
+                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.voiceMessages.description')}</p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Enregistrement facile</span>
+                      <span>{t('services.voiceMessages.features.easyRecording')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Qualité audio optimale</span>
+                      <span>{t('services.voiceMessages.features.optimalAudioQuality')}</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>Lecture instantanée</span>
+                      <span>{t('services.voiceMessages.features.instantReading')}</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -357,43 +359,43 @@ const Index = () => {
 
           {/* Section Tarifs */}
           <section id="pricing" className="mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">Abonnement</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">{t('home.pricingTitle')}</h2>
             <div className="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-md text-center border-2 border-blue-200">
               <div className="mb-6">
                 <Crown className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold mb-2">BimFun Premium</h3>
+                <h3 className="text-2xl font-bold mb-2">{t('pricing.premium')}</h3>
                 <div className="text-4xl font-bold text-blue-600 mb-2">
-                  10,00 $
-                  <span className="text-lg font-normal text-gray-600">/mois</span>
+                  {t('pricing.price')}
+                  <span className="text-lg font-normal text-gray-600">{t('pricing.perMonth')}</span>
                 </div>
-                <p className="text-gray-600 mb-6 text-base">Accès complet à toutes les fonctionnalités</p>
+                <p className="text-gray-600 mb-6 text-base">{t('pricing.description')}</p>
               </div>
               
               <div className="mb-6">
                 <ul className="space-y-3 text-left">
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-base">Publications créatives illimitées</span>
+                    <span className="text-base">{t('pricing.features.unlimitedPublications')}</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-base">Messagerie avancée en temps réel</span>
+                    <span className="text-base">{t('pricing.features.advancedMessaging')}</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-base">Appels vocaux et vidéo HD</span>
+                    <span className="text-base">{t('pricing.features.hdCalls')}</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-base">Réseau professionnel étendu</span>
+                    <span className="text-base">{t('pricing.features.extendedNetwork')}</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-base">Sécurité renforcée</span>
+                    <span className="text-base">{t('pricing.features.enhancedSecurity')}</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-base">Support prioritaire</span>
+                    <span className="text-base">{t('pricing.features.prioritySupport')}</span>
                   </li>
                 </ul>
               </div>
@@ -410,24 +412,24 @@ const Index = () => {
                 }}
               >
                 {isProcessing && <Loader2 className="h-5 w-5 animate-spin" />}
-                {isProcessing ? "Préparation..." : "Commencer maintenant"}
+                {isProcessing ? t('home.preparing') : t('home.startNow')}
               </Button>
               
               <p className="text-sm text-gray-500 mt-4">
-                Annulation possible à tout moment
+                {t('home.cancelAnytime')}
               </p>
             </div>
           </section>
 
           {/* Section About */}
           <section id="about" className="mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">À propos</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">{t('home.aboutTitle')}</h2>
             <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
               <p className="text-lg text-gray-700 mb-4 leading-relaxed">
-                BimFun est une plateforme sociale innovante conçue pour les créateurs et les professionnels qui souhaitent partager leur travail, collaborer et se connecter avec une communauté dynamique.
+                {t('about.description1')}
               </p>
               <p className="text-lg text-gray-700 leading-relaxed">
-                Notre mission est de fournir un espace sûr et créatif où les idées peuvent s'épanouir et où les collaborations peuvent naître naturellement.
+                {t('about.description2')}
               </p>
             </div>
           </section>

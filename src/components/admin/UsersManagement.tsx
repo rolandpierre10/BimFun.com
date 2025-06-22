@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +30,7 @@ interface UsersManagementProps {
 }
 
 const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, onRefresh }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState<string | null>(null);
@@ -45,8 +47,8 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
   const handleUserAction = async (userId: string, action: 'ban' | 'unban' | 'warn' | 'promote' | 'demote') => {
     if (!user?.id) {
       toast({
-        title: "Erreur",
-        description: "Vous devez être connecté pour effectuer cette action",
+        title: t('admin.error'),
+        description: t('admin.mustBeLoggedIn'),
         variant: "destructive",
       });
       return;
@@ -69,8 +71,8 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
         if (error) throw error;
         
         toast({
-          title: "Utilisateur promu",
-          description: "L'utilisateur a été promu modérateur",
+          title: t('admin.userPromoted'),
+          description: t('admin.userPromotedDesc'),
         });
       } else if (action === 'demote') {
         // Rétrograder l'utilisateur au rôle d'utilisateur normal
@@ -82,8 +84,8 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
         if (error) throw error;
         
         toast({
-          title: "Utilisateur rétrogradé",
-          description: "L'utilisateur a été rétrogradé au rôle d'utilisateur normal",
+          title: t('admin.userDemoted'),
+          description: t('admin.userDemotedDesc'),
         });
       } else {
         // Actions de modération (warn)
@@ -103,8 +105,8 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
         if (error) throw error;
 
         toast({
-          title: "Action effectuée",
-          description: `L'utilisateur a été averti`,
+          title: t('admin.actionPerformed'),
+          description: t('admin.userWarned'),
         });
       }
 
@@ -112,8 +114,8 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
     } catch (error) {
       console.error('Error performing user action:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible d'effectuer cette action",
+        title: t('admin.error'),
+        description: t('admin.cannotPerformAction'),
         variant: "destructive",
       });
     } finally {
@@ -126,13 +128,13 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
           <Users className="h-5 w-5" />
-          <span>Gestion des Utilisateurs</span>
+          <span>{t('admin.usersManagement')}</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {users.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">Aucun utilisateur trouvé</p>
+            <p className="text-center text-gray-500 py-8">{t('admin.noUsersFound')}</p>
           ) : (
             <>
               {/* Vue mobile */}
@@ -154,8 +156,8 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                       </div>
                       
                       <div className="flex justify-between text-xs text-gray-500">
-                        <span>{userItem.posts_count} posts</span>
-                        <span>{userItem.followers_count} abonnés</span>
+                        <span>{userItem.posts_count} {t('admin.posts')}</span>
+                        <span>{userItem.followers_count} {t('admin.followers')}</span>
                       </div>
                       
                       <div className="flex flex-wrap gap-2">
@@ -168,7 +170,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                           className="flex items-center space-x-1"
                         >
                           <AlertTriangle className="h-3 w-3" />
-                          <span className="text-xs">Avertir</span>
+                          <span className="text-xs">{t('admin.warn')}</span>
                         </Button>
                         {userItem.role === 'user' && (
                           <Button
@@ -179,7 +181,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                             className="flex items-center space-x-1"
                           >
                             <Crown className="h-3 w-3" />
-                            <span className="text-xs">Promouvoir</span>
+                            <span className="text-xs">{t('admin.promote')}</span>
                           </Button>
                         )}
                         {userItem.role === 'moderator' && (
@@ -191,7 +193,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                             className="flex items-center space-x-1"
                           >
                             <Shield className="h-3 w-3" />
-                            <span className="text-xs">Rétrograder</span>
+                            <span className="text-xs">{t('admin.demote')}</span>
                           </Button>
                         )}
                       </div>
@@ -219,9 +221,9 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                         </div>
                         <p className="text-sm text-gray-600">@{userItem.username}</p>
                         <div className="flex space-x-4 text-sm text-gray-500">
-                          <span>{userItem.posts_count} publications</span>
-                          <span>{userItem.followers_count} abonnés</span>
-                          <span>Inscrit: {new Date(userItem.created_at).toLocaleDateString('fr-FR')}</span>
+                          <span>{userItem.posts_count} {t('admin.publications')}</span>
+                          <span>{userItem.followers_count} {t('admin.followers')}</span>
+                          <span>{t('admin.subscribedSince')} {new Date(userItem.created_at).toLocaleDateString('fr-FR')}</span>
                         </div>
                       </div>
                       
@@ -236,7 +238,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                           className="flex items-center space-x-1"
                         >
                           <AlertTriangle className="h-4 w-4" />
-                          <span>Avertir</span>
+                          <span>{t('admin.warn')}</span>
                         </Button>
                         {userItem.role === 'user' && (
                           <Button
@@ -247,7 +249,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                             className="flex items-center space-x-1"
                           >
                             <Crown className="h-4 w-4" />
-                            <span>Promouvoir</span>
+                            <span>{t('admin.promote')}</span>
                           </Button>
                         )}
                         {userItem.role === 'moderator' && (
@@ -259,7 +261,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                             className="flex items-center space-x-1"
                           >
                             <Shield className="h-4 w-4" />
-                            <span>Rétrograder</span>
+                            <span>{t('admin.demote')}</span>
                           </Button>
                         )}
                       </div>

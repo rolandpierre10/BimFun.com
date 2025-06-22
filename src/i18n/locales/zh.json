@@ -1,0 +1,18 @@
+
+{
+  "nav": {
+    "home": "首页",
+    "dashboard": "仪表板",
+    "login": "登录",
+    "signup": "注册"
+  },
+  "home": {
+    "title": "欢迎来到 BimFun",
+    "startNow": "立即开始"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功"
+  }
+}

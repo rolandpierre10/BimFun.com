@@ -1,0 +1,163 @@
+
+{
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "admin": "Administration"
+  },
+  "home": {
+    "title": "Welcome to BimFun",
+    "subtitle": "The social platform where professionals share, discover and get inspired through creative content from around the world.",
+    "videoCallsTitle": "Connect via Video",
+    "servicesTitle": "Our Services",
+    "pricingTitle": "Subscription",
+    "aboutTitle": "About",
+    "startNow": "Start Now",
+    "preparing": "Preparing...",
+    "cancelAnytime": "Cancel anytime"
+  },
+  "services": {
+    "creativePublications": {
+      "title": "Creative Publications",
+      "description": "Share your creations with the community and discover other creators' work.",
+      "features": {
+        "highQuality": "High quality photos and videos",
+        "tagsCategories": "Tags and categories",
+        "viewStats": "View statistics"
+      }
+    },
+    "messaging": {
+      "title": "Advanced Messaging",
+      "description": "Communicate instantly with other platform members.",
+      "features": {
+        "realTime": "Real-time text messages",
+        "voice": "Voice messages",
+        "imageShare": "Image sharing"
+      }
+    },
+    "voiceCalls": {
+      "title": "Voice Calls",
+      "description": "Communicate by voice with high-quality audio calls.",
+      "features": {
+        "hdAudio": "Crystal clear HD audio",
+        "noiseReduction": "Noise reduction",
+        "instantConnection": "Instant connection"
+      }
+    },
+    "videoCalls": {
+      "title": "Video Calls",
+      "description": "Collaborate face-to-face with integrated video calls.",
+      "features": {
+        "hdQuality": "HD quality",
+        "screenShare": "Screen sharing",
+        "recording": "Recording"
+      }
+    },
+    "professionalNetwork": {
+      "title": "Professional Network",
+      "description": "Connect with other professionals and grow your network.",
+      "features": {
+        "profiles": "Professional profiles",
+        "followSystem": "Follow system",
+        "recommendations": "Recommendations"
+      }
+    },
+    "socialInteractions": {
+      "title": "Social Interactions",
+      "description": "Engage with the community through various interactions.",
+      "features": {
+        "likesComments": "Likes and comments",
+        "contentShare": "Content sharing",
+        "realTimeNotifications": "Real-time notifications"
+      }
+    },
+    "security": {
+      "title": "Security & Privacy",
+      "description": "Your data is protected with the highest security standards.",
+      "features": {
+        "endToEndEncryption": "End-to-end encryption",
+        "privacyControl": "Privacy control",
+        "secureAuth": "Secure authentication"
+      }
+    },
+    "voiceMessages": {
+      "title": "Voice Messages",
+      "description": "Send expressive and personalized voice messages.",
+      "features": {
+        "easyRecording": "Easy recording",
+        "optimalQuality": "Optimal audio quality",
+        "instantPlayback": "Instant playback"
+      }
+    }
+  },
+  "pricing": {
+    "premium": "BimFun Premium",
+    "price": "$10.00",
+    "perMonth": "/month",
+    "description": "Full access to all features",
+    "features": {
+      "unlimitedPublications": "Unlimited creative publications",
+      "advancedMessaging": "Advanced real-time messaging",
+      "hdCalls": "HD voice and video calls",
+      "extendedNetwork": "Extended professional network",
+      "enhancedSecurity": "Enhanced security",
+      "prioritySupport": "Priority support"
+    }
+  },
+  "about": {
+    "description1": "BimFun is an innovative social platform designed for creators and professionals who want to share their work, collaborate and connect with a dynamic community.",
+    "description2": "Our mission is to provide a safe and creative space where ideas can flourish and collaborations can be born naturally."
+  },
+  "footer": {
+    "contact": "Contact",
+    "legalInfo": "Legal Information",
+    "legalNotice": "Legal Notice",
+    "cookiePolicy": "Cookie Policy",
+    "contactUs": "Contact Us",
+    "description": "Professional social platform for creators and collaborators.",
+    "allRightsReserved": "All rights reserved"
+  },
+  "admin": {
+    "usersManagement": "Users Management",
+    "noUsersFound": "No users found",
+    "warn": "Warn",
+    "promote": "Promote",
+    "demote": "Demote",
+    "online": "Online",
+    "offline": "Offline",
+    "posts": "posts",
+    "followers": "followers",
+    "publications": "publications",
+    "subscribedSince": "Subscribed:",
+    "userPromoted": "User promoted",
+    "userPromotedDesc": "The user has been promoted to moderator",
+    "userDemoted": "User demoted",
+    "userDemotedDesc": "The user has been demoted to normal user role",
+    "actionPerformed": "Action performed",
+    "userWarned": "The user has been warned",
+    "error": "Error",
+    "mustBeLoggedIn": "You must be logged in to perform this action",
+    "cannotPerformAction": "Cannot perform this action"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "refresh": "Refresh"
+  }
+}

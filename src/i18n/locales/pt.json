@@ -1,0 +1,19 @@
+
+{
+  "nav": {
+    "home": "Início",
+    "dashboard": "Painel",
+    "login": "Entrar",
+    "signup": "Cadastrar",
+    "logout": "Sair"
+  },
+  "home": {
+    "title": "Bem-vindo ao BimFun",
+    "startNow": "Começar agora"
+  },
+  "common": {
+    "loading": "Carregando...",
+    "error": "Erro",
+    "success": "Sucesso"
+  }
+}

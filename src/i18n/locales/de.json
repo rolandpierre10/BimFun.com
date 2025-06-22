@@ -1,0 +1,24 @@
+
+{
+  "nav": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "login": "Anmelden",
+    "signup": "Registrieren",
+    "logout": "Abmelden",
+    "admin": "Verwaltung"
+  },
+  "home": {
+    "title": "Willkommen bei BimFun",
+    "subtitle": "Die soziale Plattform, auf der Profis kreativen Inhalt aus aller Welt teilen, entdecken und sich inspirieren lassen.",
+    "startNow": "Jetzt starten",
+    "preparing": "Vorbereitung..."
+  },
+  "common": {
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "cancel": "Abbrechen",
+    "save": "Speichern"
+  }
+}

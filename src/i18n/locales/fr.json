@@ -1,0 +1,163 @@
+
+{
+  "nav": {
+    "home": "Accueil",
+    "dashboard": "Tableau de bord",
+    "login": "Connexion",
+    "signup": "Inscription",
+    "logout": "Déconnexion",
+    "admin": "Administration"
+  },
+  "home": {
+    "title": "Bienvenue sur BimFun",
+    "subtitle": "La plateforme sociale où les professionnels partagent, découvrent et s'inspirent à travers du contenu créatif du monde entier.",
+    "videoCallsTitle": "Connectez-vous en vidéo",
+    "servicesTitle": "Nos Services",
+    "pricingTitle": "Abonnement",
+    "aboutTitle": "À propos",
+    "startNow": "Commencer maintenant",
+    "preparing": "Préparation...",
+    "cancelAnytime": "Annulation possible à tout moment"
+  },
+  "services": {
+    "creativePublications": {
+      "title": "Publications créatives",
+      "description": "Partagez vos créations avec la communauté et découvrez le travail d'autres créateurs.",
+      "features": {
+        "highQuality": "Photos et vidéos haute qualité",
+        "tagsCategories": "Tags et catégories",
+        "viewStats": "Statistiques de vues"
+      }
+    },
+    "messaging": {
+      "title": "Messagerie avancée",
+      "description": "Communiquez instantanément avec d'autres membres de la plateforme.",
+      "features": {
+        "realTime": "Messages texte en temps réel",
+        "voice": "Messages vocaux",
+        "imageShare": "Partage d'images"
+      }
+    },
+    "voiceCalls": {
+      "title": "Appels vocaux",
+      "description": "Communiquez par la voix avec des appels audio haute qualité.",
+      "features": {
+        "hdAudio": "Audio HD cristallin",
+        "noiseReduction": "Réduction de bruit",
+        "instantConnection": "Connexion instantanée"
+      }
+    },
+    "videoCalls": {
+      "title": "Appels vidéo",
+      "description": "Collaborez en face à face avec des appels vidéo intégrés.",
+      "features": {
+        "hdQuality": "Qualité HD",
+        "screenShare": "Partage d'écran",
+        "recording": "Enregistrement"
+      }
+    },
+    "professionalNetwork": {
+      "title": "Réseau professionnel",
+      "description": "Connectez-vous avec d'autres professionnels et développez votre réseau.",
+      "features": {
+        "profiles": "Profils professionnels",
+        "followSystem": "Système de suivi",
+        "recommendations": "Recommandations"
+      }
+    },
+    "socialInteractions": {
+      "title": "Interactions sociales",
+      "description": "Engagez-vous avec la communauté à travers diverses interactions.",
+      "features": {
+        "likesComments": "Likes et commentaires",
+        "contentShare": "Partage de contenu",
+        "realTimeNotifications": "Notifications temps réel"
+      }
+    },
+    "security": {
+      "title": "Sécurité & Confidentialité",
+      "description": "Vos données sont protégées avec les plus hauts standards de sécurité.",
+      "features": {
+        "endToEndEncryption": "Chiffrement end-to-end",
+        "privacyControl": "Contrôle de confidentialité",
+        "secureAuth": "Authentification sécurisée"
+      }
+    },
+    "voiceMessages": {
+      "title": "Messages vocaux",
+      "description": "Envoyez des messages vocaux expressifs et personnalisés.",
+      "features": {
+        "easyRecording": "Enregistrement facile",
+        "optimalQuality": "Qualité audio optimale",
+        "instantPlayback": "Lecture instantanée"
+      }
+    }
+  },
+  "pricing": {
+    "premium": "BimFun Premium",
+    "price": "10,00 $",
+    "perMonth": "/mois",
+    "description": "Accès complet à toutes les fonctionnalités",
+    "features": {
+      "unlimitedPublications": "Publications créatives illimitées",
+      "advancedMessaging": "Messagerie avancée en temps réel",
+      "hdCalls": "Appels vocaux et vidéo HD",
+      "extendedNetwork": "Réseau professionnel étendu",
+      "enhancedSecurity": "Sécurité renforcée",
+      "prioritySupport": "Support prioritaire"
+    }
+  },
+  "about": {
+    "description1": "BimFun est une plateforme sociale innovante conçue pour les créateurs et les professionnels qui souhaitent partager leur travail, collaborer et se connecter avec une communauté dynamique.",
+    "description2": "Notre mission est de fournir un espace sûr et créatif où les idées peuvent s'épanouir et où les collaborations peuvent naître naturellement."
+  },
+  "footer": {
+    "contact": "Contact",
+    "legalInfo": "Informations légales",
+    "legalNotice": "Mentions légales",
+    "cookiePolicy": "Politique de cookies",
+    "contactUs": "Nous contacter",
+    "description": "Plateforme sociale professionnelle pour créateurs et collaborateurs.",
+    "allRightsReserved": "Tous droits réservés"
+  },
+  "admin": {
+    "usersManagement": "Gestion des Utilisateurs",
+    "noUsersFound": "Aucun utilisateur trouvé",
+    "warn": "Avertir",
+    "promote": "Promouvoir",
+    "demote": "Rétrograder",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "posts": "posts",
+    "followers": "abonnés",
+    "publications": "publications",
+    "subscribedSince": "Inscrit:",
+    "userPromoted": "Utilisateur promu",
+    "userPromotedDesc": "L'utilisateur a été promu modérateur",
+    "userDemoted": "Utilisateur rétrogradé",
+    "userDemotedDesc": "L'utilisateur a été rétrogradé au rôle d'utilisateur normal",
+    "actionPerformed": "Action effectuée",
+    "userWarned": "L'utilisateur a été averti",
+    "error": "Erreur",
+    "mustBeLoggedIn": "Vous devez être connecté pour effectuer cette action",
+    "cannotPerformAction": "Impossible d'effectuer cette action"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "refresh": "Actualiser"
+  }
+}

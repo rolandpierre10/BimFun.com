@@ -1,0 +1,18 @@
+
+{
+  "nav": {
+    "home": "होम",
+    "dashboard": "डैशबोर्ड",
+    "login": "लॉगिन",
+    "signup": "साइनअप"
+  },
+  "home": {
+    "title": "BimFun में आपका स्वागत है",
+    "startNow": "अभी शुरू करें"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि",
+    "success": "सफलता"
+  }
+}

@@ -1,0 +1,50 @@
+
+{
+  "nav": {
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar sesión",
+    "admin": "Administración"
+  },
+  "home": {
+    "title": "Bienvenido a BimFun",
+    "subtitle": "La plataforma social donde los profesionales comparten, descubren e se inspiran a través de contenido creativo de todo el mundo.",
+    "videoCallsTitle": "Conéctate por Video",
+    "servicesTitle": "Nuestros Servicios",
+    "pricingTitle": "Suscripción",
+    "aboutTitle": "Acerca de",
+    "startNow": "Comenzar ahora",
+    "preparing": "Preparando...",
+    "cancelAnytime": "Cancelar en cualquier momento"
+  },
+  "services": {
+    "creativePublications": {
+      "title": "Publicaciones Creativas",
+      "description": "Comparte tus creaciones con la comunidad y descubre el trabajo de otros creadores.",
+      "features": {
+        "highQuality": "Fotos y videos de alta calidad",
+        "tagsCategories": "Etiquetas y categorías",
+        "viewStats": "Estadísticas de visualización"
+      }
+    },
+    "messaging": {
+      "title": "Mensajería Avanzada",
+      "description": "Comunícate instantáneamente con otros miembros de la plataforma.",
+      "features": {
+        "realTime": "Mensajes de texto en tiempo real",
+        "voice": "Mensajes de voz",
+        "imageShare": "Compartir imágenes"
+      }
+    }
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Guardar"
+  }
+}

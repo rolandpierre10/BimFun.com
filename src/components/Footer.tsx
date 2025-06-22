@@ -1,7 +1,10 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
+  const { t } = useTranslation();
+  
   const navigateToPage = (path: string) => {
     window.location.href = path;
   };
@@ -12,7 +15,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Contact */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contact</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.contact')}</h3>
             <p className="text-gray-300">BimFun</p>
             <p className="text-gray-300">Montréal, QC, Canada</p>
             <a 
@@ -25,25 +28,25 @@ const Footer = () => {
 
           {/* Liens légaux */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Informations légales</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.legalInfo')}</h3>
             <div className="space-y-2">
               <button 
                 onClick={() => navigateToPage('/mentions-legales')}
                 className="block text-gray-300 hover:text-white transition-colors"
               >
-                Mentions légales
+                {t('footer.legalNotice')}
               </button>
               <button 
                 onClick={() => navigateToPage('/politique-cookies')}
                 className="block text-gray-300 hover:text-white transition-colors"
               >
-                Politique de cookies
+                {t('footer.cookiePolicy')}
               </button>
               <button 
                 onClick={() => navigateToPage('/contact')}
                 className="block text-gray-300 hover:text-white transition-colors"
               >
-                Nous contacter
+                {t('footer.contactUs')}
               </button>
             </div>
           </div>
@@ -52,10 +55,10 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">BimFun</h3>
             <p className="text-gray-300">
-              Plateforme sociale professionnelle pour créateurs et collaborateurs.
+              {t('footer.description')}
             </p>
             <p className="text-gray-400 text-sm mt-4">
-              © 2024 BimFun - Tous droits réservés
+              © 2024 BimFun - {t('footer.allRightsReserved')}
             </p>
           </div>
         </div>
