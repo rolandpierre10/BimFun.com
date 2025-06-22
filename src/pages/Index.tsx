@@ -55,7 +55,7 @@ const Index = () => {
     if (isProcessing) return;
     
     setIsProcessing(true);
-    console.log('Start Now button clicked');
+    console.log('Start Now button clicked - Mobile/Desktop payment');
     
     try {
       if (user) {
@@ -71,6 +71,7 @@ const Index = () => {
             variant: "destructive",
           });
           handleOpenAuth('login');
+          setIsProcessing(false);
           return;
         }
 
@@ -93,8 +94,28 @@ const Index = () => {
         
         console.log('Checkout session created, redirecting to:', data.url);
         
-        // Redirection directe - même onglet pour mobile et desktop
-        window.location.href = data.url;
+        // Amélioration pour mobile : essayer plusieurs méthodes de redirection
+        try {
+          // Méthode 1: Redirection directe (fonctionne sur la plupart des appareils)
+          window.location.href = data.url;
+        } catch (redirectError) {
+          console.log('Direct redirect failed, trying window.open');
+          // Méthode 2: Ouvrir dans un nouvel onglet si la redirection directe échoue
+          const newWindow = window.open(data.url, '_blank');
+          if (!newWindow) {
+            // Méthode 3: Fallback si le popup est bloqué
+            toast({
+              title: "Redirection bloquée",
+              description: "Veuillez autoriser les popups ou cliquer sur le lien ci-dessous",
+              variant: "destructive",
+            });
+            // Créer un lien temporaire et le cliquer
+            const link = document.createElement('a');
+            link.href = data.url;
+            link.target = '_blank';
+            link.click();
+          }
+        }
         
       } else {
         console.log('User not authenticated, opening signup modal');
@@ -444,9 +465,10 @@ const Index = () => {
                 className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-md text-base sm:text-lg py-3 sm:py-4 px-4 transition-all duration-200 touch-manipulation flex items-center justify-center gap-2"
                 onClick={handleStartNow}
                 disabled={isProcessing}
+                onTouchStart={() => {}} // Améliore la réactivité tactile
                 style={{ 
                   minHeight: '56px',
-                  WebkitTapHighlightColor: 'transparent',
+                  WebkitTapHighlightColor: 'rgba(59, 130, 246, 0.3)',
                   userSelect: 'none',
                   cursor: isProcessing ? 'not-allowed' : 'pointer'
                 }}

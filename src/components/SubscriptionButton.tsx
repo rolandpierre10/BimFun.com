@@ -49,7 +49,42 @@ const SubscriptionButton = () => {
         description: "Redirection vers Stripe en cours",
       });
       
-      await createCheckout();
+      // Créer la session de checkout
+      const { data, error } = await supabase.functions.invoke('create-checkout');
+      
+      if (error) {
+        console.error('Checkout error:', error);
+        throw new Error(error.message || 'Erreur lors de la création de la session de paiement');
+      }
+      
+      if (!data?.url) {
+        throw new Error('URL de paiement non reçue');
+      }
+      
+      console.log('Checkout session created, redirecting to:', data.url);
+      
+      // Amélioration pour mobile : essayer plusieurs méthodes de redirection
+      try {
+        // Méthode 1: Redirection directe
+        window.location.href = data.url;
+      } catch (redirectError) {
+        console.log('Direct redirect failed, trying window.open');
+        // Méthode 2: Ouvrir dans un nouvel onglet si la redirection directe échoue
+        const newWindow = window.open(data.url, '_blank');
+        if (!newWindow) {
+          // Méthode 3: Fallback si le popup est bloqué
+          toast({
+            title: "Redirection bloquée",
+            description: "Veuillez autoriser les popups pour continuer",
+            variant: "destructive",
+          });
+          // Créer un lien temporaire et le cliquer
+          const link = document.createElement('a');
+          link.href = data.url;
+          link.target = '_blank';
+          link.click();
+        }
+      }
       
     } catch (error) {
       console.error('Complete error in handleSubscribe:', error);
@@ -138,12 +173,14 @@ const SubscriptionButton = () => {
         <Button 
           onClick={handleSubscribe}
           disabled={buttonDisabled}
+          onTouchStart={() => {}} // Améliore la réactivité tactile
           className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-medium rounded-md transition-all duration-200 touch-manipulation text-sm sm:text-base flex items-center justify-center gap-2 py-4 px-4"
           style={{ 
             minHeight: '56px',
-            WebkitTapHighlightColor: 'transparent',
+            WebkitTapHighlightColor: 'rgba(59, 130, 246, 0.3)',
             userSelect: 'none',
-            cursor: buttonDisabled ? 'not-allowed' : 'pointer'
+            cursor: buttonDisabled ? 'not-allowed' : 'pointer',
+            WebkitTouchCallout: 'none'
           }}
         >
           {isProcessing && <Loader2 className="h-4 w-4 animate-spin" />}
