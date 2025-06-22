@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
@@ -50,18 +48,18 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 lg:h-24">
           {/* Logo */}
-          <div className="flex-shrink-0 w-auto max-w-[50%] overflow-hidden">
+          <div className="flex-shrink-0 w-auto max-w-[40%] sm:max-w-[50%] overflow-hidden">
             <Link to="/" className="block">
               <img 
                 src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
                 alt="BimFun Logo" 
-                className="h-12 sm:h-16 lg:h-20 xl:h-24 w-auto max-w-full hover:opacity-80 transition-opacity object-contain"
+                className="h-10 sm:h-12 md:h-16 lg:h-20 xl:h-24 w-auto max-w-full hover:opacity-80 transition-opacity object-contain"
               />
             </Link>
           </div>
           
           {/* Mobile Menu - More space from logo */}
-          <div className="flex lg:hidden items-center gap-3 flex-shrink-0">
+          <div className="flex lg:hidden items-center gap-2 sm:gap-3 flex-shrink-0 ml-auto">
             <LanguageSelector />
             
             {user && (
@@ -259,4 +257,3 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
 };
 
 export default Navigation;
-
