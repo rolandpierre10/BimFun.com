@@ -15,6 +15,7 @@ import ClickableImage from '@/components/ClickableImage';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
+import { handleMobileRedirect } from '@/utils/mobileRedirect';
 
 const Index = () => {
   const { t } = useTranslation();
@@ -74,8 +75,8 @@ const Index = () => {
         }
 
         toast({
-          title: "Préparation du paiement...",
-          description: "Redirection vers Stripe en cours",
+          title: "Redirection vers le paiement...",
+          description: "Veuillez patienter",
         });
         
         const { data, error } = await supabase.functions.invoke('create-checkout');
@@ -91,8 +92,8 @@ const Index = () => {
         
         console.log('Checkout session created, redirecting to:', data.url);
         
-        // Redirection forcée compatible mobile
-        window.location.assign(data.url);
+        // Utiliser la nouvelle fonction de redirection mobile
+        handleMobileRedirect(data.url, 'Redirection vers le paiement en cours...');
         
       } else {
         console.log('User not authenticated, opening signup modal');

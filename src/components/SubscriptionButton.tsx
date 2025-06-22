@@ -5,6 +5,7 @@ import { Check, Crown, Star, Loader2 } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
+import { handleMobileRedirect } from '@/utils/mobileRedirect';
 
 const SubscriptionButton = () => {
   const { 
@@ -44,8 +45,8 @@ const SubscriptionButton = () => {
       console.log('User authenticated, creating checkout session');
       
       toast({
-        title: "Préparation du paiement...",
-        description: "Redirection vers Stripe en cours",
+        title: "Redirection vers le paiement...",
+        description: "Veuillez patienter",
       });
       
       const { data, error } = await supabase.functions.invoke('create-checkout');
@@ -61,8 +62,8 @@ const SubscriptionButton = () => {
       
       console.log('Checkout session created, redirecting to:', data.url);
       
-      // Redirection forcée compatible mobile
-      window.location.assign(data.url);
+      // Utiliser la nouvelle fonction de redirection mobile
+      handleMobileRedirect(data.url, 'Redirection vers le paiement en cours...');
       
     } catch (error) {
       console.error('Complete error in handleSubscribe:', error);

@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { MessageCircle, User, LogOut, Shield, Menu, X } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import LanguageSelector from './LanguageSelector';
+import { handleMobileLogout } from '@/utils/mobileRedirect';
 import {
   Drawer,
   DrawerClose,
@@ -37,8 +38,8 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
       await logout();
       console.log('Logout successful, navigating to home');
       
-      // Redirection forcée compatible mobile
-      window.location.assign('/');
+      // Utiliser la nouvelle fonction de redirection mobile pour la déconnexion
+      handleMobileLogout();
       
     } catch (error) {
       console.error('Logout error:', error);
