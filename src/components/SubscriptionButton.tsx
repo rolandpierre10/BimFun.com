@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,7 +60,11 @@ const SubscriptionButton = () => {
       }
       
       console.log('Checkout session created, redirecting to:', data.url);
-      window.location.href = data.url;
+      
+      // Force la redirection immédiate sans attendre
+      setTimeout(() => {
+        window.location.replace(data.url);
+      }, 100);
       
     } catch (error) {
       console.error('Complete error in handleSubscribe:', error);
