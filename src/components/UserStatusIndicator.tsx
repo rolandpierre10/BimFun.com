@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Badge } from "@/components/ui/badge";
 import { supabase } from '@/integrations/supabase/client';
 import { Wifi, WifiOff } from 'lucide-react';
@@ -13,9 +13,11 @@ interface UserStatusIndicatorProps {
 const UserStatusIndicator = ({ userId, showText = true, size = 'md' }: UserStatusIndicatorProps) => {
   const [isOnline, setIsOnline] = useState(false);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
+  const channelRef = useRef<any>(null);
+  const isSubscribedRef = useRef(false);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || isSubscribedRef.current) return;
 
     const fetchUserStatus = async () => {
       try {
@@ -41,11 +43,17 @@ const UserStatusIndicator = ({ userId, showText = true, size = 'md' }: UserStatu
 
     fetchUserStatus();
 
-    // Create a unique channel name to avoid conflicts
-    const channelName = `user-status-indicator-${userId}-${Date.now()}`;
+    // Nettoyer le canal précédent s'il existe
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+      isSubscribedRef.current = false;
+    }
 
-    // Écouter les mises à jour en temps réel
-    const channel = supabase
+    // Créer un nouveau canal avec un nom unique
+    const channelName = `user-status-indicator-${userId}-${Math.random().toString(36).substr(2, 9)}`;
+
+    channelRef.current = supabase
       .channel(channelName)
       .on(
         'postgres_changes',
@@ -61,12 +69,20 @@ const UserStatusIndicator = ({ userId, showText = true, size = 'md' }: UserStatu
             setLastSeen(payload.new.last_seen);
           }
         }
-      )
-      .subscribe();
+      );
+
+    // S'abonner seulement si pas déjà abonné
+    if (!isSubscribedRef.current) {
+      channelRef.current.subscribe();
+      isSubscribedRef.current = true;
+    }
 
     return () => {
-      // Proper cleanup
-      supabase.removeChannel(channel);
+      if (channelRef.current && isSubscribedRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+        isSubscribedRef.current = false;
+      }
     };
   }, [userId]);
 
