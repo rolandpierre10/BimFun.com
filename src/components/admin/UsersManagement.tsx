@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Users, Ban, AlertTriangle, Crown, User, Shield } from 'lucide-react';
+import { Users, AlertTriangle, Crown, Shield } from 'lucide-react';
 import UserOnlineStatus from '@/components/UserOnlineStatus';
 import FollowButton from '@/components/FollowButton';
 
@@ -86,14 +86,10 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
           description: "L'utilisateur a été rétrogradé au rôle d'utilisateur normal",
         });
       } else {
-        // Actions de modération (ban, warn)
+        // Actions de modération (warn)
         let actionType: 'no_action' | 'warning' | 'content_removal' | 'account_suspension' | 'account_ban' = 'no_action';
-        if (action === 'ban') actionType = 'account_ban';
         if (action === 'warn') actionType = 'warning';
         
-        const expirationDate = new Date();
-        expirationDate.setDate(expirationDate.getDate() + 30); // 30 jours d'expiration
-
         const { error } = await supabase
           .from('moderation_actions')
           .insert({
@@ -101,14 +97,14 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
             target_user_id: userId,
             action_type: actionType,
             reason: `Action ${action} effectuée par l'administrateur`,
-            expires_at: actionType === 'account_ban' ? expirationDate.toISOString() : null
+            expires_at: null
           });
 
         if (error) throw error;
 
         toast({
           title: "Action effectuée",
-          description: `L'utilisateur a été ${action === 'ban' ? 'banni' : 'averti'}`,
+          description: `L'utilisateur a été averti`,
         });
       }
 
@@ -173,16 +169,6 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                         >
                           <AlertTriangle className="h-3 w-3" />
                           <span className="text-xs">Avertir</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleUserAction(userItem.id, 'ban')}
-                          disabled={loading === userItem.id}
-                          className="flex items-center space-x-1"
-                        >
-                          <Ban className="h-3 w-3" />
-                          <span className="text-xs">Bannir</span>
                         </Button>
                         {userItem.role === 'user' && (
                           <Button
@@ -251,16 +237,6 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                         >
                           <AlertTriangle className="h-4 w-4" />
                           <span>Avertir</span>
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleUserAction(userItem.id, 'ban')}
-                          disabled={loading === userItem.id}
-                          className="flex items-center space-x-1"
-                        >
-                          <Ban className="h-4 w-4" />
-                          <span>Bannir</span>
                         </Button>
                         {userItem.role === 'user' && (
                           <Button
