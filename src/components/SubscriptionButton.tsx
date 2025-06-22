@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -65,6 +66,8 @@ const SubscriptionButton = () => {
       // Utiliser la nouvelle fonction de redirection mobile
       handleMobileRedirect(data.url, 'Redirection vers le paiement en cours...');
       
+      // Ne pas réinitialiser isProcessing ici car la redirection va interrompre l'exécution
+      
     } catch (error) {
       console.error('Complete error in handleSubscribe:', error);
       setIsProcessing(false);
@@ -83,6 +86,17 @@ const SubscriptionButton = () => {
       });
     }
   };
+
+  // Réinitialiser l'état de traitement si le composant se remonte (ex: retour de page)
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isProcessing) {
+        setIsProcessing(false);
+      }
+    }, 10000); // Timeout après 10 secondes
+
+    return () => clearTimeout(timer);
+  }, [isProcessing]);
 
   if (subscribed) {
     return (
@@ -111,7 +125,14 @@ const SubscriptionButton = () => {
             className="w-full py-3 text-sm"
             style={{ minHeight: '48px' }}
           >
-            Gérer l'abonnement
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Chargement...
+              </>
+            ) : (
+              'Gérer l\'abonnement'
+            )}
           </Button>
         </CardContent>
       </Card>
