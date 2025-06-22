@@ -8,7 +8,6 @@ import Navigation from '@/components/Navigation';
 import AuthModal from '@/components/AuthModal';
 
 const Dashboard = () => {
-  const { subscribed, subscription_tier, subscription_end, loading } = useSubscription();
   const [authModal, setAuthModal] = useState<{ isOpen: boolean; mode: 'login' | 'signup' }>({
     isOpen: false,
     mode: 'login'
