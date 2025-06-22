@@ -64,7 +64,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
           <div className="flex-shrink-0 w-auto max-w-[40%] sm:max-w-[50%] overflow-hidden">
             <Link to="/" className="block">
               <img 
-                src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
+                src="/lovable-uploads/f5b227b9-7601-4d15-aa75-f27f5c6510d7.png" 
                 alt="BimFun Logo" 
                 className="h-10 sm:h-12 md:h-16 lg:h-20 xl:h-24 w-auto max-w-full hover:opacity-80 transition-opacity object-contain"
               />
