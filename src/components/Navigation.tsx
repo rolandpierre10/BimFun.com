@@ -46,9 +46,9 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50">
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 sm:h-20 lg:h-24">
+        <div className="flex items-center h-16 sm:h-20 lg:h-24">
           {/* Logo */}
-          <div className="flex-shrink-0 w-auto max-w-[30%] overflow-hidden">
+          <div className="flex-shrink-0 w-auto max-w-[40%] overflow-hidden">
             <Link to="/" className="block">
               <img 
                 src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
@@ -58,95 +58,10 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             </Link>
           </div>
           
-          {/* Navigation Links - Desktop only */}
-          <div className="hidden lg:flex items-center space-x-6">
-            <button
-              onClick={() => scrollToSection('services')}
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
-            >
-              Fonctionnalités
-            </button>
-            <button
-              onClick={() => scrollToSection('pricing')}
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
-            >
-              Tarifs
-            </button>
-            <button
-              onClick={() => scrollToSection('about')}
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
-            >
-              À propos
-            </button>
-            <Link
-              to="/contact"
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
-            >
-              Contact
-            </Link>
-          </div>
-          
-          {/* Desktop User Menu */}
-          <div className="hidden lg:flex items-center space-x-4">
+          {/* Mobile Menu - Right next to logo */}
+          <div className="flex lg:hidden items-center ml-2 gap-1 flex-shrink-0">
             <LanguageSelector />
             
-            {user ? (
-              <>
-                <Link to="/dashboard">
-                  <Button variant="ghost" size="sm" className="flex items-center space-x-2 hover:bg-blue-50">
-                    <MessageCircle className="h-4 w-4" />
-                    <span>Dashboard</span>
-                  </Button>
-                </Link>
-
-                {userRole === 'admin' && (
-                  <Link to="/admin">
-                    <Button variant="ghost" size="sm" className="flex items-center space-x-2 hover:bg-blue-50">
-                      <Shield className="h-4 w-4" />
-                      <span>Admin</span>
-                    </Button>
-                  </Link>
-                )}
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleLogout}
-                  className="flex items-center space-x-2 hover:bg-red-50 hover:text-red-600"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Déconnexion</span>
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="ghost"
-                  onClick={() => onOpenAuth('login')}
-                  className="hover:bg-blue-50 hover:text-blue-600"
-                  size="sm"
-                >
-                  Connexion
-                </Button>
-                <Button
-                  onClick={() => onOpenAuth('signup')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                  size="sm"
-                >
-                  S'inscrire
-                </Button>
-              </>
-            )}
-          </div>
-
-          {/* Mobile Menu - Closer to Logo */}
-          <div className="flex lg:hidden items-center gap-1 flex-shrink-0">
-            {/* Language Selector */}
-            <div className="flex items-center">
-              <LanguageSelector />
-            </div>
-            
-            {/* Dashboard Button for logged in users */}
             {user && (
               <Link to="/dashboard">
                 <Button variant="ghost" size="sm" className="p-2 min-w-[36px] h-9">
@@ -155,7 +70,6 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
               </Link>
             )}
             
-            {/* Menu Button */}
             <Drawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <DrawerTrigger asChild>
                 <Button variant="outline" size="sm" className="p-2 min-w-[36px] h-9 border-gray-300">
@@ -254,6 +168,87 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                 </div>
               </DrawerContent>
             </Drawer>
+          </div>
+          
+          {/* Navigation Links - Desktop only */}
+          <div className="hidden lg:flex items-center space-x-6 flex-1 justify-center">
+            <button
+              onClick={() => scrollToSection('services')}
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            >
+              Fonctionnalités
+            </button>
+            <button
+              onClick={() => scrollToSection('pricing')}
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            >
+              Tarifs
+            </button>
+            <button
+              onClick={() => scrollToSection('about')}
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            >
+              À propos
+            </button>
+            <Link
+              to="/contact"
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            >
+              Contact
+            </Link>
+          </div>
+          
+          {/* Desktop User Menu */}
+          <div className="hidden lg:flex items-center space-x-4">
+            <LanguageSelector />
+            
+            {user ? (
+              <>
+                <Link to="/dashboard">
+                  <Button variant="ghost" size="sm" className="flex items-center space-x-2 hover:bg-blue-50">
+                    <MessageCircle className="h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Button>
+                </Link>
+
+                {userRole === 'admin' && (
+                  <Link to="/admin">
+                    <Button variant="ghost" size="sm" className="flex items-center space-x-2 hover:bg-blue-50">
+                      <Shield className="h-4 w-4" />
+                      <span>Admin</span>
+                    </Button>
+                  </Link>
+                )}
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  className="flex items-center space-x-2 hover:bg-red-50 hover:text-red-600"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Déconnexion</span>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  onClick={() => onOpenAuth('login')}
+                  className="hover:bg-blue-50 hover:text-blue-600"
+                  size="sm"
+                >
+                  Connexion
+                </Button>
+                <Button
+                  onClick={() => onOpenAuth('signup')}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  size="sm"
+                >
+                  S'inscrire
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
