@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
@@ -38,10 +37,8 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
       await logout();
       console.log('Logout successful, navigating to home');
       
-      // Force la redirection immédiate avec un petit délai
-      setTimeout(() => {
-        window.location.replace('/');
-      }, 100);
+      // Redirection forcée compatible mobile
+      window.location.assign('/');
       
     } catch (error) {
       console.error('Logout error:', error);

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -92,10 +91,8 @@ const Index = () => {
         
         console.log('Checkout session created, redirecting to:', data.url);
         
-        // Force la redirection immédiate avec un petit délai
-        setTimeout(() => {
-          window.location.replace(data.url);
-        }, 100);
+        // Redirection forcée compatible mobile
+        window.location.assign(data.url);
         
       } else {
         console.log('User not authenticated, opening signup modal');

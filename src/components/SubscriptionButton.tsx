@@ -61,10 +61,8 @@ const SubscriptionButton = () => {
       
       console.log('Checkout session created, redirecting to:', data.url);
       
-      // Force la redirection immédiate sans attendre
-      setTimeout(() => {
-        window.location.replace(data.url);
-      }, 100);
+      // Redirection forcée compatible mobile
+      window.location.assign(data.url);
       
     } catch (error) {
       console.error('Complete error in handleSubscribe:', error);
