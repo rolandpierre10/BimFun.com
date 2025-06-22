@@ -1,9 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSubscription } from '@/hooks/useSubscription';
 import UserPublications from '@/components/UserPublications';
-import SubscriptionButton from '@/components/SubscriptionButton';
 import Navigation from '@/components/Navigation';
 import AuthModal from '@/components/AuthModal';
 
@@ -35,10 +33,6 @@ const Dashboard = () => {
           <div className="space-y-4 sm:space-y-6 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-6">
             <div className="lg:col-span-1 lg:order-1">
               <div className="space-y-4">
-                <div className="w-full">
-                  <SubscriptionButton />
-                </div>
-                
                 <Card className="w-full">
                   <CardHeader className="pb-2 sm:pb-3">
                     <CardTitle className="text-sm sm:text-base lg:text-lg">Mes statistiques</CardTitle>
