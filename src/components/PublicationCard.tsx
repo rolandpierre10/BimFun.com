@@ -338,62 +338,86 @@ const PublicationCard = ({
     switch (publication.content_type) {
       case 'photo':
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {publication.media_urls.slice(0, 4).map((url, index) => (
-              <div key={index} className="relative">
-                {isGif(url) ? (
+          <div className="w-full">
+            {publication.media_urls.length === 1 ? (
+              // Single image - full width
+              <div className="w-full">
+                {isGif(publication.media_urls[0]) ? (
                   <img
-                    src={url}
-                    alt={`GIF ${index + 1}`}
-                    className="w-full h-48 object-cover rounded-lg"
+                    src={publication.media_urls[0]}
+                    alt="GIF"
+                    className="w-full max-h-96 object-contain rounded-lg mx-auto"
                   />
                 ) : (
                   <ClickableImage
-                    src={url}
-                    alt={`Image ${index + 1}`}
-                    className="w-full h-48 object-cover rounded-lg"
+                    src={publication.media_urls[0]}
+                    alt="Image"
+                    className="w-full max-h-96 object-contain rounded-lg mx-auto"
                     title={publication.title}
                     description={publication.description}
                   />
                 )}
-                {index === 3 && publication.media_urls.length > 4 && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center pointer-events-none">
-                    <span className="text-white text-lg font-semibold">
-                      +{publication.media_urls.length - 4}
-                    </span>
-                  </div>
-                )}
               </div>
-            ))}
+            ) : (
+              // Multiple images - responsive grid
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {publication.media_urls.slice(0, 4).map((url, index) => (
+                  <div key={index} className="relative">
+                    {isGif(url) ? (
+                      <img
+                        src={url}
+                        alt={`GIF ${index + 1}`}
+                        className="w-full h-48 sm:h-40 object-cover rounded-lg"
+                      />
+                    ) : (
+                      <ClickableImage
+                        src={url}
+                        alt={`Image ${index + 1}`}
+                        className="w-full h-48 sm:h-40 object-cover rounded-lg"
+                        title={publication.title}
+                        description={publication.description}
+                      />
+                    )}
+                    {index === 3 && publication.media_urls.length > 4 && (
+                      <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center pointer-events-none">
+                        <span className="text-white text-lg font-semibold">
+                          +{publication.media_urls.length - 4}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         );
 
       case 'video':
       case 'series':
         return (
-          <div className="relative">
+          <div className="relative w-full">
             <video 
               src={publication.media_urls[0]}
-              className="w-full h-64 object-cover rounded-lg"
+              className="w-full max-h-80 object-contain rounded-lg mx-auto"
               poster=""
               controls={false}
             />
             <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center">
-              <Play className="h-16 w-16 text-white" />
+              <Play className="h-12 w-12 sm:h-16 sm:w-16 text-white" />
             </div>
           </div>
         );
 
       case 'music':
         return (
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-6 text-white">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                <Play className="h-8 w-8" />
+          <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-4 sm:p-6 text-white w-full">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center shrink-0">
+                <Play className="h-6 w-6 sm:h-8 sm:w-8" />
               </div>
-              <div>
-                <h4 className="font-semibold">{publication.title}</h4>
-                <p className="opacity-80">Piste audio</p>
+              <div className="min-w-0">
+                <h4 className="font-semibold text-sm sm:text-base truncate">{publication.title}</h4>
+                <p className="opacity-80 text-xs sm:text-sm">Piste audio</p>
               </div>
             </div>
           </div>
@@ -498,10 +522,10 @@ const PublicationCard = ({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <h4 className="font-semibold text-lg">{publication.title}</h4>
+        <h4 className="font-semibold text-base sm:text-lg">{publication.title}</h4>
         
         {publication.description && (
-          <p className="text-gray-700">{publication.description}</p>
+          <p className="text-gray-700 text-sm sm:text-base">{publication.description}</p>
         )}
 
         {renderMedia()}
