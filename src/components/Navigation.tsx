@@ -37,9 +37,12 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
       setMobileMenuOpen(false);
       await logout();
       console.log('Logout successful, navigating to home');
-      navigate('/', { replace: true });
-      // Force reload to ensure clean state
-      window.location.reload();
+      
+      // Force la redirection immédiate avec un petit délai
+      setTimeout(() => {
+        window.location.replace('/');
+      }, 100);
+      
     } catch (error) {
       console.error('Logout error:', error);
     }
