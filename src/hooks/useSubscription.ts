@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { handleMobileRedirect } from '@/utils/mobileRedirect';
 
 interface SubscriptionData {
   subscribed: boolean;
@@ -57,8 +55,8 @@ export const useSubscription = () => {
       
       console.log('Checkout URL received, redirecting:', data.url);
       
-      // Utiliser la fonction handleMobileRedirect pour une redirection cohérente
-      handleMobileRedirect(data.url, 'Redirection vers le paiement...');
+      // Redirection directe et simple
+      window.location.href = data.url;
       
     } catch (error) {
       console.error('Error creating checkout:', error);
@@ -87,8 +85,8 @@ export const useSubscription = () => {
       
       console.log('Customer portal URL received, redirecting:', data.url);
       
-      // Utiliser la fonction handleMobileRedirect pour une redirection cohérente
-      handleMobileRedirect(data.url, 'Redirection vers le portail client...');
+      // Redirection directe et simple
+      window.location.href = data.url;
       
     } catch (error) {
       console.error('Error opening customer portal:', error);

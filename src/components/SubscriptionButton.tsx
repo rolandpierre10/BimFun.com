@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +5,6 @@ import { Check, Crown, Star, Loader2 } from 'lucide-react';
 import { useSubscription } from '@/hooks/useSubscription';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
-import { handleMobileRedirect } from '@/utils/mobileRedirect';
 
 const SubscriptionButton = () => {
   const { 
@@ -71,26 +69,9 @@ const SubscriptionButton = () => {
       console.log('Step 4: Checkout session created successfully');
       console.log('Redirect URL:', data.url);
       
-      // Améliorer la redirection mobile
-      console.log('Step 5: Attempting mobile-optimized redirection...');
-      
-      // Toast de confirmation avant redirection
-      toast({
-        title: "Redirection en cours...",
-        description: "Vous allez être redirigé vers Stripe",
-      });
-      
-      // Petit délai pour que l'utilisateur voie le message
-      setTimeout(() => {
-        const redirectSuccess = handleMobileRedirect(data.url, 'Redirection vers le paiement en cours...');
-        
-        if (redirectSuccess) {
-          console.log('Step 5: Redirection initiated successfully');
-        } else {
-          console.log('Step 5: Redirection failed');
-          setIsProcessing(false);
-        }
-      }, 500);
+      // Redirection directe et simple
+      console.log('Step 5: Redirecting directly to Stripe...');
+      window.location.href = data.url;
       
     } catch (error) {
       console.error('=== SUBSCRIPTION ERROR ===');
