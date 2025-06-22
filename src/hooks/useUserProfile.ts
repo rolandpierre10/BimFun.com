@@ -17,12 +17,14 @@ export const useUserProfile = (userId?: string) => {
         .from('profiles')
         .select('*')
         .eq('id', targetUserId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       return data;
     },
     enabled: !!targetUserId,
+    staleTime: 30000, // 30 secondes avant de considérer les données comme obsolètes
+    refetchInterval: false, // Désactiver le refetch automatique
   });
 
   const updateProfileMutation = useMutation({

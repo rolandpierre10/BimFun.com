@@ -12,12 +12,14 @@ interface UserOnlineStatusProps {
 const UserOnlineStatus = ({ userId, showAsButton = true }: UserOnlineStatusProps) => {
   const [isOnline, setIsOnline] = useState(false);
   const channelRef = useRef<any>(null);
-  const isSubscribedRef = useRef(false);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    if (!userId || isSubscribedRef.current) return;
-
+    mountedRef.current = true;
+    
     const fetchUserStatus = async () => {
+      if (!userId || !mountedRef.current) return;
+      
       try {
         const { data, error } = await supabase
           .from('profiles')
@@ -25,10 +27,7 @@ const UserOnlineStatus = ({ userId, showAsButton = true }: UserOnlineStatusProps
           .eq('id', userId)
           .single();
 
-        if (error) {
-          console.error('Error fetching user status:', error);
-          return;
-        }
+        if (error || !mountedRef.current) return;
 
         if (data) {
           setIsOnline(data.is_online || false);
@@ -40,44 +39,40 @@ const UserOnlineStatus = ({ userId, showAsButton = true }: UserOnlineStatusProps
 
     fetchUserStatus();
 
-    // Nettoyer le canal précédent s'il existe
+    // Nettoyer le canal précédent
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
-      isSubscribedRef.current = false;
     }
 
-    // Créer un nouveau canal avec un nom unique
-    const channelName = `user-status-${userId}-${Math.random().toString(36).substr(2, 9)}`;
-    
-    channelRef.current = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'profiles',
-          filter: `id=eq.${userId}`,
-        },
-        (payload) => {
-          if (payload.new) {
-            setIsOnline(payload.new.is_online || false);
+    // Créer un nouveau canal seulement si nécessaire
+    if (userId && mountedRef.current) {
+      const channelName = `user-status-${userId}`;
+      
+      channelRef.current = supabase
+        .channel(channelName)
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'profiles',
+            filter: `id=eq.${userId}`,
+          },
+          (payload) => {
+            if (payload.new && mountedRef.current) {
+              setIsOnline(payload.new.is_online || false);
+            }
           }
-        }
-      );
-
-    // S'abonner seulement si pas déjà abonné
-    if (!isSubscribedRef.current) {
-      channelRef.current.subscribe();
-      isSubscribedRef.current = true;
+        )
+        .subscribe();
     }
 
     return () => {
-      if (channelRef.current && isSubscribedRef.current) {
+      mountedRef.current = false;
+      if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
-        isSubscribedRef.current = false;
       }
     };
   }, [userId]);

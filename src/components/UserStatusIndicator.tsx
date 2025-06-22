@@ -14,12 +14,14 @@ const UserStatusIndicator = ({ userId, showText = true, size = 'md' }: UserStatu
   const [isOnline, setIsOnline] = useState(false);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
   const channelRef = useRef<any>(null);
-  const isSubscribedRef = useRef(false);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    if (!userId || isSubscribedRef.current) return;
-
+    mountedRef.current = true;
+    
     const fetchUserStatus = async () => {
+      if (!userId || !mountedRef.current) return;
+      
       try {
         const { data, error } = await supabase
           .from('profiles')
@@ -27,10 +29,7 @@ const UserStatusIndicator = ({ userId, showText = true, size = 'md' }: UserStatu
           .eq('id', userId)
           .single();
 
-        if (error) {
-          console.error('Error fetching user status:', error);
-          return;
-        }
+        if (error || !mountedRef.current) return;
 
         if (data) {
           setIsOnline(data.is_online || false);
@@ -43,45 +42,41 @@ const UserStatusIndicator = ({ userId, showText = true, size = 'md' }: UserStatu
 
     fetchUserStatus();
 
-    // Nettoyer le canal précédent s'il existe
+    // Nettoyer le canal précédent
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current);
       channelRef.current = null;
-      isSubscribedRef.current = false;
     }
 
-    // Créer un nouveau canal avec un nom unique
-    const channelName = `user-status-indicator-${userId}-${Math.random().toString(36).substr(2, 9)}`;
+    // Créer un nouveau canal seulement si nécessaire
+    if (userId && mountedRef.current) {
+      const channelName = `user-indicator-${userId}`;
 
-    channelRef.current = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'profiles',
-          filter: `id=eq.${userId}`,
-        },
-        (payload) => {
-          if (payload.new) {
-            setIsOnline(payload.new.is_online || false);
-            setLastSeen(payload.new.last_seen);
+      channelRef.current = supabase
+        .channel(channelName)
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'profiles',
+            filter: `id=eq.${userId}`,
+          },
+          (payload) => {
+            if (payload.new && mountedRef.current) {
+              setIsOnline(payload.new.is_online || false);
+              setLastSeen(payload.new.last_seen);
+            }
           }
-        }
-      );
-
-    // S'abonner seulement si pas déjà abonné
-    if (!isSubscribedRef.current) {
-      channelRef.current.subscribe();
-      isSubscribedRef.current = true;
+        )
+        .subscribe();
     }
 
     return () => {
-      if (channelRef.current && isSubscribedRef.current) {
+      mountedRef.current = false;
+      if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
-        isSubscribedRef.current = false;
       }
     };
   }, [userId]);
