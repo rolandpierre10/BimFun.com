@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, Trash2, Flag, Search, Filter, Calendar, Heart, MessageCircle, RefreshCw } from 'lucide-react';
+import { Eye, Trash2, Flag, Search, Filter, Calendar, Heart, MessageCircle, RefreshCw, Edit } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -45,6 +46,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 interface Publication {
   id: string;
   title: string;
+  description?: string;
   content_type: string;
   created_at: string;
   is_public: boolean;
@@ -52,6 +54,7 @@ interface Publication {
   views_count: number;
   comments_count: number;
   user_id: string;
+  tags?: string[];
   profiles?: {
     full_name: string;
     username: string;
@@ -72,6 +75,12 @@ const PublicationsManagement: React.FC<PublicationsManagementProps> = ({
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
+  const [editingPublication, setEditingPublication] = useState<Publication | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editTags, setEditTags] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   const filteredPublications = publications.filter(pub => {
     const matchesSearch = pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -82,6 +91,52 @@ const PublicationsManagement: React.FC<PublicationsManagementProps> = ({
                          pub.content_type === filterType;
     return matchesSearch && matchesFilter;
   });
+
+  const handleEditPublication = (publication: Publication) => {
+    setEditingPublication(publication);
+    setEditTitle(publication.title);
+    setEditDescription(publication.description || '');
+    setEditTags(publication.tags ? publication.tags.join(', ') : '');
+    setShowEditDialog(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingPublication) return;
+
+    setIsEditing(true);
+    try {
+      const tagsArray = editTags.split(',').map(tag => tag.trim()).filter(tag => tag);
+      
+      const { error } = await supabase
+        .from('publications')
+        .update({
+          title: editTitle,
+          description: editDescription,
+          tags: tagsArray
+        })
+        .eq('id', editingPublication.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Publication modifiée",
+        description: "La publication a été mise à jour avec succès",
+      });
+
+      setShowEditDialog(false);
+      setEditingPublication(null);
+      onRefresh();
+    } catch (error) {
+      console.error('Error updating publication:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier la publication",
+        variant: "destructive",
+      });
+    } finally {
+      setIsEditing(false);
+    }
+  };
 
   const handleToggleVisibility = async (publicationId: string, currentVisibility: boolean) => {
     try {
@@ -272,9 +327,25 @@ const PublicationsManagement: React.FC<PublicationsManagementProps> = ({
                               </div>
                               <div><strong>Auteur:</strong> {pub.profiles?.full_name || 'Utilisateur supprimé'} (@{pub.profiles?.username || 'N/A'})</div>
                               <div><strong>Date de création:</strong> {new Date(pub.created_at).toLocaleString('fr-FR')}</div>
+                              {pub.description && (
+                                <div><strong>Description:</strong> {pub.description}</div>
+                              )}
+                              {pub.tags && pub.tags.length > 0 && (
+                                <div><strong>Tags:</strong> {pub.tags.join(', ')}</div>
+                              )}
                             </div>
                           </DialogContent>
                         </Dialog>
+                        
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEditPublication(pub)}
+                          className="h-8 px-3"
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Modifier
+                        </Button>
                         
                         <Button
                           size="sm"
@@ -320,6 +391,61 @@ const PublicationsManagement: React.FC<PublicationsManagementProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit Publication Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="w-[95vw] max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle>Modifier la publication</DialogTitle>
+            <DialogDescription>
+              Modifiez les informations de la publication
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Titre</label>
+              <Input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                placeholder="Titre de la publication"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Description</label>
+              <Textarea
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                placeholder="Description de la publication"
+                rows={3}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Tags</label>
+              <Input
+                value={editTags}
+                onChange={(e) => setEditTags(e.target.value)}
+                placeholder="Tag1, Tag2, Tag3..."
+              />
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button
+                onClick={handleSaveEdit}
+                disabled={isEditing || !editTitle.trim()}
+                className="flex-1"
+              >
+                {isEditing ? 'Modification...' : 'Sauvegarder'}
+              </Button>
+              <Button
+                onClick={() => setShowEditDialog(false)}
+                variant="outline"
+                className="flex-1"
+              >
+                Annuler
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
