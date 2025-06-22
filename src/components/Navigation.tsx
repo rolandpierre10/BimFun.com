@@ -48,16 +48,16 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 sm:h-20 lg:h-24">
-          {/* Logo - Visible sur toutes les pages maintenant */}
+          {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">
             <img 
               src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
               alt="BimFun Logo" 
-              className="h-10 sm:h-12 lg:h-16 xl:h-20 w-auto hover:opacity-80 transition-opacity"
+              className="h-8 sm:h-10 lg:h-14 xl:h-16 w-auto hover:opacity-80 transition-opacity"
             />
           </Link>
           
-          {/* Navigation Links - Masqués sur mobile */}
+          {/* Navigation Links - Desktop only */}
           <div className="hidden lg:flex items-center space-x-6">
             <button
               onClick={() => scrollToSection('services')}
@@ -138,8 +138,13 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             )}
           </div>
 
-          {/* Mobile Menu - Visible sur tablette et mobile */}
-          <div className="flex lg:hidden items-center space-x-1">
+          {/* Mobile Menu - Compact layout */}
+          <div className="flex lg:hidden items-center space-x-2">
+            {/* Language Selector - Compact mobile version */}
+            <div className="scale-90 origin-right">
+              <LanguageSelector />
+            </div>
+            
             {user && (
               <Link to="/dashboard">
                 <Button variant="ghost" size="sm" className="p-2">
@@ -167,12 +172,6 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                 </DrawerHeader>
                 
                 <div className="px-4 py-6 space-y-2 overflow-y-auto">
-                  {/* Language Selector - First item in mobile menu */}
-                  <div className="pb-4 border-b border-gray-100">
-                    <div className="text-sm font-medium text-gray-700 mb-3">Langue</div>
-                    <LanguageSelector />
-                  </div>
-
                   {/* Navigation Links */}
                   <div className="space-y-1">
                     <button
