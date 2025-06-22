@@ -55,12 +55,11 @@ const Index = () => {
     if (isProcessing) return;
     
     setIsProcessing(true);
+    console.log('Start Now button clicked on mobile');
     
     try {
-      console.log('Start Now button clicked');
-      
       if (user) {
-        console.log('User authenticated, checking auth status...');
+        console.log('User authenticated, creating checkout session for mobile');
         
         // Vérifier que l'utilisateur est toujours connecté
         const { data: { user: currentUser } } = await supabase.auth.getUser();
@@ -75,24 +74,26 @@ const Index = () => {
           return;
         }
 
-        console.log('User confirmed, creating checkout session');
-        
         toast({
           title: "Préparation du paiement...",
           description: "Redirection vers Stripe en cours",
         });
         
-        // Redirection directe pour mobile
+        // Créer la session de checkout directement via Supabase
         const { data, error } = await supabase.functions.invoke('create-checkout');
         
         if (error) {
           console.error('Checkout error:', error);
-          throw error;
+          throw new Error(error.message || 'Erreur lors de la création de la session de paiement');
+        }
+        
+        if (!data?.url) {
+          throw new Error('URL de paiement non reçue');
         }
         
         console.log('Checkout session created, redirecting to:', data.url);
         
-        // Redirection directe dans le même onglet pour mobile
+        // Redirection directe pour mobile - dans le même onglet
         window.location.href = data.url;
         
       } else {

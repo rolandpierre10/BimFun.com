@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
@@ -33,11 +32,13 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
     e.stopPropagation();
     
     try {
-      console.log('Logout button clicked');
+      console.log('Logout button clicked - starting logout process');
+      setMobileMenuOpen(false);
       await logout();
       console.log('Logout successful, navigating to home');
-      navigate('/');
-      setMobileMenuOpen(false);
+      navigate('/', { replace: true });
+      // Force reload to ensure clean state
+      window.location.reload();
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -68,7 +69,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             </Link>
           </div>
           
-          {/* Mobile Menu - More space from logo */}
+          {/* Mobile Menu */}
           <div className="flex lg:hidden items-center gap-2 sm:gap-3 flex-shrink-0 ml-auto">
             <LanguageSelector />
             
@@ -103,26 +104,30 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                   <div className="space-y-1">
                     <button
                       onClick={() => scrollToSection('services')}
-                      className="w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation"
+                      style={{ minHeight: '56px', WebkitTapHighlightColor: 'transparent' }}
                     >
                       Fonctionnalités
                     </button>
                     <button
                       onClick={() => scrollToSection('pricing')}
-                      className="w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation"
+                      style={{ minHeight: '56px', WebkitTapHighlightColor: 'transparent' }}
                     >
                       Tarifs
                     </button>
                     <button
                       onClick={() => scrollToSection('about')}
-                      className="w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation"
+                      style={{ minHeight: '56px', WebkitTapHighlightColor: 'transparent' }}
                     >
                       À propos
                     </button>
                     <Link
                       to="/contact"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="block w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="block w-full text-left py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation"
+                      style={{ minHeight: '56px', WebkitTapHighlightColor: 'transparent' }}
                     >
                       Contact
                     </Link>
@@ -136,7 +141,8 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                           <Link
                             to="/admin"
                             onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center space-x-3 py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="flex items-center space-x-3 py-4 px-4 text-lg font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation"
+                            style={{ minHeight: '56px', WebkitTapHighlightColor: 'transparent' }}
                           >
                             <Shield className="h-5 w-5" />
                             <span>Administration</span>
@@ -145,10 +151,11 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                         
                         <button
                           onClick={handleLogout}
-                          className="flex items-center space-x-3 w-full text-left py-4 px-4 text-lg font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors touch-manipulation"
+                          className="flex items-center space-x-3 w-full text-left py-4 px-4 text-lg font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors touch-manipulation active:bg-red-100"
                           style={{ 
-                            minHeight: '48px',
-                            WebkitTapHighlightColor: 'transparent'
+                            minHeight: '56px',
+                            WebkitTapHighlightColor: 'transparent',
+                            cursor: 'pointer'
                           }}
                         >
                           <LogOut className="h-5 w-5" />
@@ -163,7 +170,8 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                             onOpenAuth('login');
                             setMobileMenuOpen(false);
                           }}
-                          className="w-full justify-start text-lg py-6 hover:bg-blue-50 hover:text-blue-600"
+                          className="w-full justify-start text-lg py-6 hover:bg-blue-50 hover:text-blue-600 touch-manipulation"
+                          style={{ minHeight: '56px', WebkitTapHighlightColor: 'transparent' }}
                         >
                           Connexion
                         </Button>
@@ -172,7 +180,8 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
                             onOpenAuth('signup');
                             setMobileMenuOpen(false);
                           }}
-                          className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-6"
+                          className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-6 touch-manipulation active:bg-blue-800"
+                          style={{ minHeight: '56px', WebkitTapHighlightColor: 'transparent' }}
                         >
                           S'inscrire
                         </Button>
@@ -184,7 +193,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             </Drawer>
           </div>
           
-          {/* Navigation Links - Desktop only */}
+          {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-6 flex-1 justify-center">
             <button
               onClick={() => scrollToSection('services')}
