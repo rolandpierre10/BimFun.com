@@ -46,14 +46,14 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-lg border-b border-gray-200 z-50">
-      <div className="max-w-7xl mx-auto px-0.5 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-10 sm:h-20 lg:h-24">
+      <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-12 sm:h-20 lg:h-24">
           {/* Logo */}
-          <Link to="/" className="flex items-center flex-shrink-0 min-w-0">
+          <Link to="/" className="flex items-center flex-shrink-0 min-w-0 max-w-[45%]">
             <img 
               src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
               alt="BimFun Logo" 
-              className="h-5 sm:h-10 lg:h-14 xl:h-16 w-auto hover:opacity-80 transition-opacity"
+              className="h-8 sm:h-10 lg:h-14 xl:h-16 w-auto max-w-full hover:opacity-80 transition-opacity"
             />
           </Link>
           
@@ -138,25 +138,25 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             )}
           </div>
 
-          {/* Mobile Menu - Ultra compact */}
-          <div className="flex lg:hidden items-center gap-0 flex-shrink-0">
-            {/* Language Selector - Micro mobile version */}
-            <div className="scale-[0.5] origin-right -mr-3">
+          {/* Mobile Menu - Minimal and constrained */}
+          <div className="flex lg:hidden items-center gap-0 flex-shrink-0 max-w-[50%]">
+            {/* Language Selector - Extra micro mobile version */}
+            <div className="scale-[0.4] origin-right -mr-4">
               <LanguageSelector />
             </div>
             
             {user && (
               <Link to="/dashboard">
-                <Button variant="ghost" size="sm" className="p-0.5 min-w-[28px] h-7">
-                  <MessageCircle className="h-3.5 w-3.5" />
+                <Button variant="ghost" size="sm" className="p-1 min-w-[24px] h-6">
+                  <MessageCircle className="h-3 w-3" />
                 </Button>
               </Link>
             )}
             
             <Drawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <DrawerTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-0.5 min-w-[28px] h-7">
-                  <Menu className="h-3.5 w-3.5" />
+                <Button variant="ghost" size="sm" className="p-1 min-w-[24px] h-6">
+                  <Menu className="h-3 w-3" />
                 </Button>
               </DrawerTrigger>
               <DrawerContent className="max-h-[80vh]">
