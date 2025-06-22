@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -85,30 +86,30 @@ const Index = () => {
   console.log('About to render Navigation component');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden">
       <DemoInteractions />
       <Navigation onOpenAuth={handleOpenAuth} />
       
-      <div className="pt-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="pt-16 sm:pt-20 lg:pt-24">
+        <div className="w-full max-w-6xl mx-auto px-3 sm:px-4 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+          <div className="text-center mb-8 sm:mb-12">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight px-2">
               {t('home.title')}
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed max-w-4xl mx-auto">
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-6 sm:mb-8 leading-relaxed max-w-4xl mx-auto px-2">
               {t('home.subtitle')}
             </p>
           </div>
 
           {/* Galerie d'images d'appels vidéo */}
-          <section className="mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">{t('home.videoCallsTitle')}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+          <section className="mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 text-center px-2">{t('home.videoCallsTitle')}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
               <ClickableImage
                 src="/lovable-uploads/42e4cfc8-b297-45ae-bdc5-61eb1a2b5be0.png"
                 alt="Appels vidéo multi-participants sur ordinateur et mobile"
-                className="rounded-lg shadow-lg w-full h-48 object-cover"
+                className="rounded-lg shadow-lg w-full h-40 sm:h-48 object-cover"
                 title="Appels vidéo multi-participants"
                 description="Connectez-vous avec plusieurs personnes simultanément"
               />
@@ -116,7 +117,7 @@ const Index = () => {
               <ClickableImage
                 src="/lovable-uploads/3d1a7653-54c7-4fde-904a-a4c2860d53e8.png"
                 alt="Réseau professionnel connecté"
-                className="rounded-lg shadow-lg w-full h-48 object-cover"
+                className="rounded-lg shadow-lg w-full h-40 sm:h-48 object-cover"
                 title="Réseau professionnel"
                 description="Développez votre réseau de contacts professionnels"
               />
@@ -124,7 +125,7 @@ const Index = () => {
               <ClickableImage
                 src="/lovable-uploads/204a0def-1515-4520-8e02-32f5df1f3b53.png"
                 alt="Appels vidéo sur tablette et mobile"
-                className="rounded-lg shadow-lg w-full h-48 object-cover"
+                className="rounded-lg shadow-lg w-full h-40 sm:h-48 object-cover"
                 title="Multi-appareils"
                 description="Utilisez BimFun sur tous vos appareils"
               />
@@ -133,7 +134,7 @@ const Index = () => {
                 <ClickableImage
                   src="/lovable-uploads/cc9c6bca-8998-48f7-a0a1-bdfccfac3973.png"
                   alt="Appel vidéo mobile interface utilisateur"
-                  className="rounded-lg shadow-lg w-full h-48 sm:h-64 object-cover"
+                  className="rounded-lg shadow-lg w-full h-40 sm:h-48 md:h-64 object-cover"
                   title="Interface intuitive"
                   description="Une interface simple et élégante pour vos appels"
                 />
@@ -142,21 +143,21 @@ const Index = () => {
           </section>
 
           {/* Section Services */}
-          <section id="services" className="mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">{t('home.servicesTitle')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <section id="services" className="mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 text-center px-2">{t('home.servicesTitle')}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               
               {/* Publications créatives */}
               <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                <CardHeader className="text-center pb-4">
+                <CardHeader className="text-center pb-4 px-4 sm:px-6">
                   <div className="mx-auto mb-4 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                     <Camera className="h-6 w-6 text-blue-600" />
                   </div>
-                  <CardTitle className="text-lg">{t('services.creativePublications.title')}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">{t('services.creativePublications.title')}</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.creativePublications.description')}</p>
-                  <ul className="space-y-2 text-sm text-gray-600">
+                <CardContent className="pt-0 px-4 sm:px-6">
+                  <p className="text-gray-600 text-center mb-4 text-sm sm:text-base">{t('services.creativePublications.description')}</p>
+                  <ul className="space-y-2 text-xs sm:text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                       <span>{t('services.creativePublications.features.highQuality')}</span>
@@ -175,15 +176,15 @@ const Index = () => {
 
               {/* Messagerie */}
               <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                <CardHeader className="text-center pb-4">
+                <CardHeader className="text-center pb-4 px-4 sm:px-6">
                   <div className="mx-auto mb-4 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                     <MessageCircle className="h-6 w-6 text-green-600" />
                   </div>
-                  <CardTitle className="text-lg">{t('services.messaging.title')}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">{t('services.messaging.title')}</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.messaging.description')}</p>
-                  <ul className="space-y-2 text-sm text-gray-600">
+                <CardContent className="pt-0 px-4 sm:px-6">
+                  <p className="text-gray-600 text-center mb-4 text-sm sm:text-base">{t('services.messaging.description')}</p>
+                  <ul className="space-y-2 text-xs sm:text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                       <span>{t('services.messaging.features.realTime')}</span>
@@ -201,15 +202,15 @@ const Index = () => {
               </Card>
 
               <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                <CardHeader className="text-center pb-4">
+                <CardHeader className="text-center pb-4 px-4 sm:px-6">
                   <div className="mx-auto mb-4 w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
                     <Phone className="h-6 w-6 text-emerald-600" />
                   </div>
-                  <CardTitle className="text-lg">{t('services.voiceCalls.title')}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">{t('services.voiceCalls.title')}</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.voiceCalls.description')}</p>
-                  <ul className="space-y-2 text-sm text-gray-600">
+                <CardContent className="pt-0 px-4 sm:px-6">
+                  <p className="text-gray-600 text-center mb-4 text-sm sm:text-base">{t('services.voiceCalls.description')}</p>
+                  <ul className="space-y-2 text-xs sm:text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                       <span>{t('services.voiceCalls.features.hdAudio')}</span>
@@ -227,15 +228,15 @@ const Index = () => {
               </Card>
 
               <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                <CardHeader className="text-center pb-4">
+                <CardHeader className="text-center pb-4 px-4 sm:px-6">
                   <div className="mx-auto mb-4 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
                     <Video className="h-6 w-6 text-purple-600" />
                   </div>
-                  <CardTitle className="text-lg">{t('services.videoCalls.title')}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">{t('services.videoCalls.title')}</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.videoCalls.description')}</p>
-                  <ul className="space-y-2 text-sm text-gray-600">
+                <CardContent className="pt-0 px-4 sm:px-6">
+                  <p className="text-gray-600 text-center mb-4 text-sm sm:text-base">{t('services.videoCalls.description')}</p>
+                  <ul className="space-y-2 text-xs sm:text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                       <span>{t('services.videoCalls.features.hdQuality')}</span>
@@ -253,15 +254,15 @@ const Index = () => {
               </Card>
 
               <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                <CardHeader className="text-center pb-4">
+                <CardHeader className="text-center pb-4 px-4 sm:px-6">
                   <div className="mx-auto mb-4 w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
                     <Users className="h-6 w-6 text-orange-600" />
                   </div>
-                  <CardTitle className="text-lg">{t('services.professionalNetwork.title')}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">{t('services.professionalNetwork.title')}</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.professionalNetwork.description')}</p>
-                  <ul className="space-y-2 text-sm text-gray-600">
+                <CardContent className="pt-0 px-4 sm:px-6">
+                  <p className="text-gray-600 text-center mb-4 text-sm sm:text-base">{t('services.professionalNetwork.description')}</p>
+                  <ul className="space-y-2 text-xs sm:text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                       <span>{t('services.professionalNetwork.features.professionalProfiles')}</span>
@@ -279,15 +280,15 @@ const Index = () => {
               </Card>
 
               <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                <CardHeader className="text-center pb-4">
+                <CardHeader className="text-center pb-4 px-4 sm:px-6">
                   <div className="mx-auto mb-4 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                     <Share2 className="h-6 w-6 text-red-600" />
                   </div>
-                  <CardTitle className="text-lg">{t('services.socialInteractions.title')}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">{t('services.socialInteractions.title')}</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.socialInteractions.description')}</p>
-                  <ul className="space-y-2 text-sm text-gray-600">
+                <CardContent className="pt-0 px-4 sm:px-6">
+                  <p className="text-gray-600 text-center mb-4 text-sm sm:text-base">{t('services.socialInteractions.description')}</p>
+                  <ul className="space-y-2 text-xs sm:text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                       <span>{t('services.socialInteractions.features.likesAndComments')}</span>
@@ -305,15 +306,15 @@ const Index = () => {
               </Card>
 
               <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                <CardHeader className="text-center pb-4">
+                <CardHeader className="text-center pb-4 px-4 sm:px-6">
                   <div className="mx-auto mb-4 w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
                     <Shield className="h-6 w-6 text-indigo-600" />
                   </div>
-                  <CardTitle className="text-lg">{t('services.security.title')}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">{t('services.security.title')}</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.security.description')}</p>
-                  <ul className="space-y-2 text-sm text-gray-600">
+                <CardContent className="pt-0 px-4 sm:px-6">
+                  <p className="text-gray-600 text-center mb-4 text-sm sm:text-base">{t('services.security.description')}</p>
+                  <ul className="space-y-2 text-xs sm:text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                       <span>{t('services.security.features.endToEndEncryption')}</span>
@@ -331,15 +332,15 @@ const Index = () => {
               </Card>
 
               <Card className="hover:shadow-lg transition-shadow duration-300 h-full">
-                <CardHeader className="text-center pb-4">
+                <CardHeader className="text-center pb-4 px-4 sm:px-6">
                   <div className="mx-auto mb-4 w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center">
                     <Mic className="h-6 w-6 text-teal-600" />
                   </div>
-                  <CardTitle className="text-lg">{t('services.voiceMessages.title')}</CardTitle>
+                  <CardTitle className="text-base sm:text-lg">{t('services.voiceMessages.title')}</CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0">
-                  <p className="text-gray-600 text-center mb-4 text-base">{t('services.voiceMessages.description')}</p>
-                  <ul className="space-y-2 text-sm text-gray-600">
+                <CardContent className="pt-0 px-4 sm:px-6">
+                  <p className="text-gray-600 text-center mb-4 text-sm sm:text-base">{t('services.voiceMessages.description')}</p>
+                  <ul className="space-y-2 text-xs sm:text-sm text-gray-600">
                     <li className="flex items-center gap-2">
                       <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
                       <span>{t('services.voiceMessages.features.easyRecording')}</span>
@@ -360,54 +361,54 @@ const Index = () => {
           </section>
 
           {/* Section Tarifs */}
-          <section id="pricing" className="mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">{t('home.pricingTitle')}</h2>
-            <div className="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-md text-center border-2 border-blue-200">
+          <section id="pricing" className="mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 text-center px-2">{t('home.pricingTitle')}</h2>
+            <div className="max-w-xl mx-auto bg-white p-6 sm:p-8 rounded-lg shadow-md text-center border-2 border-blue-200">
               <div className="mb-6">
                 <Crown className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold mb-2">{t('pricing.premium')}</h3>
-                <div className="text-4xl font-bold text-blue-600 mb-2">
+                <h3 className="text-xl sm:text-2xl font-bold mb-2">{t('pricing.premium')}</h3>
+                <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">
                   {t('pricing.price')}
-                  <span className="text-lg font-normal text-gray-600">{t('pricing.perMonth')}</span>
+                  <span className="text-base sm:text-lg font-normal text-gray-600">{t('pricing.perMonth')}</span>
                 </div>
-                <p className="text-gray-600 mb-6 text-base">{t('pricing.description')}</p>
+                <p className="text-gray-600 mb-6 text-sm sm:text-base px-2">{t('pricing.description')}</p>
               </div>
               
               <div className="mb-6">
                 <ul className="space-y-3 text-left">
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-base">{t('pricing.features.unlimitedPublications')}</span>
+                    <span className="text-sm sm:text-base">{t('pricing.features.unlimitedPublications')}</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-base">{t('pricing.features.advancedMessaging')}</span>
+                    <span className="text-sm sm:text-base">{t('pricing.features.advancedMessaging')}</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-base">{t('pricing.features.hdCalls')}</span>
+                    <span className="text-sm sm:text-base">{t('pricing.features.hdCalls')}</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-base">{t('pricing.features.extendedNetwork')}</span>
+                    <span className="text-sm sm:text-base">{t('pricing.features.extendedNetwork')}</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-base">{t('pricing.features.enhancedSecurity')}</span>
+                    <span className="text-sm sm:text-base">{t('pricing.features.enhancedSecurity')}</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    <span className="text-base">{t('pricing.features.prioritySupport')}</span>
+                    <span className="text-sm sm:text-base">{t('pricing.features.prioritySupport')}</span>
                   </li>
                 </ul>
               </div>
               
               <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-md text-lg py-4 px-4 transition-all duration-200 touch-manipulation flex items-center justify-center gap-2"
+                className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-md text-base sm:text-lg py-3 sm:py-4 px-4 transition-all duration-200 touch-manipulation flex items-center justify-center gap-2"
                 onClick={handleStartNow}
                 disabled={isProcessing}
                 style={{ 
-                  minHeight: '56px',
+                  minHeight: '48px',
                   WebkitTapHighlightColor: 'transparent',
                   userSelect: 'none',
                   cursor: isProcessing ? 'not-allowed' : 'pointer'
@@ -417,27 +418,27 @@ const Index = () => {
                 {isProcessing ? t('home.preparing') : t('home.startNow')}
               </Button>
               
-              <p className="text-sm text-gray-500 mt-4">
+              <p className="text-xs sm:text-sm text-gray-500 mt-4 px-2">
                 {t('home.cancelAnytime')}
               </p>
             </div>
           </section>
 
           {/* Section About */}
-          <section id="about" className="mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">{t('home.aboutTitle')}</h2>
-            <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
-              <p className="text-lg text-gray-700 mb-4 leading-relaxed">
+          <section id="about" className="mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 text-center px-2">{t('home.aboutTitle')}</h2>
+            <div className="max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-lg shadow-md">
+              <p className="text-base sm:text-lg text-gray-700 mb-4 leading-relaxed px-2">
                 {t('about.description1')}
               </p>
-              <p className="text-lg text-gray-700 leading-relaxed">
+              <p className="text-base sm:text-lg text-gray-700 leading-relaxed px-2">
                 {t('about.description2')}
               </p>
             </div>
           </section>
 
           {/* Section Subscription */}
-          <section id="subscription" className="mb-16">
+          <section id="subscription" className="mb-12 sm:mb-16">
             <div className="space-y-6">
               {/* Bouton d'abonnement mobile */}
               {user && (
@@ -447,7 +448,7 @@ const Index = () => {
               )}
 
               {/* Layout principal avec feed */}
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
                 {/* Sidebar desktop uniquement */}
                 <div className="hidden lg:block lg:col-span-1">
                   {user && <SubscriptionButton />}
