@@ -92,8 +92,8 @@ const Index = () => {
         
         console.log('Checkout session created, redirecting to:', data.url);
         
-        // Utiliser la nouvelle fonction de redirection mobile
-        handleMobileRedirect(data.url, 'Redirection vers le paiement en cours...');
+        // Redirection directe et simple - fonctionne sur mobile et desktop
+        window.location.href = data.url;
         
       } else {
         console.log('User not authenticated, opening signup modal');
