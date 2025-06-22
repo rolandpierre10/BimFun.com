@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
@@ -61,7 +60,6 @@ const Index = () => {
       if (user) {
         console.log('User authenticated, creating checkout session');
         
-        // Vérifier que l'utilisateur est toujours connecté
         const { data: { user: currentUser } } = await supabase.auth.getUser();
         if (!currentUser) {
           console.log('User not authenticated anymore');
@@ -80,7 +78,6 @@ const Index = () => {
           description: "Redirection vers Stripe en cours",
         });
         
-        // Créer la session de checkout directement via Supabase
         const { data, error } = await supabase.functions.invoke('create-checkout');
         
         if (error) {
@@ -94,28 +91,8 @@ const Index = () => {
         
         console.log('Checkout session created, redirecting to:', data.url);
         
-        // Amélioration pour mobile : essayer plusieurs méthodes de redirection
-        try {
-          // Méthode 1: Redirection directe (fonctionne sur la plupart des appareils)
-          window.location.href = data.url;
-        } catch (redirectError) {
-          console.log('Direct redirect failed, trying window.open');
-          // Méthode 2: Ouvrir dans un nouvel onglet si la redirection directe échoue
-          const newWindow = window.open(data.url, '_blank');
-          if (!newWindow) {
-            // Méthode 3: Fallback si le popup est bloqué
-            toast({
-              title: "Redirection bloquée",
-              description: "Veuillez autoriser les popups ou cliquer sur le lien ci-dessous",
-              variant: "destructive",
-            });
-            // Créer un lien temporaire et le cliquer
-            const link = document.createElement('a');
-            link.href = data.url;
-            link.target = '_blank';
-            link.click();
-          }
-        }
+        // Redirection simple et directe - la meilleure méthode pour mobile
+        window.location.href = data.url;
         
       } else {
         console.log('User not authenticated, opening signup modal');
@@ -462,18 +439,15 @@ const Index = () => {
               </div>
               
               <Button 
-                className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-semibold rounded-md text-base sm:text-lg py-3 sm:py-4 px-4 transition-all duration-200 touch-manipulation flex items-center justify-center gap-2"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md text-base sm:text-lg py-4 px-4 transition-colors duration-200"
                 onClick={handleStartNow}
                 disabled={isProcessing}
-                onTouchStart={() => {}} // Améliore la réactivité tactile
                 style={{ 
                   minHeight: '56px',
-                  WebkitTapHighlightColor: 'rgba(59, 130, 246, 0.3)',
-                  userSelect: 'none',
                   cursor: isProcessing ? 'not-allowed' : 'pointer'
                 }}
               >
-                {isProcessing && <Loader2 className="h-5 w-5 animate-spin" />}
+                {isProcessing && <Loader2 className="h-5 w-5 animate-spin mr-2" />}
                 {isProcessing ? t('home.preparing') : t('home.startNow')}
               </Button>
               
