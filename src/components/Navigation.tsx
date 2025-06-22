@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
@@ -48,12 +49,12 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="flex items-center h-16 sm:h-20 lg:h-24">
           {/* Logo */}
-          <div className="flex-shrink-0 w-auto max-w-[40%] overflow-hidden">
+          <div className="flex-shrink-0 w-auto max-w-[50%] overflow-hidden">
             <Link to="/" className="block">
               <img 
                 src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
                 alt="BimFun Logo" 
-                className="h-8 sm:h-10 lg:h-14 xl:h-16 w-auto max-w-full hover:opacity-80 transition-opacity object-contain"
+                className="h-12 sm:h-16 lg:h-20 xl:h-24 w-auto max-w-full hover:opacity-80 transition-opacity object-contain"
               />
             </Link>
           </div>
