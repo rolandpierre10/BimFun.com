@@ -213,8 +213,8 @@ const PublicationsManagement: React.FC<PublicationsManagementProps> = ({
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Filters - Mobile Optimized */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+          {/* Filters - Responsive */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
@@ -226,7 +226,7 @@ const PublicationsManagement: React.FC<PublicationsManagementProps> = ({
             </div>
             <div className="flex gap-2">
               <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="w-32 sm:w-40">
+                <SelectTrigger className="w-full sm:w-40">
                   <SelectValue placeholder="Filtrer..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -244,149 +244,298 @@ const PublicationsManagement: React.FC<PublicationsManagementProps> = ({
             </div>
           </div>
 
-          {/* Publications List - Always showing cards for better mobile experience */}
+          {/* Publications Display - Mobile-First with Desktop Table Fallback */}
           <div className="space-y-4">
             {filteredPublications.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 Aucune publication trouvée
               </div>
             ) : (
-              filteredPublications.map((pub) => (
-                <Card key={pub.id} className="w-full">
-                  <CardContent className="p-4">
-                    <div className="space-y-3">
-                      {/* Header */}
-                      <div className="flex justify-between items-start gap-3">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm sm:text-base truncate">
-                            {pub.title}
-                          </h3>
-                          <div className="text-xs text-gray-500 mt-1">
-                            <div>Par: {pub.profiles?.full_name || 'Utilisateur supprimé'}</div>
-                            <div>@{pub.profiles?.username || 'N/A'}</div>
+              <>
+                {/* Mobile View - Cards */}
+                <div className="block lg:hidden">
+                  {filteredPublications.map((pub) => (
+                    <Card key={pub.id} className="mb-4">
+                      <CardContent className="p-4">
+                        <div className="space-y-3">
+                          {/* Header with Title and Status */}
+                          <div className="flex justify-between items-start gap-3">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-base truncate">
+                                {pub.title}
+                              </h3>
+                              <div className="text-xs text-gray-500 mt-1">
+                                <div>Par: {pub.profiles?.full_name || 'Utilisateur supprimé'}</div>
+                                <div>@{pub.profiles?.username || 'N/A'}</div>
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-end gap-2 shrink-0">
+                              <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                                {pub.content_type}
+                              </span>
+                              <Button
+                                size="sm"
+                                variant={pub.is_public ? "default" : "secondary"}
+                                onClick={() => handleToggleVisibility(pub.id, pub.is_public)}
+                                className="text-xs px-3 py-1 h-7"
+                              >
+                                {pub.is_public ? 'Public' : 'Privé'}
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Stats Row */}
+                          <div className="flex items-center gap-4 text-sm">
+                            <span className="flex items-center gap-1">
+                              <Heart className="h-4 w-4 text-red-500" />
+                              <span>{pub.likes_count}</span>
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MessageCircle className="h-4 w-4 text-blue-500" />
+                              <span>{pub.comments_count}</span>
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Eye className="h-4 w-4 text-gray-500" />
+                              <span>{pub.views_count}</span>
+                            </span>
+                            <span className="flex items-center gap-1 ml-auto">
+                              <Calendar className="h-4 w-4 text-gray-400" />
+                              <span className="text-xs">
+                                {new Date(pub.created_at).toLocaleDateString('fr-FR')}
+                              </span>
+                            </span>
+                          </div>
+
+                          {/* Actions Row */}
+                          <div className="flex justify-end gap-2 pt-2 border-t">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button size="sm" variant="outline" className="h-8 px-3">
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Voir
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="w-[95vw] max-w-lg mx-auto max-h-[80vh] overflow-y-auto">
+                                <DialogHeader>
+                                  <DialogTitle className="text-left pr-8">{pub.title}</DialogTitle>
+                                  <DialogDescription className="text-left">
+                                    Publié par {pub.profiles?.full_name || 'Utilisateur supprimé'} le {new Date(pub.created_at).toLocaleDateString('fr-FR')}
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-3 text-left">
+                                  <div><strong>Type:</strong> {pub.content_type}</div>
+                                  <div><strong>Status:</strong> {pub.is_public ? 'Public' : 'Privé'}</div>
+                                  <div>
+                                    <strong>Engagement:</strong> {pub.likes_count} likes, {pub.comments_count} commentaires, {pub.views_count} vues
+                                  </div>
+                                  <div><strong>Auteur:</strong> {pub.profiles?.full_name || 'Utilisateur supprimé'} (@{pub.profiles?.username || 'N/A'})</div>
+                                  <div><strong>Date de création:</strong> {new Date(pub.created_at).toLocaleString('fr-FR')}</div>
+                                  {pub.description && (
+                                    <div><strong>Description:</strong> {pub.description}</div>
+                                  )}
+                                  {pub.tags && pub.tags.length > 0 && (
+                                    <div><strong>Tags:</strong> {pub.tags.join(', ')}</div>
+                                  )}
+                                </div>
+                              </DialogContent>
+                            </Dialog>
+                            
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEditPublication(pub)}
+                              className="h-8 px-3"
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Modifier
+                            </Button>
+                            
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleReportPublication(pub.id, 'Signalé par l\'administrateur')}
+                              className="h-8 px-3"
+                            >
+                              <Flag className="h-4 w-4 mr-1" />
+                              Signaler
+                            </Button>
+                            
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button size="sm" variant="destructive" className="h-8 px-3">
+                                  <Trash2 className="h-4 w-4 mr-1" />
+                                  Supprimer
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent className="w-[95vw] max-w-md mx-auto">
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Êtes-vous sûr de vouloir supprimer cette publication "{pub.title}" ? Cette action est irréversible.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+                                  <AlertDialogCancel className="w-full sm:w-auto">Annuler</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeletePublication(pub.id)}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90 w-full sm:w-auto"
+                                  >
+                                    Supprimer définitivement
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </div>
                         </div>
-                        <div className="flex flex-col items-end gap-2 shrink-0">
-                          <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                            {pub.content_type}
-                          </span>
-                          <Button
-                            size="sm"
-                            variant={pub.is_public ? "default" : "secondary"}
-                            onClick={() => handleToggleVisibility(pub.id, pub.is_public)}
-                            className="text-xs px-3 py-1 h-7"
-                          >
-                            {pub.is_public ? 'Public' : 'Privé'}
-                          </Button>
-                        </div>
-                      </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
 
-                      {/* Stats */}
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="flex items-center gap-1">
-                          <Heart className="h-4 w-4 text-red-500" />
-                          <span>{pub.likes_count}</span>
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MessageCircle className="h-4 w-4 text-blue-500" />
-                          <span>{pub.comments_count}</span>
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Eye className="h-4 w-4 text-gray-500" />
-                          <span>{pub.views_count}</span>
-                        </span>
-                        <span className="flex items-center gap-1 ml-auto">
-                          <Calendar className="h-4 w-4 text-gray-400" />
-                          <span className="text-xs">
-                            {new Date(pub.created_at).toLocaleDateString('fr-FR')}
-                          </span>
-                        </span>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex justify-end gap-2 pt-2 border-t">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button size="sm" variant="outline" className="h-8 px-3">
-                              <Eye className="h-4 w-4 mr-1" />
-                              Voir
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="w-[95vw] max-w-lg mx-auto max-h-[80vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle className="text-left pr-8">{pub.title}</DialogTitle>
-                              <DialogDescription className="text-left">
-                                Publié par {pub.profiles?.full_name || 'Utilisateur supprimé'} le {new Date(pub.created_at).toLocaleDateString('fr-FR')}
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="space-y-3 text-left">
-                              <div><strong>Type:</strong> {pub.content_type}</div>
-                              <div><strong>Status:</strong> {pub.is_public ? 'Public' : 'Privé'}</div>
-                              <div>
-                                <strong>Engagement:</strong> {pub.likes_count} likes, {pub.comments_count} commentaires, {pub.views_count} vues
+                {/* Desktop View - Table */}
+                <div className="hidden lg:block">
+                  <ScrollArea className="w-full">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Titre</TableHead>
+                          <TableHead>Auteur</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Engagement</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredPublications.map((pub) => (
+                          <TableRow key={pub.id}>
+                            <TableCell className="font-medium max-w-xs">
+                              <div className="truncate">{pub.title}</div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-sm">
+                                <div>{pub.profiles?.full_name || 'Utilisateur supprimé'}</div>
+                                <div className="text-gray-500">@{pub.profiles?.username || 'N/A'}</div>
                               </div>
-                              <div><strong>Auteur:</strong> {pub.profiles?.full_name || 'Utilisateur supprimé'} (@{pub.profiles?.username || 'N/A'})</div>
-                              <div><strong>Date de création:</strong> {new Date(pub.created_at).toLocaleString('fr-FR')}</div>
-                              {pub.description && (
-                                <div><strong>Description:</strong> {pub.description}</div>
-                              )}
-                              {pub.tags && pub.tags.length > 0 && (
-                                <div><strong>Tags:</strong> {pub.tags.join(', ')}</div>
-                              )}
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                        
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEditPublication(pub)}
-                          className="h-8 px-3"
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Modifier
-                        </Button>
-                        
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleReportPublication(pub.id, 'Signalé par l\'administrateur')}
-                          className="h-8 px-3"
-                        >
-                          <Flag className="h-4 w-4 mr-1" />
-                          Signaler
-                        </Button>
-                        
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button size="sm" variant="destructive" className="h-8 px-3">
-                              <Trash2 className="h-4 w-4 mr-1" />
-                              Supprimer
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent className="w-[95vw] max-w-md mx-auto">
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Êtes-vous sûr de vouloir supprimer cette publication "{pub.title}" ? Cette action est irréversible.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
-                              <AlertDialogCancel className="w-full sm:w-auto">Annuler</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDeletePublication(pub.id)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 w-full sm:w-auto"
+                            </TableCell>
+                            <TableCell>
+                              <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                                {pub.content_type}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                size="sm"
+                                variant={pub.is_public ? "default" : "secondary"}
+                                onClick={() => handleToggleVisibility(pub.id, pub.is_public)}
                               >
-                                Supprimer définitivement
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+                                {pub.is_public ? 'Public' : 'Privé'}
+                              </Button>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-4 text-sm">
+                                <span className="flex items-center gap-1">
+                                  <Heart className="h-4 w-4 text-red-500" />
+                                  {pub.likes_count}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <MessageCircle className="h-4 w-4 text-blue-500" />
+                                  {pub.comments_count}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Eye className="h-4 w-4 text-gray-500" />
+                                  {pub.views_count}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-sm">
+                                {new Date(pub.created_at).toLocaleDateString('fr-FR')}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button size="sm" variant="outline">
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                    <DialogHeader>
+                                      <DialogTitle>{pub.title}</DialogTitle>
+                                      <DialogDescription>
+                                        Publié par {pub.profiles?.full_name || 'Utilisateur supprimé'} le {new Date(pub.created_at).toLocaleDateString('fr-FR')}
+                                      </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="space-y-3">
+                                      <div><strong>Type:</strong> {pub.content_type}</div>
+                                      <div><strong>Status:</strong> {pub.is_public ? 'Public' : 'Privé'}</div>
+                                      <div>
+                                        <strong>Engagement:</strong> {pub.likes_count} likes, {pub.comments_count} commentaires, {pub.views_count} vues
+                                      </div>
+                                      <div><strong>Auteur:</strong> {pub.profiles?.full_name || 'Utilisateur supprimé'} (@{pub.profiles?.username || 'N/A'})</div>
+                                      <div><strong>Date de création:</strong> {new Date(pub.created_at).toLocaleString('fr-FR')}</div>
+                                      {pub.description && (
+                                        <div><strong>Description:</strong> {pub.description}</div>
+                                      )}
+                                      {pub.tags && pub.tags.length > 0 && (
+                                        <div><strong>Tags:</strong> {pub.tags.join(', ')}</div>
+                                      )}
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
+                                
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleEditPublication(pub)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleReportPublication(pub.id, 'Signalé par l\'administrateur')}
+                                >
+                                  <Flag className="h-4 w-4" />
+                                </Button>
+                                
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button size="sm" variant="destructive">
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Êtes-vous sûr de vouloir supprimer cette publication "{pub.title}" ? Cette action est irréversible.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                      <AlertDialogAction
+                                        onClick={() => handleDeletePublication(pub.id)}
+                                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      >
+                                        Supprimer définitivement
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </ScrollArea>
+                </div>
+              </>
             )}
           </div>
         </CardContent>
