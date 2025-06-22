@@ -24,16 +24,20 @@ const SubscriptionButton = () => {
     e.preventDefault();
     e.stopPropagation();
     
-    if (isProcessing) return;
+    if (isProcessing) {
+      console.log('Already processing, ignoring click');
+      return;
+    }
     
+    console.log('=== SUBSCRIPTION BUTTON CLICKED ===');
     setIsProcessing(true);
     
     try {
-      console.log('Subscribe button clicked - starting process');
+      console.log('Step 1: Checking user authentication...');
       
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        console.log('User not authenticated');
+        console.log('ERROR: User not authenticated');
         toast({
           title: "Connexion requise",
           description: "Veuillez vous connecter pour vous abonner",
@@ -43,35 +47,47 @@ const SubscriptionButton = () => {
         return;
       }
 
-      console.log('User authenticated, creating checkout session');
+      console.log('Step 2: User authenticated, creating checkout session...');
+      console.log('User:', { id: user.id, email: user.email });
       
       toast({
         title: "Redirection vers le paiement...",
         description: "Veuillez patienter",
       });
       
+      console.log('Step 3: Calling create-checkout function...');
       const { data, error } = await supabase.functions.invoke('create-checkout');
       
       if (error) {
-        console.error('Checkout error:', error);
+        console.error('Step 3 ERROR: Checkout error:', error);
         throw new Error(error.message || 'Erreur lors de la création de la session de paiement');
       }
       
       if (!data?.url) {
+        console.error('Step 3 ERROR: No URL received in response:', data);
         throw new Error('URL de paiement non reçue');
       }
       
-      console.log('Checkout session created, redirecting to:', data.url);
+      console.log('Step 4: Checkout session created successfully');
+      console.log('Redirect URL:', data.url);
       
-      // Utiliser la nouvelle fonction de redirection mobile
-      handleMobileRedirect(data.url, 'Redirection vers le paiement en cours...');
+      // Tenter la redirection
+      console.log('Step 5: Attempting redirection...');
+      const redirectSuccess = handleMobileRedirect(data.url, 'Redirection vers le paiement en cours...');
       
-      // Réinitialiser après un délai pour éviter que le bouton reste bloqué
-      setTimeout(() => {
+      if (redirectSuccess) {
+        console.log('Step 5: Redirection initiated successfully');
+        // Garder le loading pendant un moment car la page va changer
+        setTimeout(() => {
+          setIsProcessing(false);
+        }, 5000);
+      } else {
+        console.log('Step 5: Redirection failed');
         setIsProcessing(false);
-      }, 3000);
+      }
       
     } catch (error) {
+      console.error('=== SUBSCRIPTION ERROR ===');
       console.error('Complete error in handleSubscribe:', error);
       setIsProcessing(false);
       
@@ -81,6 +97,8 @@ const SubscriptionButton = () => {
       } else if (typeof error === 'string') {
         errorMessage = error;
       }
+      
+      console.error('Final error message:', errorMessage);
       
       toast({
         title: "Erreur de paiement",
