@@ -23,10 +23,11 @@ export const useUserProfile = (userId?: string) => {
       return data;
     },
     enabled: !!targetUserId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000, // 10 minutes
     refetchInterval: false,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    refetchOnReconnect: false,
   });
 
   const updateProfileMutation = useMutation({
