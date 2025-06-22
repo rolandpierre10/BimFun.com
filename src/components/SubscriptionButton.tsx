@@ -66,7 +66,10 @@ const SubscriptionButton = () => {
       // Utiliser la nouvelle fonction de redirection mobile
       handleMobileRedirect(data.url, 'Redirection vers le paiement en cours...');
       
-      // Ne pas réinitialiser isProcessing ici car la redirection va interrompre l'exécution
+      // Réinitialiser après un délai pour éviter que le bouton reste bloqué
+      setTimeout(() => {
+        setIsProcessing(false);
+      }, 3000);
       
     } catch (error) {
       console.error('Complete error in handleSubscribe:', error);
@@ -86,17 +89,6 @@ const SubscriptionButton = () => {
       });
     }
   };
-
-  // Réinitialiser l'état de traitement si le composant se remonte (ex: retour de page)
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      if (isProcessing) {
-        setIsProcessing(false);
-      }
-    }, 10000); // Timeout après 10 secondes
-
-    return () => clearTimeout(timer);
-  }, [isProcessing]);
 
   if (subscribed) {
     return (
