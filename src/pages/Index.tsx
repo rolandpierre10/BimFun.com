@@ -55,11 +55,11 @@ const Index = () => {
     if (isProcessing) return;
     
     setIsProcessing(true);
-    console.log('Start Now button clicked on mobile');
+    console.log('Start Now button clicked');
     
     try {
       if (user) {
-        console.log('User authenticated, creating checkout session for mobile');
+        console.log('User authenticated, creating checkout session');
         
         // Vérifier que l'utilisateur est toujours connecté
         const { data: { user: currentUser } } = await supabase.auth.getUser();
@@ -93,7 +93,7 @@ const Index = () => {
         
         console.log('Checkout session created, redirecting to:', data.url);
         
-        // Redirection directe pour mobile - dans le même onglet
+        // Redirection directe - même onglet pour mobile et desktop
         window.location.href = data.url;
         
       } else {
@@ -179,7 +179,7 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Section Services */}
+          {/* Section Services - Affichage complet sur toutes les tailles d'écran */}
           <section id="services" className="mb-12 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 text-center px-2">{t('home.servicesTitle')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -474,17 +474,17 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Section Subscription */}
+          {/* Section Subscription - Affichage complet sur toutes les tailles */}
           <section id="subscription" className="mb-12 sm:mb-16">
             <div className="space-y-6">
-              {/* Bouton d'abonnement mobile */}
+              {/* Bouton d'abonnement pour tous les écrans */}
               {user && (
-                <div className="block lg:hidden">
+                <div className="w-full">
                   <SubscriptionButton />
                 </div>
               )}
 
-              {/* Layout principal avec feed */}
+              {/* Layout principal avec feed - Affiché sur toutes les tailles */}
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
                 {/* Sidebar desktop uniquement */}
                 <div className="hidden lg:block lg:col-span-1">

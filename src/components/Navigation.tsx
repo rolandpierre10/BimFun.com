@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
@@ -69,8 +70,8 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             </Link>
           </div>
           
-          {/* Mobile Menu */}
-          <div className="flex lg:hidden items-center gap-2 sm:gap-3 flex-shrink-0 ml-auto">
+          {/* Mobile Menu - Always show all elements */}
+          <div className="flex md:hidden items-center gap-2 sm:gap-3 flex-shrink-0 ml-auto">
             <LanguageSelector />
             
             {user && (
@@ -193,8 +194,8 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             </Drawer>
           </div>
           
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-6 flex-1 justify-center">
+          {/* Desktop/Tablet Navigation - Show from medium screens and up */}
+          <div className="hidden md:flex items-center space-x-6 flex-1 justify-center">
             <button
               onClick={() => scrollToSection('services')}
               className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
@@ -221,8 +222,8 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             </Link>
           </div>
           
-          {/* Desktop User Menu */}
-          <div className="hidden lg:flex items-center space-x-4">
+          {/* Desktop/Tablet User Menu */}
+          <div className="hidden md:flex items-center space-x-4">
             <LanguageSelector />
             
             {user ? (
