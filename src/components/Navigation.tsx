@@ -48,12 +48,12 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 sm:h-20 lg:h-24">
           {/* Logo */}
-          <div className="flex-shrink-0 w-auto max-w-[50%] overflow-hidden">
+          <div className="flex-shrink-0 w-auto max-w-[30%] overflow-hidden">
             <Link to="/" className="block">
               <img 
                 src="/lovable-uploads/645f62d9-970f-4252-8a69-4c1f8ffe6dd0.png" 
                 alt="BimFun Logo" 
-                className="h-10 sm:h-10 lg:h-14 xl:h-16 w-auto max-w-full hover:opacity-80 transition-opacity object-contain"
+                className="h-8 sm:h-10 lg:h-14 xl:h-16 w-auto max-w-full hover:opacity-80 transition-opacity object-contain"
               />
             </Link>
           </div>
@@ -139,9 +139,9 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
             )}
           </div>
 
-          {/* Mobile Menu - More Visible */}
-          <div className="flex lg:hidden items-center gap-2 flex-shrink-0">
-            {/* Language Selector - Full Size on Mobile */}
+          {/* Mobile Menu - Closer to Logo */}
+          <div className="flex lg:hidden items-center gap-1 flex-shrink-0">
+            {/* Language Selector */}
             <div className="flex items-center">
               <LanguageSelector />
             </div>
@@ -155,7 +155,7 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
               </Link>
             )}
             
-            {/* Menu Button - More Visible */}
+            {/* Menu Button */}
             <Drawer open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <DrawerTrigger asChild>
                 <Button variant="outline" size="sm" className="p-2 min-w-[36px] h-9 border-gray-300">
