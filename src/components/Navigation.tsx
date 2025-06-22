@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from '@/contexts/AuthContext';
 import { MessageCircle, User, LogOut, Shield, Menu, X } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import LanguageSelector from './LanguageSelector';
 import {
   Drawer,
   DrawerClose,
@@ -86,6 +87,8 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
           
           {/* Desktop User Menu */}
           <div className="hidden lg:flex items-center space-x-4">
+            <LanguageSelector />
+            
             {user ? (
               <>
                 <Link to="/dashboard">
@@ -137,6 +140,8 @@ const Navigation = ({ onOpenAuth }: NavigationProps) => {
 
           {/* Mobile Menu - Visible sur tablette et mobile */}
           <div className="flex lg:hidden items-center space-x-2">
+            <LanguageSelector />
+            
             {user && (
               <Link to="/dashboard">
                 <Button variant="ghost" size="sm" className="p-2">
