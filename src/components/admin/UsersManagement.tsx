@@ -5,9 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Users, AlertTriangle, Crown, Shield, UserCheck } from 'lucide-react';
+import { Users, AlertTriangle, Crown, Shield, UserCheck, RefreshCw } from 'lucide-react';
 import UserOnlineStatus from '@/components/UserOnlineStatus';
 import FollowButton from '@/components/FollowButton';
 
@@ -27,13 +26,14 @@ interface UsersManagementProps {
   users: User[];
   onUserAction: (userId: string, action: 'ban' | 'unban' | 'warn' | 'promote' | 'demote') => void;
   onRefresh: () => void;
+  loading?: boolean;
 }
 
-const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, onRefresh }) => {
+const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, onRefresh, loading = false }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
-  const [loading, setLoading] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   console.log('UsersManagement received users:', users);
 
@@ -65,7 +65,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
       return;
     }
 
-    setLoading(userId);
+    setActionLoading(userId);
     try {
       console.log(`Performing action ${action} on user ${userId}`);
       await onUserAction(userId, action);
@@ -77,11 +77,11 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
         variant: "destructive",
       });
     } finally {
-      setLoading(null);
+      setActionLoading(null);
     }
   };
 
-  if (!users || users.length === 0) {
+  if (loading) {
     return (
       <Card>
         <CardHeader>
@@ -92,13 +92,44 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
-            <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">Aucun utilisateur trouvé</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-500">Chargement des utilisateurs...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!users || users.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Users className="h-5 w-5" />
+              <span>Gestion des Utilisateurs</span>
+            </div>
             <Button 
               onClick={onRefresh} 
               variant="outline" 
-              className="mt-4"
+              size="sm"
+              disabled={loading}
             >
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Actualiser
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 mb-4">Aucun utilisateur trouvé</p>
+            <Button 
+              onClick={onRefresh} 
+              variant="outline" 
+              disabled={loading}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
               Actualiser
             </Button>
           </div>
@@ -115,7 +146,13 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
             <Users className="h-5 w-5" />
             <span>Gestion des Utilisateurs ({users.length})</span>
           </div>
-          <Button onClick={onRefresh} variant="outline" size="sm">
+          <Button 
+            onClick={onRefresh} 
+            variant="outline" 
+            size="sm"
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Actualiser
           </Button>
         </CardTitle>
@@ -158,7 +195,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                         size="sm"
                         variant="outline"
                         onClick={() => handleUserAction(userItem.id, 'warn')}
-                        disabled={loading === userItem.id}
+                        disabled={actionLoading === userItem.id}
                         className="flex items-center space-x-1"
                       >
                         <AlertTriangle className="h-3 w-3" />
@@ -169,7 +206,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                           size="sm"
                           variant="secondary"
                           onClick={() => handleUserAction(userItem.id, 'promote')}
-                          disabled={loading === userItem.id}
+                          disabled={actionLoading === userItem.id}
                           className="flex items-center space-x-1"
                         >
                           <Crown className="h-3 w-3" />
@@ -181,7 +218,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                           size="sm"
                           variant="outline"
                           onClick={() => handleUserAction(userItem.id, 'demote')}
-                          disabled={loading === userItem.id}
+                          disabled={actionLoading === userItem.id}
                           className="flex items-center space-x-1"
                         >
                           <Shield className="h-3 w-3" />
@@ -235,7 +272,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                           size="sm"
                           variant="outline"
                           onClick={() => handleUserAction(userItem.id, 'warn')}
-                          disabled={loading === userItem.id}
+                          disabled={actionLoading === userItem.id}
                           className="flex items-center space-x-1"
                         >
                           <AlertTriangle className="h-4 w-4" />
@@ -246,7 +283,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                             size="sm"
                             variant="secondary"
                             onClick={() => handleUserAction(userItem.id, 'promote')}
-                            disabled={loading === userItem.id}
+                            disabled={actionLoading === userItem.id}
                             className="flex items-center space-x-1"
                           >
                             <Crown className="h-4 w-4" />
@@ -258,7 +295,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                             size="sm"
                             variant="outline"
                             onClick={() => handleUserAction(userItem.id, 'demote')}
-                            disabled={loading === userItem.id}
+                            disabled={actionLoading === userItem.id}
                             className="flex items-center space-x-1"
                           >
                             <Shield className="h-4 w-4" />

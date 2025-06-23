@@ -42,6 +42,7 @@ const AdminDashboard = () => {
   const [publications, setPublications] = useState<any[]>([]);
   const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [usersLoading, setUsersLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
@@ -56,10 +57,14 @@ const AdminDashboard = () => {
       console.log('Loading admin dashboard data...');
       await Promise.all([
         loadStats(),
-        loadUsers(),
         loadPublications(),
         loadReports()
       ]);
+      
+      // Charger les utilisateurs seulement si l'onglet est actif
+      if (activeTab === 'users') {
+        await loadUsers();
+      }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
       toast({
@@ -74,7 +79,7 @@ const AdminDashboard = () => {
 
   const loadStats = async () => {
     try {
-      console.log('Attempting to load stats...');
+      console.log('Loading stats...');
       
       const [usersCount, pubsCount, subsCount, reportsCount] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact' }),
@@ -107,20 +112,16 @@ const AdminDashboard = () => {
   };
 
   const loadUsers = async () => {
+    if (usersLoading) return;
+    
+    setUsersLoading(true);
     try {
       console.log('Loading users...');
       
       // Charger les profils
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          id,
-          full_name,
-          username,
-          created_at,
-          posts_count,
-          followers_count
-        `)
+        .select('id, full_name, username, created_at, posts_count, followers_count')
         .order('created_at', { ascending: false })
         .limit(100);
 
@@ -131,6 +132,7 @@ const AdminDashboard = () => {
           description: "Impossible de charger les profils utilisateurs",
           variant: "destructive",
         });
+        setUsers([]);
         return;
       }
       
@@ -155,17 +157,17 @@ const AdminDashboard = () => {
       console.log('Roles data:', rolesData);
       console.log('Subscriptions data:', subscriptionsData);
 
-      const formattedUsers: AdminUser[] = profilesData.map(user => {
-        const userRole = rolesData.find(r => r.user_id === user.id);
-        const userSub = subscriptionsData.find(s => s.user_id === user.id);
+      const formattedUsers: AdminUser[] = profilesData.map(userProfile => {
+        const userRole = rolesData.find(r => r.user_id === userProfile.id);
+        const userSub = subscriptionsData.find(s => s.user_id === userProfile.id);
         
         return {
-          id: user.id,
-          full_name: user.full_name || 'Utilisateur',
-          username: user.username || 'utilisateur',
-          created_at: user.created_at,
-          posts_count: user.posts_count || 0,
-          followers_count: user.followers_count || 0,
+          id: userProfile.id,
+          full_name: userProfile.full_name || 'Utilisateur',
+          username: userProfile.username || 'utilisateur',
+          created_at: userProfile.created_at,
+          posts_count: userProfile.posts_count || 0,
+          followers_count: userProfile.followers_count || 0,
           role: userRole?.role || 'user',
           subscribed: userSub?.subscribed || false,
           subscription_tier: userSub?.subscription_tier || 'free'
@@ -182,8 +184,17 @@ const AdminDashboard = () => {
         variant: "destructive",
       });
       setUsers([]);
+    } finally {
+      setUsersLoading(false);
     }
   };
+
+  // Charger les utilisateurs quand l'onglet devient actif
+  useEffect(() => {
+    if (activeTab === 'users' && users.length === 0 && !usersLoading) {
+      loadUsers();
+    }
+  }, [activeTab]);
 
   const loadPublications = async () => {
     try {
@@ -393,7 +404,7 @@ const AdminDashboard = () => {
         <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-lg mb-6 overflow-x-auto">
           {[
             { id: 'overview', label: 'Vue d\'ensemble', icon: TrendingUp },
-            { id: 'users', label: `Utilisateurs (${users.length})`, icon: Users },
+            { id: 'users', label: `Utilisateurs${users.length > 0 ? ` (${users.length})` : ''}`, icon: Users },
             { id: 'publications', label: 'Publications', icon: FileText },
             { id: 'create-publication', label: 'Créer Publication', icon: Plus },
             { id: 'subscriptions', label: 'Abonnements', icon: CreditCard },
@@ -423,6 +434,7 @@ const AdminDashboard = () => {
             users={users} 
             onUserAction={handleUserAction} 
             onRefresh={loadUsers}
+            loading={usersLoading}
           />
         )}
         
