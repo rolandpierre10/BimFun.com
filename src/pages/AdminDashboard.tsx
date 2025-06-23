@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -104,7 +105,7 @@ const AdminDashboard = () => {
   const loadUsers = async () => {
     try {
       console.log('Loading users...');
-      const { data, error } = await supabase
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select(`
           id,
@@ -117,26 +118,39 @@ const AdminDashboard = () => {
         .order('created_at', { ascending: false })
         .limit(50);
 
-      if (error) {
-        console.error('Error loading users:', error);
+      if (profilesError) {
+        console.error('Error loading profiles:', profilesError);
         return;
       }
       
-      const userIds = data?.map(u => u.id) || [];
+      if (!profilesData || profilesData.length === 0) {
+        console.log('No profiles found');
+        setUsers([]);
+        return;
+      }
+
+      const userIds = profilesData.map(u => u.id);
       
-      const [rolesData, subscriptionsData] = await Promise.all([
+      // Chargement des rôles et abonnements en parallèle
+      const [rolesResult, subscriptionsResult] = await Promise.all([
         supabase.from('user_roles').select('user_id, role').in('user_id', userIds),
         supabase.from('subscribers').select('user_id, subscribed, subscription_tier').in('user_id', userIds)
       ]);
 
-      const formattedUsers = data?.map(user => {
-        const userRole = rolesData.data?.find(r => r.user_id === user.id);
-        const userSub = subscriptionsData.data?.find(s => s.user_id === user.id);
+      const rolesData = rolesResult.data || [];
+      const subscriptionsData = subscriptionsResult.data || [];
+
+      console.log('Roles data:', rolesData);
+      console.log('Subscriptions data:', subscriptionsData);
+
+      const formattedUsers: AdminUser[] = profilesData.map(user => {
+        const userRole = rolesData.find(r => r.user_id === user.id);
+        const userSub = subscriptionsData.find(s => s.user_id === user.id);
         
         return {
           id: user.id,
-          full_name: user.full_name || 'N/A',
-          username: user.username || 'N/A',
+          full_name: user.full_name || 'Utilisateur',
+          username: user.username || 'utilisateur',
           created_at: user.created_at,
           posts_count: user.posts_count || 0,
           followers_count: user.followers_count || 0,
@@ -144,12 +158,17 @@ const AdminDashboard = () => {
           subscribed: userSub?.subscribed || false,
           subscription_tier: userSub?.subscription_tier || 'free'
         };
-      }) || [];
+      });
 
-      console.log('Users loaded:', formattedUsers.length);
+      console.log('Formatted users:', formattedUsers);
       setUsers(formattedUsers);
     } catch (error) {
       console.error('Error loading users:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les utilisateurs",
+        variant: "destructive",
+      });
     }
   };
 
@@ -239,6 +258,7 @@ const AdminDashboard = () => {
   };
 
   const handleUserAction = async (userId: string, action: 'ban' | 'unban' | 'warn' | 'promote' | 'demote') => {
+    console.log(`Admin action: ${action} on user ${userId}`);
     await loadUsers(); // Refresh users after action
   };
 
