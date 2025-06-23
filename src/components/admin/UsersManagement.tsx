@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Users, AlertTriangle, Crown, Shield } from 'lucide-react';
+import { Users, AlertTriangle, Crown, Shield, UserCheck } from 'lucide-react';
 import UserOnlineStatus from '@/components/UserOnlineStatus';
 import FollowButton from '@/components/FollowButton';
 
@@ -49,8 +49,17 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
   const handleUserAction = async (userId: string, action: 'ban' | 'unban' | 'warn' | 'promote' | 'demote') => {
     if (!user?.id) {
       toast({
-        title: t('admin.error'),
-        description: t('admin.mustBeLoggedIn'),
+        title: "Erreur",
+        description: "Vous devez être connecté pour effectuer cette action",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (userId === user.id) {
+      toast({
+        title: "Action interdite",
+        description: "Vous ne pouvez pas effectuer d'action sur votre propre compte",
         variant: "destructive",
       });
       return;
@@ -59,72 +68,12 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
     setLoading(userId);
     try {
       console.log(`Performing action ${action} on user ${userId}`);
-      
-      if (action === 'promote') {
-        // Promouvoir l'utilisateur au rôle de modérateur
-        const { error } = await supabase
-          .from('user_roles')
-          .upsert({
-            user_id: userId,
-            role: 'moderator',
-            assigned_by: user.id
-          });
-
-        if (error) {
-          console.error('Error promoting user:', error);
-          throw error;
-        }
-        
-        toast({
-          title: t('admin.userPromoted'),
-          description: t('admin.userPromotedDesc'),
-        });
-      } else if (action === 'demote') {
-        // Rétrograder l'utilisateur au rôle d'utilisateur normal
-        const { error } = await supabase
-          .from('user_roles')
-          .delete()
-          .eq('user_id', userId);
-
-        if (error) {
-          console.error('Error demoting user:', error);
-          throw error;
-        }
-        
-        toast({
-          title: t('admin.userDemoted'),
-          description: t('admin.userDemotedDesc'),
-        });
-      } else if (action === 'warn') {
-        // Actions de modération (warn)
-        const { error } = await supabase
-          .from('moderation_actions')
-          .insert({
-            moderator_id: user.id,
-            target_user_id: userId,
-            action_type: 'warning',
-            reason: `Action ${action} effectuée par l'administrateur`,
-            expires_at: null
-          });
-
-        if (error) {
-          console.error('Error warning user:', error);
-          throw error;
-        }
-
-        toast({
-          title: t('admin.actionPerformed'),
-          description: t('admin.userWarned'),
-        });
-      }
-
-      // Refresh the users list
-      onRefresh();
+      await onUserAction(userId, action);
     } catch (error) {
       console.error('Error performing user action:', error);
       toast({
-        title: t('admin.error'),
-        description: t('admin.cannotPerformAction'),
+        title: "Erreur",
+        description: "Impossible d'effectuer cette action",
         variant: "destructive",
       });
     } finally {
@@ -138,13 +87,20 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Users className="h-5 w-5" />
-            <span>{t('admin.usersManagement')}</span>
+            <span>Gestion des Utilisateurs</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
             <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">{t('admin.noUsersFound')}</p>
+            <p className="text-gray-500">Aucun utilisateur trouvé</p>
+            <Button 
+              onClick={onRefresh} 
+              variant="outline" 
+              className="mt-4"
+            >
+              Actualiser
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -154,9 +110,14 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <Users className="h-5 w-5" />
-          <span>{t('admin.usersManagement')} ({users.length})</span>
+        <CardTitle className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Users className="h-5 w-5" />
+            <span>Gestion des Utilisateurs ({users.length})</span>
+          </div>
+          <Button onClick={onRefresh} variant="outline" size="sm">
+            Actualiser
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -173,6 +134,12 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                         <Badge variant={getRoleBadgeVariant(userItem.role)} className="text-xs">
                           {userItem.role}
                         </Badge>
+                        {userItem.id === user?.id && (
+                          <Badge variant="default" className="text-xs">
+                            <UserCheck className="h-3 w-3 mr-1" />
+                            Vous
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-xs text-gray-600">@{userItem.username}</p>
                     </div>
@@ -180,47 +147,49 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                   </div>
                   
                   <div className="flex justify-between text-xs text-gray-500">
-                    <span>{userItem.posts_count} {t('admin.posts')}</span>
-                    <span>{userItem.followers_count} {t('admin.followers')}</span>
+                    <span>{userItem.posts_count} publications</span>
+                    <span>{userItem.followers_count} abonnés</span>
                   </div>
                   
-                  <div className="flex flex-wrap gap-2">
-                    <FollowButton userId={userItem.id} userName={userItem.full_name} size="sm" variant="outline" />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleUserAction(userItem.id, 'warn')}
-                      disabled={loading === userItem.id}
-                      className="flex items-center space-x-1"
-                    >
-                      <AlertTriangle className="h-3 w-3" />
-                      <span className="text-xs">{t('admin.warn')}</span>
-                    </Button>
-                    {userItem.role === 'user' && (
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => handleUserAction(userItem.id, 'promote')}
-                        disabled={loading === userItem.id}
-                        className="flex items-center space-x-1"
-                      >
-                        <Crown className="h-3 w-3" />
-                        <span className="text-xs">{t('admin.promote')}</span>
-                      </Button>
-                    )}
-                    {userItem.role === 'moderator' && (
+                  {userItem.id !== user?.id && (
+                    <div className="flex flex-wrap gap-2">
+                      <FollowButton userId={userItem.id} userName={userItem.full_name} size="sm" variant="outline" />
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => handleUserAction(userItem.id, 'demote')}
+                        onClick={() => handleUserAction(userItem.id, 'warn')}
                         disabled={loading === userItem.id}
                         className="flex items-center space-x-1"
                       >
-                        <Shield className="h-3 w-3" />
-                        <span className="text-xs">{t('admin.demote')}</span>
+                        <AlertTriangle className="h-3 w-3" />
+                        <span className="text-xs">Avertir</span>
                       </Button>
-                    )}
-                  </div>
+                      {userItem.role === 'user' && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleUserAction(userItem.id, 'promote')}
+                          disabled={loading === userItem.id}
+                          className="flex items-center space-x-1"
+                        >
+                          <Crown className="h-3 w-3" />
+                          <span className="text-xs">Promouvoir</span>
+                        </Button>
+                      )}
+                      {userItem.role === 'moderator' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleUserAction(userItem.id, 'demote')}
+                          disabled={loading === userItem.id}
+                          className="flex items-center space-x-1"
+                        >
+                          <Shield className="h-3 w-3" />
+                          <span className="text-xs">Rétrograder</span>
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </Card>
             ))}
@@ -242,51 +211,61 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
                           {userItem.subscription_tier}
                         </Badge>
                       )}
+                      {userItem.id === user?.id && (
+                        <Badge variant="default">
+                          <UserCheck className="h-3 w-3 mr-1" />
+                          Vous
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm text-gray-600">@{userItem.username}</p>
                     <div className="flex space-x-4 text-sm text-gray-500">
-                      <span>{userItem.posts_count} {t('admin.publications')}</span>
-                      <span>{userItem.followers_count} {t('admin.followers')}</span>
-                      <span>{t('admin.subscribedSince')} {new Date(userItem.created_at).toLocaleDateString('fr-FR')}</span>
+                      <span>{userItem.posts_count} publications</span>
+                      <span>{userItem.followers_count} abonnés</span>
+                      <span>Inscrit le {new Date(userItem.created_at).toLocaleDateString('fr-FR')}</span>
                     </div>
                   </div>
                   
                   <div className="flex space-x-2 items-center">
-                    <FollowButton userId={userItem.id} userName={userItem.full_name} size="sm" variant="outline" />
                     <UserOnlineStatus userId={userItem.id} showAsButton={true} />
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleUserAction(userItem.id, 'warn')}
-                      disabled={loading === userItem.id}
-                      className="flex items-center space-x-1"
-                    >
-                      <AlertTriangle className="h-4 w-4" />
-                      <span>{t('admin.warn')}</span>
-                    </Button>
-                    {userItem.role === 'user' && (
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => handleUserAction(userItem.id, 'promote')}
-                        disabled={loading === userItem.id}
-                        className="flex items-center space-x-1"
-                      >
-                        <Crown className="h-4 w-4" />
-                        <span>{t('admin.promote')}</span>
-                      </Button>
-                    )}
-                    {userItem.role === 'moderator' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleUserAction(userItem.id, 'demote')}
-                        disabled={loading === userItem.id}
-                        className="flex items-center space-x-1"
-                      >
-                        <Shield className="h-4 w-4" />
-                        <span>{t('admin.demote')}</span>
-                      </Button>
+                    {userItem.id !== user?.id && (
+                      <>
+                        <FollowButton userId={userItem.id} userName={userItem.full_name} size="sm" variant="outline" />
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleUserAction(userItem.id, 'warn')}
+                          disabled={loading === userItem.id}
+                          className="flex items-center space-x-1"
+                        >
+                          <AlertTriangle className="h-4 w-4" />
+                          <span>Avertir</span>
+                        </Button>
+                        {userItem.role === 'user' && (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleUserAction(userItem.id, 'promote')}
+                            disabled={loading === userItem.id}
+                            className="flex items-center space-x-1"
+                          >
+                            <Crown className="h-4 w-4" />
+                            <span>Promouvoir</span>
+                          </Button>
+                        )}
+                        {userItem.role === 'moderator' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleUserAction(userItem.id, 'demote')}
+                            disabled={loading === userItem.id}
+                            className="flex items-center space-x-1"
+                          >
+                            <Shield className="h-4 w-4" />
+                            <span>Rétrograder</span>
+                          </Button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

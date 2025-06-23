@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -63,6 +62,11 @@ const AdminDashboard = () => {
       ]);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les données du tableau de bord",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -105,6 +109,8 @@ const AdminDashboard = () => {
   const loadUsers = async () => {
     try {
       console.log('Loading users...');
+      
+      // Charger les profils
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select(`
@@ -116,10 +122,15 @@ const AdminDashboard = () => {
           followers_count
         `)
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(100);
 
       if (profilesError) {
         console.error('Error loading profiles:', profilesError);
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les profils utilisateurs",
+          variant: "destructive",
+        });
         return;
       }
       
@@ -129,9 +140,10 @@ const AdminDashboard = () => {
         return;
       }
 
+      console.log('Profiles loaded:', profilesData.length);
       const userIds = profilesData.map(u => u.id);
       
-      // Chargement des rôles et abonnements en parallèle
+      // Charger les rôles et abonnements en parallèle
       const [rolesResult, subscriptionsResult] = await Promise.all([
         supabase.from('user_roles').select('user_id, role').in('user_id', userIds),
         supabase.from('subscribers').select('user_id, subscribed, subscription_tier').in('user_id', userIds)
@@ -169,6 +181,7 @@ const AdminDashboard = () => {
         description: "Impossible de charger les utilisateurs",
         variant: "destructive",
       });
+      setUsers([]);
     }
   };
 
@@ -258,8 +271,74 @@ const AdminDashboard = () => {
   };
 
   const handleUserAction = async (userId: string, action: 'ban' | 'unban' | 'warn' | 'promote' | 'demote') => {
-    console.log(`Admin action: ${action} on user ${userId}`);
-    await loadUsers(); // Refresh users after action
+    if (!user?.id) {
+      toast({
+        title: "Erreur",
+        description: "Vous devez être connecté pour effectuer cette action",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      console.log(`Admin action: ${action} on user ${userId} by ${user.id}`);
+      
+      if (action === 'promote') {
+        const { error } = await supabase
+          .from('user_roles')
+          .upsert({
+            user_id: userId,
+            role: 'moderator',
+            assigned_by: user.id
+          });
+
+        if (error) throw error;
+        
+        toast({
+          title: "Utilisateur promu",
+          description: "L'utilisateur a été promu modérateur",
+        });
+      } else if (action === 'demote') {
+        const { error } = await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', userId);
+
+        if (error) throw error;
+        
+        toast({
+          title: "Utilisateur rétrogradé",
+          description: "L'utilisateur a été rétrogradé",
+        });
+      } else if (action === 'warn') {
+        const { error } = await supabase
+          .from('moderation_actions')
+          .insert({
+            moderator_id: user.id,
+            target_user_id: userId,
+            action_type: 'warning',
+            reason: `Avertissement donné par l'administrateur`,
+            expires_at: null
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Avertissement envoyé",
+          description: "L'utilisateur a été averti",
+        });
+      }
+
+      // Recharger les utilisateurs après l'action
+      await loadUsers();
+    } catch (error) {
+      console.error('Error performing user action:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'effectuer cette action",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDeletePublication = async (publicationId: string) => {
@@ -314,7 +393,7 @@ const AdminDashboard = () => {
         <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-lg mb-6 overflow-x-auto">
           {[
             { id: 'overview', label: 'Vue d\'ensemble', icon: TrendingUp },
-            { id: 'users', label: 'Utilisateurs', icon: Users },
+            { id: 'users', label: `Utilisateurs (${users.length})`, icon: Users },
             { id: 'publications', label: 'Publications', icon: FileText },
             { id: 'create-publication', label: 'Créer Publication', icon: Plus },
             { id: 'subscriptions', label: 'Abonnements', icon: CreditCard },
