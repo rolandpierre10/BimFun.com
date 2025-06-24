@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -51,6 +52,13 @@ const AdminDashboard = () => {
     }
   }, [user]);
 
+  // Charger les utilisateurs quand l'onglet devient actif
+  useEffect(() => {
+    if (activeTab === 'users' && !usersLoading && users.length === 0) {
+      loadUsers();
+    }
+  }, [activeTab]);
+
   const loadDashboardData = async () => {
     setLoading(true);
     try {
@@ -60,11 +68,6 @@ const AdminDashboard = () => {
         loadPublications(),
         loadReports()
       ]);
-      
-      // Charger les utilisateurs seulement si l'onglet est actif
-      if (activeTab === 'users') {
-        await loadUsers();
-      }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
       toast({
@@ -112,18 +115,18 @@ const AdminDashboard = () => {
   };
 
   const loadUsers = async () => {
-    if (usersLoading) return;
-    
     setUsersLoading(true);
     try {
-      console.log('Loading users...');
+      console.log('Starting to load users...');
       
       // Charger les profils
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, full_name, username, created_at, posts_count, followers_count')
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(100);
+
+      console.log('Profiles query result:', { profilesData, profilesError });
 
       if (profilesError) {
         console.error('Error loading profiles:', profilesError);
@@ -188,13 +191,6 @@ const AdminDashboard = () => {
       setUsersLoading(false);
     }
   };
-
-  // Charger les utilisateurs quand l'onglet devient actif
-  useEffect(() => {
-    if (activeTab === 'users' && users.length === 0 && !usersLoading) {
-      loadUsers();
-    }
-  }, [activeTab]);
 
   const loadPublications = async () => {
     try {

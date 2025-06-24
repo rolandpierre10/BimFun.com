@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/contexts/AuthContext';
 import { Users, AlertTriangle, Crown, Shield, UserCheck, RefreshCw } from 'lucide-react';
@@ -232,82 +233,101 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ users, onUserAction, 
             ))}
           </div>
 
-          {/* Vue desktop */}
-          <div className="hidden md:block space-y-4">
-            {users.map((userItem) => (
-              <div key={userItem.id} className="border rounded-lg p-4 space-y-3">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <h3 className="font-semibold">{userItem.full_name}</h3>
-                      <Badge variant={getRoleBadgeVariant(userItem.role)}>
-                        {userItem.role}
-                      </Badge>
-                      {userItem.subscribed && (
-                        <Badge variant="default">
-                          {userItem.subscription_tier}
+          {/* Vue desktop avec table */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Utilisateur</TableHead>
+                  <TableHead>Rôle</TableHead>
+                  <TableHead>Statistiques</TableHead>
+                  <TableHead>Inscription</TableHead>
+                  <TableHead>Statut</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((userItem) => (
+                  <TableRow key={userItem.id}>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-semibold">{userItem.full_name}</span>
+                          {userItem.id === user?.id && (
+                            <Badge variant="default" className="text-xs">
+                              <UserCheck className="h-3 w-3 mr-1" />
+                              Vous
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600">@{userItem.username}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <Badge variant={getRoleBadgeVariant(userItem.role)}>
+                          {userItem.role}
                         </Badge>
-                      )}
-                      {userItem.id === user?.id && (
-                        <Badge variant="default">
-                          <UserCheck className="h-3 w-3 mr-1" />
-                          Vous
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-600">@{userItem.username}</p>
-                    <div className="flex space-x-4 text-sm text-gray-500">
-                      <span>{userItem.posts_count} publications</span>
-                      <span>{userItem.followers_count} abonnés</span>
-                      <span>Inscrit le {new Date(userItem.created_at).toLocaleDateString('fr-FR')}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex space-x-2 items-center">
-                    <UserOnlineStatus userId={userItem.id} showAsButton={true} />
-                    {userItem.id !== user?.id && (
-                      <>
-                        <FollowButton userId={userItem.id} userName={userItem.full_name} size="sm" variant="outline" />
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleUserAction(userItem.id, 'warn')}
-                          disabled={actionLoading === userItem.id}
-                          className="flex items-center space-x-1"
-                        >
-                          <AlertTriangle className="h-4 w-4" />
-                          <span>Avertir</span>
-                        </Button>
-                        {userItem.role === 'user' && (
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleUserAction(userItem.id, 'promote')}
-                            disabled={actionLoading === userItem.id}
-                            className="flex items-center space-x-1"
-                          >
-                            <Crown className="h-4 w-4" />
-                            <span>Promouvoir</span>
-                          </Button>
+                        {userItem.subscribed && (
+                          <Badge variant="default" className="ml-1">
+                            {userItem.subscription_tier}
+                          </Badge>
                         )}
-                        {userItem.role === 'moderator' && (
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm space-y-1">
+                        <div>{userItem.posts_count} publications</div>
+                        <div>{userItem.followers_count} abonnés</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">
+                        {new Date(userItem.created_at).toLocaleDateString('fr-FR')}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <UserOnlineStatus userId={userItem.id} showAsButton={true} />
+                    </TableCell>
+                    <TableCell>
+                      {userItem.id !== user?.id && (
+                        <div className="flex space-x-2">
+                          <FollowButton userId={userItem.id} userName={userItem.full_name} size="sm" variant="outline" />
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleUserAction(userItem.id, 'demote')}
+                            onClick={() => handleUserAction(userItem.id, 'warn')}
                             disabled={actionLoading === userItem.id}
-                            className="flex items-center space-x-1"
                           >
-                            <Shield className="h-4 w-4" />
-                            <span>Rétrograder</span>
+                            <AlertTriangle className="h-4 w-4" />
                           </Button>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
+                          {userItem.role === 'user' && (
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => handleUserAction(userItem.id, 'promote')}
+                              disabled={actionLoading === userItem.id}
+                            >
+                              <Crown className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {userItem.role === 'moderator' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleUserAction(userItem.id, 'demote')}
+                              disabled={actionLoading === userItem.id}
+                            >
+                              <Shield className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         </div>
       </CardContent>
